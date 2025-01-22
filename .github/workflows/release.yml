@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   release:
-    runs-on: nscloud-ubuntu-22.04-amd64-8x8
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,9 +55,6 @@ jobs:
         with:
           scope: FriendsOfShopware/nur-packages
           identity: release
-
-      - name: Login into Github Docker Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Login into Docker Hub
         run: echo "${{ secrets.DOCKER_HUB_SHOPWARE_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_HUB_SHOPWARE_USERNAME }} --password-stdin
