@@ -49,6 +49,14 @@ dockers:
     goos: linux
     goarch: amd64
     image_templates:
+      - "shopware/shopware-cli:{{ .Tag }}-php-8.4-amd64"
+    build_flag_templates:
+      - "--build-arg=PHP_VERSION=8.4"
+      - "--platform=linux/amd64"
+  - use: buildx
+    goos: linux
+    goarch: amd64
+    image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
     build_flag_templates:
       - "--build-arg=PHP_VERSION=8.3"
@@ -71,6 +79,14 @@ dockers:
       - "--platform=linux/amd64"
 
   # ARM64
+  - use: buildx
+    goos: linux
+    goarch: arm64
+    image_templates:
+      - "shopware/shopware-cli:{{ .Tag }}-php-8.4-arm64"
+    build_flag_templates:
+      - "--build-arg=PHP_VERSION=8.4"
+      - "--platform=linux/arm64"
   - use: buildx
     goos: linux
     goarch: arm64
@@ -118,8 +134,13 @@ docker_manifests:
   # Shopware Docker Hub
   - name_template: shopware/shopware-cli:latest
     image_templates:
-      - "shopware/shopware-cli:{{ .Tag }}-php-8.2-amd64"
-      - "shopware/shopware-cli:{{ .Tag }}-php-8.2-arm64"
+      - "shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
+      - "shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
+
+  - name_template: shopware/shopware-cli:latest-php-8.4
+    image_templates:
+      - "shopware/shopware-cli:{{ .Tag }}-php-8.4-amd64"
+      - "shopware/shopware-cli:{{ .Tag }}-php-8.4-arm64"
 
   - name_template: shopware/shopware-cli:latest-php-8.3
     image_templates:
