@@ -49,10 +49,6 @@ var projectCreateCmd = &cobra.Command{
 			return fmt.Errorf("the folder %s exists already", projectFolder)
 		}
 
-		if err := os.Mkdir(projectFolder, os.ModePerm); err != nil {
-			return err
-		}
-
 		logging.FromContext(cmd.Context()).Infof("Using Symfony Flex to create a new Shopware 6 project")
 
 		filteredVersions, err := getFilteredInstallVersions(cmd.Context())
@@ -77,16 +73,23 @@ var projectCreateCmd = &cobra.Command{
 
 		chooseVersion := ""
 
-		for _, release := range filteredVersions {
-			if release.String() == result {
-				chooseVersion = release.String()
-				break
+		if result == "latest" {
+			chooseVersion = filteredVersions[0].String()
+		} else {
+			for _, release := range filteredVersions {
+				if release.String() == result {
+					chooseVersion = release.String()
+					break
+				}
 			}
 		}
 
 		if chooseVersion == "" {
-			_ = os.RemoveAll(projectFolder)
 			return fmt.Errorf("cannot find version %s", result)
+		}
+
+		if err := os.Mkdir(projectFolder, os.ModePerm); err != nil {
+			return err
 		}
 
 		logging.FromContext(cmd.Context()).Infof("Setting up Shopware %s", chooseVersion)
@@ -123,7 +126,6 @@ var projectCreateCmd = &cobra.Command{
 		logging.FromContext(cmd.Context()).Infof("Installing dependencies")
 
 		composerBinary, err := exec.LookPath("composer")
-
 		if err != nil {
 			return err
 		}
@@ -284,7 +286,6 @@ func generateComposerJson(version string, rc bool) (string, error) {
 		Version: version,
 		RC:      rc,
 	})
-
 	if err != nil {
 		return "", err
 	}
