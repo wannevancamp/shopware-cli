@@ -29,6 +29,7 @@ require (
 	go.uber.org/zap v1.27.0
 	golang.org/x/text v0.21.0
 	gopkg.in/yaml.v3 v3.0.1
+	github.com/go-sql-driver/mysql v1.8.1
 )
 
 require github.com/otiai10/mint v1.6.3 // indirect
@@ -43,7 +44,6 @@ require (
 	github.com/chzyer/readline v1.5.1 // indirect
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/go-sql-driver/mysql v1.8.1 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
