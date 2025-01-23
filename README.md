@@ -9,7 +9,7 @@ A cli which contains handy helpful commands for daily Shopware tasks
 - Manage your Shopware account extensions in the CLI
 - Build and validate Shopware extensions
 
-For docs see [here](https://sw-cli.fos.gg/)
+For docs see [here](https://developer.shopware.com/docs/products/cli/)
 
 ## Contributing
 
