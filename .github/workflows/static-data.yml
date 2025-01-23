@@ -6,6 +6,8 @@ on:
         paths:
             - 'static-data/**'
     workflow_dispatch:
+    schedule:
+        - cron: '0 5 * * *'
 
 permissions:
     contents: read
