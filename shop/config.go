@@ -2,11 +2,12 @@ package shop
 
 import (
 	"fmt"
-	"github.com/invopop/jsonschema"
-	orderedmap "github.com/wk8/go-ordered-map/v2"
 	"os"
 	"path"
 	"strings"
+
+	"github.com/invopop/jsonschema"
+	orderedmap "github.com/wk8/go-ordered-map/v2"
 
 	"dario.cat/mergo"
 
@@ -43,6 +44,8 @@ type ConfigBuild struct {
 	Browserslist string `yaml:"browserslist,omitempty"`
 	// Extensions to exclude from the build
 	ExcludeExtensions []string `yaml:"exclude_extensions,omitempty"`
+	// When enabled, the storefront build will be skipped
+	DisableStorefrontBuild bool `yaml:"disable_storefront_build,omitempty"`
 }
 
 type ConfigAdminApi struct {
@@ -313,7 +316,6 @@ func NewUuid() string {
 
 func DefaultConfigFileName() string {
 	currentDir, err := os.Getwd()
-
 	if err != nil {
 		return ".shopware-project.yml"
 	}

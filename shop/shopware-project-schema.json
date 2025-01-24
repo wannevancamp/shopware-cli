@@ -95,6 +95,10 @@
           },
           "type": "array",
           "description": "Extensions to exclude from the build"
+        },
+        "disable_storefront_build": {
+          "type": "boolean",
+          "description": "When enabled, the storefront build will be skipped"
         }
       },
       "additionalProperties": false,
