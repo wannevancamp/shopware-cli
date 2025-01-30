@@ -24,6 +24,48 @@ const testAppManifest = `<?xml version="1.0" encoding="UTF-8"?>
 	</meta>
 </manifest>`
 
+const testAppManifestMissingLicense = `<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/Framework/App/Manifest/Schema/manifest-2.0.xsd">
+	<meta>
+		<name>MyExampleApp</name>
+		<label>Label</label>
+		<label lang="de-DE">Name</label>
+		<description>A description</description>
+		<description lang="de-DE">Eine Beschreibung</description>
+		<author>Your Company Ltd.</author>
+		<copyright>(c) by Your Company Ltd.</copyright>
+		<version>1.0.0</version>
+	</meta>
+</manifest>`
+
+const testAppManifestMissingCopyright = `<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/Framework/App/Manifest/Schema/manifest-2.0.xsd">
+	<meta>
+		<name>MyExampleApp</name>
+		<label>Label</label>
+		<label lang="de-DE">Name</label>
+		<description>A description</description>
+		<description lang="de-DE">Eine Beschreibung</description>
+		<author>Your Company Ltd.</author>
+		<version>1.0.0</version>
+		<license>MIT</license>
+	</meta>
+</manifest>`
+
+const testAppManifestMissingAuthor = `<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/Framework/App/Manifest/Schema/manifest-2.0.xsd">
+	<meta>
+		<name>MyExampleApp</name>
+		<label>Label</label>
+		<label lang="de-DE">Name</label>
+		<description>A description</description>
+		<description lang="de-DE">Eine Beschreibung</description>
+		<copyright>(c) by Your Company Ltd.</copyright>
+		<version>1.0.0</version>
+		<license>MIT</license>
+	</meta>
+</manifest>`
+
 const testAppManifestCompatibility = `<?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/Framework/App/Manifest/Schema/manifest-2.0.xsd">
 	<meta>
@@ -56,6 +98,25 @@ const testAppManifestIcon = `<?xml version="1.0" encoding="UTF-8"?>
 	</meta>
 </manifest>`
 
+const testAppManifestSetup = `<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/Framework/App/Manifest/Schema/manifest-2.0.xsd">
+	<meta>
+		<name>MyExampleApp</name>
+		<label>Label</label>
+		<label lang="de-DE">Name</label>
+		<description>A description</description>
+		<description lang="de-DE">Eine Beschreibung</description>
+		<compatibility>~6.5.0</compatibility>
+		<author>Your Company Ltd.</author>
+		<copyright>(c) by Your Company Ltd.</copyright>
+		<version>1.0.0</version>
+		<license>MIT</license>
+	</meta>
+	<setup>
+		<secret>foo</secret>
+	</setup>
+</manifest>`
+
 func TestIconNotExists(t *testing.T) {
 	appPath := t.TempDir()
 
@@ -75,13 +136,85 @@ func TestIconNotExists(t *testing.T) {
 	assert.Equal(t, "Cannot find app icon at Resources/config/plugin.png", ctx.errors[0])
 }
 
+func TestAppNoLicense(t *testing.T) {
+	appPath := t.TempDir()
+
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "manifest.xml"), []byte(testAppManifestMissingLicense), os.ModePerm))
+	assert.NoError(t, os.MkdirAll(path.Join(appPath, "Resources/config"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+
+	app, err := newApp(appPath)
+
+	assert.NoError(t, err)
+
+	ctx := newValidationContext(app)
+	app.Validate(getTestContext(), ctx)
+
+	assert.Equal(t, 1, len(ctx.errors))
+	assert.Equal(t, "The element meta:license was not found in the manifest.xml", ctx.errors[0])
+}
+
+func TestAppNoCopyright(t *testing.T) {
+	appPath := t.TempDir()
+
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "manifest.xml"), []byte(testAppManifestMissingCopyright), os.ModePerm))
+	assert.NoError(t, os.MkdirAll(path.Join(appPath, "Resources/config"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+
+	app, err := newApp(appPath)
+
+	assert.NoError(t, err)
+
+	ctx := newValidationContext(app)
+	app.Validate(getTestContext(), ctx)
+
+	assert.Equal(t, 1, len(ctx.errors))
+	assert.Equal(t, "The element meta:copyright was not found in the manifest.xml", ctx.errors[0])
+}
+
+func TestAppNoAuthor(t *testing.T) {
+	appPath := t.TempDir()
+
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "manifest.xml"), []byte(testAppManifestMissingAuthor), os.ModePerm))
+	assert.NoError(t, os.MkdirAll(path.Join(appPath, "Resources/config"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+
+	app, err := newApp(appPath)
+
+	assert.NoError(t, err)
+
+	ctx := newValidationContext(app)
+	app.Validate(getTestContext(), ctx)
+
+	assert.Equal(t, 1, len(ctx.errors))
+	assert.Equal(t, "The element meta:author was not found in the manifest.xml", ctx.errors[0])
+}
+
+func TestAppHasSecret(t *testing.T) {
+	appPath := t.TempDir()
+
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "manifest.xml"), []byte(testAppManifestSetup), os.ModePerm))
+	assert.NoError(t, os.MkdirAll(path.Join(appPath, "Resources/config"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+
+	app, err := newApp(appPath)
+
+	assert.NoError(t, err)
+
+	ctx := newValidationContext(app)
+	app.Validate(getTestContext(), ctx)
+
+	assert.Equal(t, 1, len(ctx.errors))
+	assert.Equal(t, "The xml element setup:secret is only for local development, please remove it. You can find your generated app secret on your extension detail page in the master data section. For more information see https://docs.shopware.com/en/shopware-platform-dev-en/app-system-guide/setup#authorisation", ctx.errors[0])
+}
+
 func TestIconExistsDefaultsPath(t *testing.T) {
 	appPath := t.TempDir()
 
 	assert.NoError(t, os.MkdirAll(path.Join(appPath, "Resources/config"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
 
 	assert.NoError(t, os.WriteFile(path.Join(appPath, "manifest.xml"), []byte(testAppManifest), os.ModePerm))
-	assert.NoError(t, os.WriteFile(path.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
 
 	app, err := newApp(appPath)
 
