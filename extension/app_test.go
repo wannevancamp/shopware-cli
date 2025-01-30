@@ -3,6 +3,7 @@ package extension
 import (
 	"os"
 	"path"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -165,6 +166,10 @@ func TestAppWithPHPFiles(t *testing.T) {
 }
 
 func TestAppWithTwigFiles(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("skipping test on windows")
+	}
+
 	appPath := t.TempDir()
 
 	assert.NoError(t, os.MkdirAll(path.Join(appPath, "Resources/config"), os.ModePerm))
