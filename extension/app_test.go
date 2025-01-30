@@ -143,3 +143,45 @@ func TestCompatibilityGiven(t *testing.T) {
 
 	assert.Equal(t, "~6.5.0", compatibility.String())
 }
+
+func TestAppWithPHPFiles(t *testing.T) {
+	appPath := t.TempDir()
+
+	assert.NoError(t, os.MkdirAll(path.Join(appPath, "Resources/config"), os.ModePerm))
+
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "manifest.xml"), []byte(testAppManifest), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "test.php"), []byte("<?php echo 'Hello World';"), os.ModePerm))
+
+	app, err := newApp(appPath)
+
+	assert.NoError(t, err)
+
+	ctx := newValidationContext(app)
+	app.Validate(getTestContext(), ctx)
+
+	assert.Equal(t, 1, len(ctx.errors))
+	assert.Contains(t, ctx.errors[0], "Found unexpected PHP file")
+}
+
+func TestAppWithTwigFiles(t *testing.T) {
+	appPath := t.TempDir()
+
+	assert.NoError(t, os.MkdirAll(path.Join(appPath, "Resources/config"), os.ModePerm))
+	assert.NoError(t, os.MkdirAll(path.Join(appPath, "Resources/views/"), os.ModePerm))
+
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "manifest.xml"), []byte(testAppManifest), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "test.twig"), []byte("<?php echo 'Hello World';"), os.ModePerm))
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "Resources/views/test.twig"), []byte("<?php echo 'Hello World';"), os.ModePerm))
+
+	app, err := newApp(appPath)
+
+	assert.NoError(t, err)
+
+	ctx := newValidationContext(app)
+	app.Validate(getTestContext(), ctx)
+
+	assert.Equal(t, 1, len(ctx.errors))
+	assert.Contains(t, ctx.errors[0], "Twig files should be at")
+}

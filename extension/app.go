@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	"github.com/shopware/shopware-cli/version"
 )
@@ -140,4 +141,18 @@ func (a App) Validate(_ context.Context, ctx *ValidationContext) {
 	if _, err := os.Stat(filepath.Join(a.GetPath(), appIcon)); os.IsNotExist(err) {
 		ctx.AddError(fmt.Sprintf("Cannot find app icon at %s", appIcon))
 	}
+
+	allowedTwigLocations := []string{path.Join(a.GetRootDir(), "Resources", "views"), path.Join(a.GetRootDir(), "Resources", "scripts")}
+
+	_ = filepath.Walk(a.GetRootDir(), func(path string, info os.FileInfo, err error) error {
+		if filepath.Ext(path) == ".php" {
+			ctx.AddError(fmt.Sprintf("Found unexpected PHP file %s, PHP files are not allowed in Apps", path))
+		}
+
+		if filepath.Ext(path) == ".twig" && (!strings.HasPrefix(path, allowedTwigLocations[0]) && !strings.HasPrefix(path, allowedTwigLocations[1])) {
+			ctx.AddError(fmt.Sprintf("Found unexpected Twig file %s. Twig files should be at Resources/views or Resources/scripts", path))
+		}
+
+		return nil
+	})
 }
