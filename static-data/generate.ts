@@ -42,10 +42,6 @@ async function fetchShopwareTags(): Promise<void> {
             }
         }
 
-        if (!tags.includes('6.7.0.0')) {
-            tags.unshift('6.7.0.0');
-        }
-
         writeFileSync('versions.json', JSON.stringify(tags, null, 2));
         console.log('Successfully wrote versions.json');
 
