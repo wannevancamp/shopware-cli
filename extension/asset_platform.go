@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -430,7 +431,19 @@ func BuildAssetConfigFromExtensions(ctx context.Context, sources []asset.Source,
 			continue
 		}
 
-		sourceConfig := createConfigFromPath(source.Name, source.Path)
+		absPath, err := filepath.EvalSymlinks(source.Path)
+		if err != nil {
+			logging.FromContext(ctx).Errorf("Could not resolve symlinks for %s: %s", source.Path, err.Error())
+			continue
+		}
+
+		absPath, err = filepath.Abs(absPath)
+		if err != nil {
+			logging.FromContext(ctx).Errorf("Could not get absolute path for %s: %s", source.Path, err.Error())
+			continue
+		}
+
+		sourceConfig := createConfigFromPath(source.Name, absPath)
 		sourceConfig.EnableESBuildForAdmin = source.AdminEsbuildCompatible
 		sourceConfig.EnableESBuildForStorefront = source.StorefrontEsbuildCompatible
 		sourceConfig.DisableSass = source.DisableSass
