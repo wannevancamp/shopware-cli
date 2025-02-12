@@ -151,6 +151,13 @@ var extensionZipCmd = &cobra.Command{
 			}
 		}
 
+		if cmd.Flags().Changed("overwrite-app-backend-secret") {
+			extCfg.Validation.Ignore = append(extCfg.Validation.Ignore, "metadata.setup")
+			if err := extCfg.Dump(extDir); err != nil {
+				return fmt.Errorf("dump extension config: %w", err)
+			}
+		}
+
 		// Cleanup not wanted files
 		if err := extension.CleanupExtensionFolder(extDir, extCfg.Build.Zip.Pack.Excludes.Paths); err != nil {
 			return fmt.Errorf("cleanup package: %w", err)
