@@ -5,12 +5,9 @@ import (
 	"context"
 	_ "embed"
 	"fmt"
-	"os"
 	"regexp"
 	"strings"
 	"text/template"
-
-	"github.com/sashabaranov/go-openai"
 
 	"github.com/shopware/shopware-cli/internal/git"
 )
@@ -94,15 +91,9 @@ func renderChangelog(commits []git.GitCommit, cfg Config) (string, error) {
 
 	templateParsed := template.Must(template.New("changelog").Parse(cfg.Template))
 
-	aiMessage, err := generateAiMessage(changelog, cfg)
-	if err != nil {
-		return "", fmt.Errorf("failed to generate AI message: %v", err)
-	}
-
 	templateContext := map[string]interface{}{
-		"Commits":     changelog,
-		"Config":      cfg,
-		"AiSummarize": aiMessage,
+		"Commits": changelog,
+		"Config":  cfg,
 	}
 
 	var buf bytes.Buffer
@@ -111,42 +102,4 @@ func renderChangelog(commits []git.GitCommit, cfg Config) (string, error) {
 	}
 
 	return strings.Trim(buf.String(), "\n"), nil
-}
-
-func generateAiMessage(changelog []Commit, cfg Config) (string, error) {
-	if !cfg.AiEnabled {
-		return "", nil
-	}
-
-	aiRequestBody := ""
-
-	for _, commit := range changelog {
-		aiRequestBody += commit.Message + "\n"
-	}
-
-	aiRequestBody += "Please summarize the changelog into 1-2 sentences and ignore chore or build things"
-
-	client := openai.NewClient(os.Getenv("OPENAI_TOKEN"))
-	resp, err := client.CreateChatCompletion(
-		context.Background(),
-		openai.ChatCompletionRequest{
-			Model:  openai.GPT3Dot5Turbo,
-			Stream: false,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: aiRequestBody,
-				},
-			},
-		},
-	)
-	if err != nil {
-		return "", err
-	}
-
-	if len(resp.Choices) > 0 {
-		return resp.Choices[0].Message.Content, nil
-	}
-
-	return "", fmt.Errorf("got no response from openai: %w", err)
 }

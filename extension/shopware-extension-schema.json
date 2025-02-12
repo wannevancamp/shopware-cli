@@ -33,11 +33,6 @@
 					"default": false,
 					"description": "Enables the changelog generation."
 				},
-				"ai_enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enables the changelog generation with OpenAI (Requires OPENAI_TOKEN environment variable)."
-				},
 				"pattern": {
 					"type": "string",
 					"default": "",

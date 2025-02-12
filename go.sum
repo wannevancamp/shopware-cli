@@ -91,8 +91,6 @@ github.com/rivo/uniseg v0.4.7/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUc
 github.com/rogpeppe/go-internal v1.6.1 h1:/FiVV8dS/e+YqF2JvO3yXRFbBLTIuSDkuC7aBOAvL+k=
 github.com/rogpeppe/go-internal v1.6.1/go.mod h1:xXDCJY+GAPziupqXw64V24skbSoqbTEfhy4qGm1nDQc=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
-github.com/sashabaranov/go-openai v1.37.0 h1:hQQowgYm4OXJ1Z/wTrE+XZaO20BYsL0R3uRPSpfNZkY=
-github.com/sashabaranov/go-openai v1.37.0/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
 github.com/shyim/go-htmlprinter v0.0.0-20250212091723-cc11f7bf036d h1:H4beXhaWS4edAoYRzbdszvIfL9bHt4jUbGgt5G+QdGY=
 github.com/shyim/go-htmlprinter v0.0.0-20250212091723-cc11f7bf036d/go.mod h1:7pOn8MeVA6hUnFkgkXpNFVjGtNnh2/AeZTDwXwWtNp8=
 github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce h1:xQidim5dm481TchU2tzi7SjQwfmD6ombHKPHFsUL8Z4=
