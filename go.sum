@@ -95,8 +95,8 @@ github.com/sashabaranov/go-openai v1.37.0 h1:hQQowgYm4OXJ1Z/wTrE+XZaO20BYsL0R3uR
 github.com/sashabaranov/go-openai v1.37.0/go.mod h1:lj5b/K+zjTSFxVLijLSTDZuP7adOgerWeFyZLUhAKRg=
 github.com/shyim/go-htmlprinter v0.0.0-20250212091723-cc11f7bf036d h1:H4beXhaWS4edAoYRzbdszvIfL9bHt4jUbGgt5G+QdGY=
 github.com/shyim/go-htmlprinter v0.0.0-20250212091723-cc11f7bf036d/go.mod h1:7pOn8MeVA6hUnFkgkXpNFVjGtNnh2/AeZTDwXwWtNp8=
-github.com/shyim/go-mad v0.0.0-20241125132504-2377d2341711 h1:Q+bPtwUv/ONAB1Bq2d2aCHsui+/kv2lwahJuDjGr4is=
-github.com/shyim/go-mad v0.0.0-20241125132504-2377d2341711/go.mod h1:yfWKFJm6NisKuie2cdH5zUttu4gZYHa/CY7CHpA3tMU=
+github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce h1:xQidim5dm481TchU2tzi7SjQwfmD6ombHKPHFsUL8Z4=
+github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce/go.mod h1:yfWKFJm6NisKuie2cdH5zUttu4gZYHa/CY7CHpA3tMU=
 github.com/spf13/cobra v1.8.1 h1:e5/vxKd/rZsfSJMUX1agtjeTDf+qv1/JdBF8gg5k9ZM=
 github.com/spf13/cobra v1.8.1/go.mod h1:wHxEcudfqmLYa8iTfL+OuZPbBZkmvliBWKIezN3kD9Y=
 github.com/spf13/pflag v1.0.5 h1:iy+VFUOCP1a+8yFto/drg2CJ5u0yRoB7fZw3DKv/JXA=

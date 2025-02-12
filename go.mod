@@ -34,7 +34,7 @@ require (
 
 require github.com/otiai10/mint v1.6.3 // indirect
 
-replace github.com/doutorfinancas/go-mad v0.0.0-20240205120830-463c1e9760f0 => github.com/shyim/go-mad v0.0.0-20241125132504-2377d2341711
+replace github.com/doutorfinancas/go-mad v0.0.0-20240205120830-463c1e9760f0 => github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
