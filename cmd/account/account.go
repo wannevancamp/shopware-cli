@@ -3,7 +3,7 @@ package account
 import (
 	"github.com/spf13/cobra"
 
-	account_api "github.com/shopware/shopware-cli/account-api"
+	account_api "github.com/shopware/shopware-cli/internal/account-api"
 	"github.com/shopware/shopware-cli/internal/config"
 )
 

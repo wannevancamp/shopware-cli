@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	accountApi "github.com/shopware/shopware-cli/account-api"
+	accountApi "github.com/shopware/shopware-cli/internal/account-api"
 	"github.com/shopware/shopware-cli/logging"
 )
 

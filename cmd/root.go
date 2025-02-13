@@ -6,10 +6,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	accountApi "github.com/shopware/shopware-cli/account-api"
 	"github.com/shopware/shopware-cli/cmd/account"
 	"github.com/shopware/shopware-cli/cmd/extension"
 	"github.com/shopware/shopware-cli/cmd/project"
+	accountApi "github.com/shopware/shopware-cli/internal/account-api"
 	"github.com/shopware/shopware-cli/internal/config"
 	"github.com/shopware/shopware-cli/logging"
 )
