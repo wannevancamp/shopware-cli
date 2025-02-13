@@ -139,13 +139,6 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 			if err != nil {
 				return err
 			}
-
-			for name, entry := range nonCompatibleExtensions {
-				options := esbuild.NewAssetCompileOptionsAdmin(name, entry.BasePath)
-				if err := esbuild.DumpViteConfig(options); err != nil {
-					return err
-				}
-			}
 		}
 	}
 
