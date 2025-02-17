@@ -1,11 +1,12 @@
 package extension
 
 import (
-	"github.com/joho/godotenv"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 func PlatformPath(projectRoot, component, path string) string {
@@ -35,8 +36,8 @@ func LoadSymfonyEnvFile(projectRoot string) error {
 	}
 
 	possibleEnvFiles := []string{
-		path.Join(projectRoot, ".env"),
 		path.Join(projectRoot, ".env.dist"),
+		path.Join(projectRoot, ".env"),
 		path.Join(projectRoot, ".env.local"),
 		path.Join(projectRoot, ".env."+currentEnv),
 		path.Join(projectRoot, ".env."+currentEnv+".local"),
@@ -55,7 +56,6 @@ func LoadSymfonyEnvFile(projectRoot string) error {
 	}
 
 	currentMap, err := godotenv.Read(foundEnvFiles...)
-
 	if err != nil {
 		return err
 	}
