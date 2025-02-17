@@ -71,10 +71,11 @@ func filterAndWritePluginJson(cmd *cobra.Command, projectRoot string, shopCfg *s
 
 	if onlyExtensions != "" {
 		cfgs = cfgs.Only(strings.Split(onlyExtensions, ","))
-	}
-
-	if skipExtensions != "" {
+	} else if skipExtensions != "" {
 		cfgs = cfgs.Not(strings.Split(skipExtensions, ","))
+	} else {
+		logging.FromContext(cmd.Context()).Infof("Excluding extensions based on project config: %s", strings.Join(shopCfg.Build.ExcludeExtensions, ", "))
+		cfgs = cfgs.Not(shopCfg.Build.ExcludeExtensions)
 	}
 
 	if _, err := extension.InstallNodeModulesOfConfigs(cmd.Context(), cfgs, false); err != nil {
