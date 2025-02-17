@@ -50,8 +50,6 @@ linters:
     - nilnil
 
 linters-settings:
-  golint:
-    min-confidence: 0
   gci:
     sections:
       - Standard
