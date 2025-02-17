@@ -20,8 +20,6 @@ func findPHPWasmFile(ctx context.Context, phpVersion string) ([]byte, error) {
 		return os.ReadFile(expectedPathLocation)
 	}
 
-	logging.FromContext(ctx).Infof("Downloading PHP %s wasm build", phpVersion)
-
 	downloadUrl := "https://github.com/shopwareLabs/php-cli-wasm-binaries/releases/download/1.0.0/" + expectedFile
 
 	r, err := http.NewRequestWithContext(ctx, http.MethodGet, downloadUrl, nil)
