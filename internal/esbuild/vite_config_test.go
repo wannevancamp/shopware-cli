@@ -138,3 +138,38 @@ func TestDumpViteConfig(t *testing.T) {
 	_, err = os.Stat(path.Join(viteDir, "entrypoints.json"))
 	assert.NoError(t, err)
 }
+
+func TestDumpViteConfigCannotOverwrite(t *testing.T) {
+	// Create a temporary directory
+	tempDir := t.TempDir()
+
+	// Define sample AssetCompileOptions
+	options := AssetCompileOptions{
+		OutputJSFile:  "main.js",
+		OutputCSSFile: "styles.css",
+		Name:          "TestName",
+		Path:          tempDir,
+		OutputDir:     "dist",
+	}
+
+	// First call creates the vite config
+	err := DumpViteConfig(options)
+	assert.NoError(t, err)
+
+	// Read file content after first call
+	viteDir := path.Join(tempDir, "dist", ".vite")
+	manifestPath := path.Join(viteDir, "manifest.json")
+	initialContent, err := os.ReadFile(manifestPath)
+	assert.NoError(t, err)
+
+	options.Name = "NewName"
+
+	// Second call should simply do nothing and return nil
+	err = DumpViteConfig(options)
+	assert.NoError(t, err)
+
+	// Verify that the content remains unchanged
+	newContent, err := os.ReadFile(manifestPath)
+	assert.NoError(t, err)
+	assert.Equal(t, initialContent, newContent)
+}
