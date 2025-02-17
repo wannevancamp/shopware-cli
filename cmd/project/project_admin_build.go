@@ -39,7 +39,7 @@ var projectAdminBuildCmd = &cobra.Command{
 			return err
 		}
 
-		sources, err := extension.DumpAndLoadAssetSourcesOfProject(cmd.Context(), projectRoot, shopCfg)
+		sources, err := filterAndGetSources(cmd, projectRoot, shopCfg)
 		if err != nil {
 			return err
 		}
@@ -76,4 +76,6 @@ func init() {
 	projectRootCmd.AddCommand(projectAdminBuildCmd)
 	projectAdminBuildCmd.PersistentFlags().Bool("skip-assets-install", false, "Skips the assets installation")
 	projectAdminBuildCmd.PersistentFlags().Bool("force-install-dependencies", false, "Force install NPM dependencies")
+	projectAdminBuildCmd.PersistentFlags().String("only-extensions", "", "Only watch the given extensions (comma separated)")
+	projectAdminBuildCmd.PersistentFlags().String("skip-extensions", "", "Skips the given extensions (comma separated)")
 }

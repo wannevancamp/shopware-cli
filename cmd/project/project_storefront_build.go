@@ -39,7 +39,7 @@ var projectStorefrontBuildCmd = &cobra.Command{
 			return err
 		}
 
-		sources, err := extension.DumpAndLoadAssetSourcesOfProject(cmd.Context(), projectRoot, shopCfg)
+		sources, err := filterAndGetSources(cmd, projectRoot, shopCfg)
 		if err != nil {
 			return err
 		}
@@ -76,4 +76,6 @@ func init() {
 	projectRootCmd.AddCommand(projectStorefrontBuildCmd)
 	projectStorefrontBuildCmd.PersistentFlags().Bool("skip-theme-compile", false, "Skip theme compilation")
 	projectStorefrontBuildCmd.PersistentFlags().Bool("force-install-dependencies", false, "Force install NPM dependencies")
+	projectStorefrontBuildCmd.PersistentFlags().String("only-extensions", "", "Only watch the given extensions (comma separated)")
+	projectStorefrontBuildCmd.PersistentFlags().String("skip-extensions", "", "Skips the given extensions (comma separated)")
 }

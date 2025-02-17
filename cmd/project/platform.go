@@ -6,9 +6,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/shopware/shopware-cli/extension"
+	"github.com/shopware/shopware-cli/internal/asset"
+	"github.com/shopware/shopware-cli/logging"
 	"github.com/shopware/shopware-cli/shop"
 	"github.com/spf13/cobra"
 )
@@ -88,4 +91,39 @@ func filterAndWritePluginJson(cmd *cobra.Command, projectRoot string, shopCfg *s
 	}
 
 	return nil
+}
+
+func filterAndGetSources(cmd *cobra.Command, projectRoot string, shopCfg *shop.Config) ([]asset.Source, error) {
+	sources, err := extension.DumpAndLoadAssetSourcesOfProject(cmd.Context(), projectRoot, shopCfg)
+	if err != nil {
+		return nil, err
+	}
+
+	onlyExtensions, _ := cmd.PersistentFlags().GetString("only-extensions")
+	skipExtensions, _ := cmd.PersistentFlags().GetString("skip-extensions")
+
+	if onlyExtensions != "" && skipExtensions != "" {
+		return nil, fmt.Errorf("only-extensions and skip-extensions cannot be used together")
+	}
+
+	if onlyExtensions == "" && skipExtensions == "" {
+		logging.FromContext(cmd.Context()).Infof("Excluding extensions based on project config: %s", strings.Join(shopCfg.Build.ExcludeExtensions, ", "))
+		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			return slices.Contains(shopCfg.Build.ExcludeExtensions, s.Name)
+		})
+	}
+
+	if onlyExtensions != "" {
+		logging.FromContext(cmd.Context()).Infof("Only including extensions: %s", onlyExtensions)
+		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			return !slices.Contains(strings.Split(onlyExtensions, ","), s.Name)
+		})
+	} else if skipExtensions != "" {
+		logging.FromContext(cmd.Context()).Infof("Excluding extensions: %s", skipExtensions)
+		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			return slices.Contains(strings.Split(skipExtensions, ","), s.Name)
+		})
+	}
+
+	return sources, nil
 }
