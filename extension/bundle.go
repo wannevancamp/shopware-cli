@@ -62,6 +62,7 @@ type shopwareBundleComposerJson struct {
 	Version string                          `json:"version"`
 	Require map[string]string               `json:"require"`
 	Extra   shopwareBundleComposerJsonExtra `json:"extra"`
+	Suggest map[string]string               `json:"suggest"`
 }
 
 type shopwareBundleComposerJsonExtra struct {
