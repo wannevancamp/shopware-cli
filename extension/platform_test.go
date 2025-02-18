@@ -10,7 +10,7 @@ import (
 func getTestPlugin(tempDir string) PlatformPlugin {
 	return PlatformPlugin{
 		path: tempDir,
-		composer: platformComposerJson{
+		composer: PlatformComposerJson{
 			Name:        "frosh/frosh-tools",
 			Description: "Frosh Tools",
 			License:     "mit",

@@ -277,11 +277,11 @@ func addExtensionsByComposer(project string) []Extension {
 			// The extension in the vendor folder has maybe not filled the version in this composer.json. Let's overwrite it with the version from composer.lock
 			switch pkg.PackageType {
 			case ComposerTypePlugin:
-				ext.(*PlatformPlugin).composer.Version = pkg.Version
+				ext.(*PlatformPlugin).Composer.Version = pkg.Version
 			case ComposerTypeApp:
 				ext.(*App).manifest.Meta.Version = pkg.Version
 			case ComposerTypeBundle:
-				ext.(*ShopwareBundle).composer.Version = pkg.Version
+				ext.(*ShopwareBundle).Composer.Version = pkg.Version
 			}
 
 			list = append(list, ext)

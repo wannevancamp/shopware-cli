@@ -11,7 +11,7 @@ func TestConvertPlugin(t *testing.T) {
 	plugin := PlatformPlugin{
 		path:   t.TempDir(),
 		config: &Config{},
-		composer: platformComposerJson{
+		composer: PlatformComposerJson{
 			Extra: platformComposerJsonExtra{
 				ShopwarePluginClass: "FroshTools\\FroshTools",
 			},

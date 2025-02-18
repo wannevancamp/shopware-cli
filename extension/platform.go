@@ -20,7 +20,7 @@ var ErrPlatformInvalidType = errors.New("invalid composer type")
 
 type PlatformPlugin struct {
 	path     string
-	composer platformComposerJson
+	Composer PlatformComposerJson
 	config   *Config
 }
 
@@ -45,9 +45,8 @@ func newPlatformPlugin(path string) (*PlatformPlugin, error) {
 		return nil, fmt.Errorf("newPlatformPlugin: %v", err)
 	}
 
-	var composerJson platformComposerJson
-	err = json.Unmarshal(jsonFile, &composerJson)
-	if err != nil {
+	var composerJson PlatformComposerJson
+	if err := json.Unmarshal(jsonFile, &composerJson); err != nil {
 		return nil, fmt.Errorf("newPlatformPlugin: %v", err)
 	}
 
@@ -61,7 +60,7 @@ func newPlatformPlugin(path string) (*PlatformPlugin, error) {
 	}
 
 	extension := PlatformPlugin{
-		composer: composerJson,
+		Composer: composerJson,
 		path:     path,
 		config:   cfg,
 	}
@@ -69,7 +68,7 @@ func newPlatformPlugin(path string) (*PlatformPlugin, error) {
 	return &extension, nil
 }
 
-type platformComposerJson struct {
+type PlatformComposerJson struct {
 	Name        string   `json:"name"`
 	Keywords    []string `json:"keywords"`
 	Description string   `json:"description"`
@@ -86,6 +85,7 @@ type platformComposerJson struct {
 		Psr0 map[string]string `json:"psr-0"`
 		Psr4 map[string]string `json:"psr-4"`
 	} `json:"autoload"`
+	Suggest map[string]string `json:"suggest"`
 }
 
 type platformComposerJsonExtra struct {
@@ -98,11 +98,11 @@ type platformComposerJsonExtra struct {
 }
 
 func (p PlatformPlugin) GetName() (string, error) {
-	if p.composer.Extra.ShopwarePluginClass == "" {
+	if p.Composer.Extra.ShopwarePluginClass == "" {
 		return "", fmt.Errorf("extension name is empty")
 	}
 
-	parts := strings.Split(p.composer.Extra.ShopwarePluginClass, "\\")
+	parts := strings.Split(p.Composer.Extra.ShopwarePluginClass, "\\")
 
 	return parts[len(parts)-1], nil
 }
@@ -121,7 +121,7 @@ func (p PlatformPlugin) GetShopwareVersionConstraint() (*version.Constraints, er
 		return &constraint, nil
 	}
 
-	shopwareConstraintString, ok := p.composer.Require["shopware/core"]
+	shopwareConstraintString, ok := p.Composer.Require["shopware/core"]
 
 	if !ok {
 		return nil, fmt.Errorf("require.shopware/core is required")
@@ -140,7 +140,7 @@ func (PlatformPlugin) GetType() string {
 }
 
 func (p PlatformPlugin) GetVersion() (*version.Version, error) {
-	return version.NewVersion(p.composer.Version)
+	return version.NewVersion(p.Composer.Version)
 }
 
 func (p PlatformPlugin) GetChangelog() (*ExtensionChangelog, error) {
@@ -148,7 +148,7 @@ func (p PlatformPlugin) GetChangelog() (*ExtensionChangelog, error) {
 }
 
 func (p PlatformPlugin) GetLicense() (string, error) {
-	return p.composer.License, nil
+	return p.Composer.License, nil
 }
 
 func (p PlatformPlugin) GetPath() string {
@@ -157,49 +157,49 @@ func (p PlatformPlugin) GetPath() string {
 
 func (p PlatformPlugin) GetMetaData() *extensionMetadata {
 	return &extensionMetadata{
-		Name: p.composer.Name,
+		Name: p.Composer.Name,
 		Label: extensionTranslated{
-			German:  p.composer.Extra.Label["de-DE"],
-			English: p.composer.Extra.Label["en-GB"],
+			German:  p.Composer.Extra.Label["de-DE"],
+			English: p.Composer.Extra.Label["en-GB"],
 		},
 		Description: extensionTranslated{
-			German:  p.composer.Extra.Description["de-DE"],
-			English: p.composer.Extra.Description["en-GB"],
+			German:  p.Composer.Extra.Description["de-DE"],
+			English: p.Composer.Extra.Description["en-GB"],
 		},
 	}
 }
 
 func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
-	if p.composer.Name == "" {
+	if p.Composer.Name == "" {
 		ctx.AddError("metadata.name", "Key `name` is required")
 	}
 
-	if p.composer.Type == "" {
+	if p.Composer.Type == "" {
 		ctx.AddError("metadata.type", "Key `type` is required")
-	} else if p.composer.Type != ComposerTypePlugin {
+	} else if p.Composer.Type != ComposerTypePlugin {
 		ctx.AddError("metadata.type", "The composer type must be shopware-platform-plugin")
 	}
 
-	if p.composer.Description == "" {
+	if p.Composer.Description == "" {
 		ctx.AddError("metadata.description", "Key `description` is required")
 	}
 
-	if p.composer.License == "" {
+	if p.Composer.License == "" {
 		ctx.AddError("metadata.license", "Key `license` is required")
 	}
 
-	if p.composer.Version == "" {
+	if p.Composer.Version == "" {
 		ctx.AddError("metadata.version", "Key `version` is required")
 	}
 
-	if len(p.composer.Authors) == 0 {
+	if len(p.Composer.Authors) == 0 {
 		ctx.AddError("metadata.author", "Key `authors` is required")
 	}
 
-	if len(p.composer.Require) == 0 {
+	if len(p.Composer.Require) == 0 {
 		ctx.AddError("metadata.require", "Key `require` is required")
 	} else {
-		_, exists := p.composer.Require["shopware/core"]
+		_, exists := p.Composer.Require["shopware/core"]
 
 		if !exists {
 			ctx.AddError("metadata.require", "You need to require \"shopware/core\" package")
@@ -209,10 +209,10 @@ func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
 	requiredKeys := []string{"de-DE", "en-GB"}
 
 	for _, key := range requiredKeys {
-		_, hasLabel := p.composer.Extra.Label[key]
-		_, hasDescription := p.composer.Extra.Description[key]
-		_, hasManufacturer := p.composer.Extra.ManufacturerLink[key]
-		_, hasSupportLink := p.composer.Extra.SupportLink[key]
+		_, hasLabel := p.Composer.Extra.Label[key]
+		_, hasDescription := p.Composer.Extra.Description[key]
+		_, hasManufacturer := p.Composer.Extra.ManufacturerLink[key]
+		_, hasSupportLink := p.Composer.Extra.SupportLink[key]
 
 		if !hasLabel {
 			ctx.AddError("metadata.label", fmt.Sprintf("extra.label for language %s is required", key))
@@ -231,11 +231,11 @@ func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
 		}
 	}
 
-	if len(p.composer.Autoload.Psr0) == 0 && len(p.composer.Autoload.Psr4) == 0 {
+	if len(p.Composer.Autoload.Psr0) == 0 && len(p.Composer.Autoload.Psr4) == 0 {
 		ctx.AddError("metadata.autoload", "At least one of the properties psr-0 or psr-4 are required in the composer.json")
 	}
 
-	pluginIcon := p.composer.Extra.PluginIcon
+	pluginIcon := p.Composer.Extra.PluginIcon
 
 	if pluginIcon == "" {
 		pluginIcon = "src/Resources/config/plugin.png"

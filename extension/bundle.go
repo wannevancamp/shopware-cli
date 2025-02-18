@@ -12,7 +12,7 @@ import (
 
 type ShopwareBundle struct {
 	path     string
-	composer shopwareBundleComposerJson
+	Composer shopwareBundleComposerJson
 	config   *Config
 }
 
@@ -47,7 +47,7 @@ func newShopwareBundle(path string) (*ShopwareBundle, error) {
 	}
 
 	extension := ShopwareBundle{
-		composer: composerJson,
+		Composer: composerJson,
 		path:     path,
 		config:   cfg,
 	}
@@ -79,7 +79,7 @@ func (p ShopwareBundle) GetResourcesDir() string {
 }
 
 func (p ShopwareBundle) GetName() (string, error) {
-	return p.composer.Extra.BundleName, nil
+	return p.Composer.Extra.BundleName, nil
 }
 
 func (p ShopwareBundle) GetExtensionConfig() *Config {
@@ -96,7 +96,7 @@ func (p ShopwareBundle) GetShopwareVersionConstraint() (*version.Constraints, er
 		return &constraint, nil
 	}
 
-	shopwareConstraintString, ok := p.composer.Require["shopware/core"]
+	shopwareConstraintString, ok := p.Composer.Require["shopware/core"]
 
 	if !ok {
 		return nil, fmt.Errorf("require.shopware/core is required")
@@ -115,7 +115,7 @@ func (ShopwareBundle) GetType() string {
 }
 
 func (p ShopwareBundle) GetVersion() (*version.Version, error) {
-	return version.NewVersion(p.composer.Version)
+	return version.NewVersion(p.Composer.Version)
 }
 
 func (p ShopwareBundle) GetChangelog() (*ExtensionChangelog, error) {
@@ -123,7 +123,7 @@ func (p ShopwareBundle) GetChangelog() (*ExtensionChangelog, error) {
 }
 
 func (p ShopwareBundle) GetLicense() (string, error) {
-	return p.composer.License, nil
+	return p.Composer.License, nil
 }
 
 func (p ShopwareBundle) GetPath() string {
