@@ -410,11 +410,21 @@ func addComposerReplacements(composer map[string]interface{}, minVersion string)
 	return composer, nil
 }
 
+type packagistResponse struct {
+	Packages struct {
+		Core []struct {
+			Version string `json:"version_normalized"`
+		} `json:"shopware/core"`
+	} `json:"packages"`
+}
+
 func lookupForMinMatchingVersion(ctx context.Context, versionConstraint *version.Constraints) (string, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://shopware.github.io/shopware-cli/versions.json", http.NoBody)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://repo.packagist.org/p2/shopware/core.json", http.NoBody)
 	if err != nil {
 		return "", fmt.Errorf("create composer version request: %w", err)
 	}
+
+	req.Header.Set("User-Agent", "Shopware CLI")
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -426,15 +436,20 @@ func lookupForMinMatchingVersion(ctx context.Context, versionConstraint *version
 		}
 	}()
 
-	versionString, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("read version body: %w", err)
+	if resp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("fetch composer versions: %s", resp.Status)
 	}
 
+	var pckResponse packagistResponse
+
 	var versions []string
-	err = json.Unmarshal(versionString, &versions)
-	if err != nil {
-		return "", fmt.Errorf("unmarshal composer versions: %w", err)
+
+	if err := json.NewDecoder(resp.Body).Decode(&pckResponse); err != nil {
+		return "", fmt.Errorf("decode composer versions: %w", err)
+	}
+
+	for _, v := range pckResponse.Packages.Core {
+		versions = append(versions, v.Version)
 	}
 
 	return getMinMatchingVersion(versionConstraint, versions), nil
