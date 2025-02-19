@@ -10,7 +10,7 @@ import (
 func getTestPlugin(tempDir string) PlatformPlugin {
 	return PlatformPlugin{
 		path: tempDir,
-		composer: PlatformComposerJson{
+		Composer: PlatformComposerJson{
 			Name:        "frosh/frosh-tools",
 			Description: "Frosh Tools",
 			License:     "mit",
@@ -80,7 +80,7 @@ func TestPluginIconDifferntPathExists(t *testing.T) {
 	dir := t.TempDir()
 
 	plugin := getTestPlugin(dir)
-	plugin.composer.Extra.PluginIcon = "plugin.png"
+	plugin.Composer.Extra.PluginIcon = "plugin.png"
 
 	assert.NoError(t, os.WriteFile(dir+"/plugin.png", []byte("test"), os.ModePerm))
 
