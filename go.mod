@@ -1,6 +1,8 @@
 module github.com/shopware/shopware-cli
 
-go 1.23.6
+go 1.24.0
+
+replace github.com/doutorfinancas/go-mad v0.0.0-20240205120830-463c1e9760f0 => github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce
 
 require (
 	dario.cat/mergo v1.0.1
@@ -19,6 +21,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/otiai10/copy v1.14.1
+	github.com/shyim/go-version v0.0.0-20240530110323-4b7091cee42c
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/tetratelabs/wazero v1.8.2
@@ -30,13 +33,6 @@ require (
 	golang.org/x/text v0.22.0
 	gopkg.in/yaml.v3 v3.0.1
 )
-
-require (
-	github.com/otiai10/mint v1.6.3 // indirect
-	github.com/shyim/go-version v0.0.0-20240530110323-4b7091cee42c // indirect
-)
-
-replace github.com/doutorfinancas/go-mad v0.0.0-20240205120830-463c1e9760f0 => github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -53,6 +49,7 @@ require (
 	github.com/klauspost/compress v1.17.11
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
+	github.com/otiai10/mint v1.6.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/shyim/go-htmlprinter v0.0.0-20250212091723-cc11f7bf036d
