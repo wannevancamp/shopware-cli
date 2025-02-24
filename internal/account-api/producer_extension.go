@@ -12,7 +12,7 @@ import (
 
 	"github.com/microcosm-cc/bluemonday"
 
-	"github.com/shopware/shopware-cli/version"
+	"github.com/shyim/go-version"
 )
 
 type SoftwareVersionList []SoftwareVersion

@@ -14,7 +14,7 @@ import (
 	"github.com/shopware/shopware-cli/internal/asset"
 	"github.com/shopware/shopware-cli/internal/esbuild"
 	"github.com/shopware/shopware-cli/logging"
-	"github.com/shopware/shopware-cli/version"
+	"github.com/shyim/go-version"
 )
 
 const (

@@ -13,7 +13,7 @@ import (
 
 	"github.com/shopware/shopware-cli/internal/phplint"
 	"github.com/shopware/shopware-cli/logging"
-	"github.com/shopware/shopware-cli/version"
+	"github.com/shyim/go-version"
 )
 
 var ErrPlatformInvalidType = errors.New("invalid composer type")

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/shopware/shopware-cli/version"
+	"github.com/shyim/go-version"
 )
 
 func TestDetermineMinVersion(t *testing.T) {

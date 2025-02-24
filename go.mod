@@ -31,7 +31,10 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-require github.com/otiai10/mint v1.6.3 // indirect
+require (
+	github.com/otiai10/mint v1.6.3 // indirect
+	github.com/shyim/go-version v0.0.0-20240530110323-4b7091cee42c // indirect
+)
 
 replace github.com/doutorfinancas/go-mad v0.0.0-20240205120830-463c1e9760f0 => github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce
 

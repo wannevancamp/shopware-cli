@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/shopware/shopware-cli/version"
+	"github.com/shyim/go-version"
 )
 
 type App struct {

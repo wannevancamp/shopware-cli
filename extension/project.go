@@ -16,7 +16,7 @@ import (
 
 	"github.com/shopware/shopware-cli/internal/asset"
 	"github.com/shopware/shopware-cli/logging"
-	"github.com/shopware/shopware-cli/version"
+	"github.com/shyim/go-version"
 )
 
 func GetShopwareProjectConstraint(project string) (*version.Constraints, error) {

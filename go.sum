@@ -95,6 +95,8 @@ github.com/shyim/go-htmlprinter v0.0.0-20250212091723-cc11f7bf036d h1:H4beXhaWS4
 github.com/shyim/go-htmlprinter v0.0.0-20250212091723-cc11f7bf036d/go.mod h1:7pOn8MeVA6hUnFkgkXpNFVjGtNnh2/AeZTDwXwWtNp8=
 github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce h1:xQidim5dm481TchU2tzi7SjQwfmD6ombHKPHFsUL8Z4=
 github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce/go.mod h1:yfWKFJm6NisKuie2cdH5zUttu4gZYHa/CY7CHpA3tMU=
+github.com/shyim/go-version v0.0.0-20240530110323-4b7091cee42c h1:3venOxJzcKW4Xi5N9ipFNrnwAS4g1yTOTcBssDHHgQA=
+github.com/shyim/go-version v0.0.0-20240530110323-4b7091cee42c/go.mod h1:z47ygE4N7EC0H58FP5j5cXZtl1pSnfjwYJsHtiVtcwU=
 github.com/spf13/cobra v1.9.1 h1:CXSaggrXdbHK9CF+8ywj8Amf7PBRmPCOJugH954Nnlo=
 github.com/spf13/cobra v1.9.1/go.mod h1:nDyEzZ8ogv936Cinf6g1RU9MRY64Ir93oCnqb9wxYW0=
 github.com/spf13/pflag v1.0.6 h1:jFzHGLGAlb3ruxLB8MhbI6A8+AQX/2eW4qeyNZXNp2o=

@@ -19,7 +19,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/shopware/shopware-cli/logging"
-	"github.com/shopware/shopware-cli/version"
+	"github.com/shyim/go-version"
 )
 
 var projectCreateCmd = &cobra.Command{

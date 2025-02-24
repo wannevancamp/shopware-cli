@@ -19,7 +19,7 @@ import (
 	"github.com/shopware/shopware-cli/extension"
 	"github.com/shopware/shopware-cli/logging"
 	"github.com/shopware/shopware-cli/shop"
-	"github.com/shopware/shopware-cli/version"
+	"github.com/shyim/go-version"
 )
 
 var projectExtensionUploadCmd = &cobra.Command{

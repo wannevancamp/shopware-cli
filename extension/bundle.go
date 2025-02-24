@@ -7,7 +7,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/shopware/shopware-cli/version"
+	"github.com/shyim/go-version"
 )
 
 type ShopwareBundle struct {
