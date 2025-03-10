@@ -35,7 +35,7 @@ func TestSymfonyDetection(t *testing.T) {
 		},
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	for _, tc := range testCases {
 		tc := tc
