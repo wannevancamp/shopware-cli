@@ -26,6 +26,7 @@ type Config struct {
 	ConfigDump       *ConfigDump       `yaml:"dump,omitempty"`
 	Sync             *ConfigSync       `yaml:"sync,omitempty"`
 	ConfigDeployment *ConfigDeployment `yaml:"deployment,omitempty"`
+	Validation       *ConfigValidation `yaml:"validation,omitempty"`
 	foundConfig      bool
 }
 
@@ -235,6 +236,20 @@ type MailTemplateTranslation struct {
 	HTML         string      `yaml:"html"`
 	Plain        string      `yaml:"plain"`
 	CustomFields interface{} `yaml:"custom_fields"`
+}
+
+// ConfigValidation is used to configure the project validation.
+type ConfigValidation struct {
+	// Ignore items from the validation.
+	Ignore []ConfigValidationIgnoreItem `yaml:"ignore,omitempty"`
+}
+
+// ConfigValidationIgnoreItem is used to ignore items from the validation.
+type ConfigValidationIgnoreItem struct {
+	// The identifier of the item to ignore.
+	Identifier string `yaml:"identifier"`
+	// The path of the item to ignore.
+	Path string `yaml:"path,omitempty"`
 }
 
 func ReadConfig(fileName string, allowFallback bool) (*Config, error) {

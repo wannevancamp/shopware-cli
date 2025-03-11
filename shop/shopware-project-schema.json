@@ -29,6 +29,9 @@
         },
         "deployment": {
           "$ref": "#/$defs/ConfigDeployment"
+        },
+        "validation": {
+          "$ref": "#/$defs/ConfigValidation"
         }
       },
       "additionalProperties": false,
@@ -302,6 +305,35 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "ConfigValidation": {
+      "properties": {
+        "ignore": {
+          "items": {
+            "$ref": "#/$defs/ConfigValidationIgnoreItem"
+          },
+          "type": "array",
+          "description": "Ignore items from the validation."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ConfigValidation is used to configure the project validation."
+    },
+    "ConfigValidationIgnoreItem": {
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "description": "The identifier of the item to ignore."
+        },
+        "path": {
+          "type": "string",
+          "description": "The path of the item to ignore."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "description": "ConfigValidationIgnoreItem is used to ignore items from the validation."
     },
     "EntitySync": {
       "properties": {
