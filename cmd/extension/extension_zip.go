@@ -152,7 +152,7 @@ var extensionZipCmd = &cobra.Command{
 		}
 
 		if cmd.Flags().Changed("overwrite-app-backend-secret") {
-			extCfg.Validation.Ignore = append(extCfg.Validation.Ignore, "metadata.setup")
+			extCfg.Validation.Ignore = append(extCfg.Validation.Ignore, extension.ConfigValidationIgnoreItem{Identifier: "metadata.setup"})
 			if err := extCfg.Dump(extDir); err != nil {
 				return fmt.Errorf("dump extension config: %w", err)
 			}

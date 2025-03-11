@@ -94,7 +94,43 @@ type ConfigStoreImagePreview struct {
 }
 
 type ConfigValidation struct {
-	Ignore []string `yaml:"ignore,omitempty"`
+	Ignore ConfigValidationList `yaml:"ignore,omitempty"`
+}
+
+type ConfigValidationList []ConfigValidationIgnoreItem
+
+func (c *ConfigValidationList) Identifiers() []string {
+	identifiers := []string{}
+	for _, item := range *c {
+		identifiers = append(identifiers, item.Identifier)
+	}
+	return identifiers
+}
+
+type ConfigValidationIgnoreItem struct {
+	Identifier string `yaml:"identifier"`
+	Path       string `yaml:"path,omitempty"`
+}
+
+func (c *ConfigValidationIgnoreItem) UnmarshalYAML(value *yaml.Node) error {
+	if value.Kind == yaml.ScalarNode {
+		c.Identifier = value.Value
+		return nil
+	}
+
+	type objectFormat struct {
+		Identifier string `yaml:"identifier"`
+		Path       string `yaml:"path,omitempty"`
+	}
+	var obj objectFormat
+	if err := value.Decode(&obj); err != nil {
+		return fmt.Errorf("failed to decode ConfigItem: %w", err)
+	}
+
+	c.Identifier = obj.Identifier
+	c.Path = obj.Path
+
+	return nil
 }
 
 type Config struct {

@@ -58,7 +58,24 @@
 					"type": "array",
 					"description": "Skip validations",
 					"items": {
-						"type": "string"
+						"oneOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "object",
+								"additionalProperties": false,
+								"required": ["identifier"],
+								"properties": {
+									"identifier": {
+										"type": "string"
+									},
+									"path": {
+										"type": "string"
+									}
+								}
+							}
+						]
 					}
 				}
 			}

@@ -67,7 +67,7 @@ func RunValidation(ctx context.Context, ext Extension) *ValidationContext {
 	ext.Validate(ctx, vc)
 	validateAdministrationSnippets(vc)
 	validateStorefrontSnippets(vc)
-	vc.ApplyIgnores(ext.GetExtensionConfig().Validation.Ignore)
+	vc.ApplyIgnores(ext.GetExtensionConfig().Validation.Ignore.Identifiers())
 
 	return vc
 }
