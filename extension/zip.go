@@ -27,7 +27,6 @@ var (
 		".editorconfig",
 		".git",
 		".github",
-		".gitignore",
 		".gitlab-ci.yml",
 		".gitpod.Dockerfile",
 		".gitpod.yml",
@@ -61,6 +60,7 @@ var (
 		".DS_Store",
 		"Thumbs.db",
 		"__MACOSX",
+		".gitignore",
 	}
 
 	defaultNotAllowedExtensions = []string{
