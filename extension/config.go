@@ -21,7 +21,7 @@ type ConfigBuild struct {
 	Zip ConfigBuildZip `yaml:"zip"`
 }
 
-// Configuration for zipping
+// Configuration for zipping.
 type ConfigBuildZip struct {
 	// Configuration for composer
 	Composer ConfigBuildZipComposer `yaml:"composer"`
