@@ -242,6 +242,8 @@ type MailTemplateTranslation struct {
 type ConfigValidation struct {
 	// Ignore items from the validation.
 	Ignore []ConfigValidationIgnoreItem `yaml:"ignore,omitempty"`
+
+	IgnoreExtensions []ConfigValidationIgnoreExtension `yaml:"ignore_extensions,omitempty"`
 }
 
 // ConfigValidationIgnoreItem is used to ignore items from the validation.
@@ -250,6 +252,11 @@ type ConfigValidationIgnoreItem struct {
 	Identifier string `yaml:"identifier"`
 	// The path of the item to ignore.
 	Path string `yaml:"path,omitempty"`
+}
+
+type ConfigValidationIgnoreExtension struct {
+	// The name of the extension to ignore.
+	Name string `yaml:"name"`
 }
 
 func ReadConfig(fileName string, allowFallback bool) (*Config, error) {

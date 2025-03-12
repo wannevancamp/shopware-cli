@@ -314,11 +314,27 @@
           },
           "type": "array",
           "description": "Ignore items from the validation."
+        },
+        "ignore_extensions": {
+          "items": {
+            "$ref": "#/$defs/ConfigValidationIgnoreExtension"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "description": "ConfigValidation is used to configure the project validation."
+    },
+    "ConfigValidationIgnoreExtension": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the extension to ignore."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
     },
     "ConfigValidationIgnoreItem": {
       "properties": {
