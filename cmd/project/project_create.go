@@ -38,6 +38,8 @@ var projectCreateCmd = &cobra.Command{
 				versions[i] = v.String()
 			}
 
+			versions = append(versions, "latest")
+
 			return versions, cobra.ShellCompDirectiveNoFileComp
 		}
 
