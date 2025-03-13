@@ -346,12 +346,12 @@ func npmRunBuild(path string, buildCmd string, buildEnvVariables []string) error
 	return nil
 }
 
-func getInstallCommand(isProductionMode bool, npmPackage NpmPackage) *exec.Cmd {
+func getInstallCommand(isProductionMode bool) *exec.Cmd {
 	// Bun can migrate on the fly the package-lock.json to a bun.lockdb and is much faster than NPM
-	if os.Getenv("SHOPWARE_CLI_FORCE_BUN") == "1" {
-		if _, err := exec.LookPath("bun"); err == nil && canRunBunOnPackage(npmPackage) && !isProductionMode {
-			return exec.Command("bun", "install", "--no-save")
-		}
+	if _, err := exec.LookPath("bun"); err == nil && !isProductionMode {
+		args := []string{"install", "--no-save"}
+
+		return exec.Command("bun", args...)
 	}
 
 	return exec.Command("npm", "install", "--no-audit", "--no-fund", "--prefer-offline", "--loglevel=error")
@@ -370,7 +370,7 @@ func InstallNPMDependencies(path string, packageJsonData NpmPackage, additionalP
 		return nil
 	}
 
-	installCmd := getInstallCommand(isProductionMode, packageJsonData)
+	installCmd := getInstallCommand(isProductionMode)
 	installCmd.Args = append(installCmd.Args, additionalParams...)
 	installCmd.Dir = path
 	installCmd.Stdout = os.Stdout
