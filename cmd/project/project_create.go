@@ -32,7 +32,7 @@ var projectCreateCmd = &cobra.Command{
 			if err != nil {
 				return []string{}, cobra.ShellCompDirectiveNoFileComp
 			}
-			versions := make([]string, len(filteredVersions))
+			versions := make([]string, 0)
 
 			for i, v := range filteredVersions {
 				versions[i] = v.String()
