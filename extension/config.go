@@ -24,11 +24,11 @@ type ConfigBuild struct {
 // Configuration for zipping.
 type ConfigBuildZip struct {
 	// Configuration for composer
-	Composer ConfigBuildZipComposer `yaml:"composer"`
+	Composer ConfigBuildZipComposer `yaml:"composer,omitempty"`
 	// Configuration for assets
-	Assets ConfigBuildZipAssets `yaml:"assets"`
+	Assets ConfigBuildZipAssets `yaml:"assets,omitempty"`
 	// Configuration for packing
-	Pack ConfigBuildZipPack `yaml:"pack"`
+	Pack ConfigBuildZipPack `yaml:"pack,omitempty"`
 }
 
 type ConfigBuildZipComposer struct {
@@ -93,16 +93,20 @@ type ConfigStore struct {
 	Icon *string `yaml:"icon"`
 	// Specifies whether the extension should automatically be set compatible with Shopware bugfix versions.
 	AutomaticBugfixVersionCompatibility *bool `yaml:"automatic_bugfix_version_compatibility"`
+	// Specifies the meta title of the extension in store.
+	MetaTitle ConfigTranslated[string] `yaml:"meta_title" jsonschema:"maxLength=50"`
+	// Specifies the meta description of the extension in store.
+	MetaDescription ConfigTranslated[string] `yaml:"meta_description" jsonschema:"maxLength=185"`
 	// Specifies the description of the extension in store.
 	Description ConfigTranslated[string] `yaml:"description"`
 	// Installation manual of the extension in store.
 	InstallationManual ConfigTranslated[string] `yaml:"installation_manual"`
 	// Specifies the tags of the extension.
-	Tags ConfigTranslated[[]string] `yaml:"tags"`
+	Tags ConfigTranslated[[]string] `yaml:"tags,omitempty"`
 	// Specifies the links of YouTube-Videos to show or describe the extension.
-	Videos ConfigTranslated[[]string] `yaml:"videos"`
+	Videos ConfigTranslated[[]string] `yaml:"videos,omitempty"`
 	// Specifies the highlights of the extension.
-	Highlights ConfigTranslated[[]string] `yaml:"highlights"`
+	Highlights ConfigTranslated[[]string] `yaml:"highlights,omitempty"`
 	// Specifies the features of the extension.
 	Features ConfigTranslated[[]string] `yaml:"features"`
 	// Specifies Frequently Asked Questions for the extension.
@@ -118,8 +122,8 @@ type Translatable interface {
 }
 
 type ConfigTranslated[T Translatable] struct {
-	German  *T `yaml:"de"`
-	English *T `yaml:"en"`
+	German  *T `yaml:"de,omitempty"`
+	English *T `yaml:"en,omitempty"`
 }
 
 type ConfigStoreFaq struct {
@@ -219,15 +223,15 @@ func (c ConfigValidationIgnoreItem) JSONSchema() *jsonschema.Schema {
 }
 
 type Config struct {
-	FileName string `jsonschema:"-"`
+	FileName string `yaml:"-" jsonschema:"-"`
 	// Store is the store configuration of the extension.
-	Store ConfigStore `yaml:"store"`
+	Store ConfigStore `yaml:"store,omitempty"`
 	// Build is the build configuration of the extension.
-	Build ConfigBuild `yaml:"build"`
+	Build ConfigBuild `yaml:"build,omitempty"`
 	// Changelog is the changelog configuration of the extension.
-	Changelog changelog.Config `yaml:"changelog"`
+	Changelog changelog.Config `yaml:"changelog,omitempty"`
 	// Validation is the validation configuration of the extension.
-	Validation ConfigValidation `yaml:"validation"`
+	Validation ConfigValidation `yaml:"validation,omitempty"`
 }
 
 func readExtensionConfig(dir string) (*Config, error) {
