@@ -9,6 +9,10 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481
+        with:
+          egress-policy: audit
+
       - name: Checkout Repository
         uses: actions/checkout@v4
 
