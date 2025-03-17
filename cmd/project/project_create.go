@@ -64,7 +64,7 @@ var projectCreateCmd = &cobra.Command{
 		if len(args) == 2 {
 			result = args[1]
 		} else {
-			options := make([]huh.Option[string], len(filteredVersions))
+			options := make([]huh.Option[string], 0)
 			for i, v := range filteredVersions {
 				versionStr := v.String()
 				options[i] = huh.NewOption(versionStr, versionStr)
