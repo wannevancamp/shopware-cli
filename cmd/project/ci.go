@@ -12,6 +12,7 @@ import (
 
 	"dario.cat/mergo"
 	"github.com/shopware/shopware-cli/extension"
+	"github.com/shopware/shopware-cli/internal/packagist"
 	"github.com/shopware/shopware-cli/internal/phpexec"
 	"github.com/shopware/shopware-cli/logging"
 	"github.com/shopware/shopware-cli/shop"
@@ -237,14 +238,6 @@ func createEmptySnippetFolder(root string) error {
 	return nil
 }
 
-type ComposerAuth struct {
-	HTTPBasicAuth  *interface{}      `json:"http-basic,omitempty"`
-	BearerAuth     map[string]string `json:"bearer,omitempty"`
-	GitlabAuth     *interface{}      `json:"gitlab-token,omitempty"`
-	GithubOAuth    *interface{}      `json:"github-oauth,omitempty"`
-	BitbucketOauth *interface{}      `json:"bitbucket-oauth,omitempty"`
-}
-
 func prepareComposerAuth(ctx context.Context) (string, error) {
 	composerToken := os.Getenv("SHOPWARE_PACKAGES_TOKEN")
 	composerAuth := os.Getenv("COMPOSER_AUTH")
@@ -255,10 +248,10 @@ func prepareComposerAuth(ctx context.Context) (string, error) {
 
 	logging.FromContext(ctx).Infof("Setting up composer auth for packages.shopware.com")
 
-	var auth ComposerAuth
+	var auth packagist.ComposerAuth
 
 	if composerAuth == "" {
-		auth = ComposerAuth{}
+		auth = packagist.ComposerAuth{}
 	} else {
 		if err := json.Unmarshal([]byte(composerAuth), &auth); err != nil {
 			return "", err

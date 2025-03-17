@@ -26,6 +26,10 @@ func (a App) GetResourcesDir() string {
 	return path.Join(a.path, "Resources")
 }
 
+func (a App) GetComposerName() (string, error) {
+	return "", fmt.Errorf("app does not have a composer name")
+}
+
 func newApp(path string) (*App, error) {
 	appFileName := fmt.Sprintf("%s/manifest.xml", path)
 

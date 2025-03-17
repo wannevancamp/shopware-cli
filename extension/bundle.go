@@ -69,6 +69,10 @@ type shopwareBundleComposerJsonExtra struct {
 	BundleName string `json:"shopware-bundle-name"`
 }
 
+func (p ShopwareBundle) GetComposerName() (string, error) {
+	return p.Composer.Name, nil
+}
+
 // GetRootDir returns the src directory of the bundle.
 func (p ShopwareBundle) GetRootDir() string {
 	return path.Join(p.path, "src")

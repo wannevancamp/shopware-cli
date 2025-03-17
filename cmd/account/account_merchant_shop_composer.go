@@ -1,12 +1,12 @@
 package account
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 
+	"github.com/shopware/shopware-cli/internal/packagist"
 	"github.com/shopware/shopware-cli/logging"
 )
 
@@ -63,91 +63,30 @@ var accountCompanyMerchantShopComposerCmd = &cobra.Command{
 		if _, err := os.Stat("composer.json"); err == nil {
 			logging.FromContext(cmd.Context()).Info("Found composer.json, adding it now as repository")
 
-			var content []byte
-
-			if content, err = os.ReadFile("composer.json"); err != nil {
+			composerJson, err := packagist.ReadComposerJson("composer.json")
+			if err != nil {
 				return err
 			}
 
-			var composer map[string]interface{}
-
-			if err := json.Unmarshal(content, &composer); err != nil {
-				return err
-			}
-
-			if _, ok := composer["repositories"]; !ok {
-				composer["repositories"] = make(map[string]interface{})
-			}
-
-			repositories, ok := composer["repositories"].(map[string]interface{})
-
-			if ok {
-				repositories["shopware-packages"] = struct {
-					Type string `json:"type"`
-					Url  string `json:"url"`
-				}{
+			if !composerJson.Repositories.HasRepository("https://packages.shopware.com") {
+				composerJson.Repositories = append(composerJson.Repositories, packagist.ComposerJsonRepository{
 					Type: "composer",
-					Url:  "https://packages.shopware.com",
-				}
-			} else {
-				repositories := composer["repositories"].([]interface{})
-
-				repoExists := false
-
-				for _, repo := range repositories {
-					mappedRepo, ok := repo.(map[string]interface{})
-
-					if !ok {
-						continue
-					}
-
-					if mappedRepo["url"] == "https://packages.shopware.com" {
-						repoExists = true
-						break
-					}
-				}
-
-				if !repoExists {
-					repositories = append(repositories, map[string]interface{}{
-						"type": "composer",
-						"url":  "https://packages.shopware.com",
-					})
-
-					composer["repositories"] = repositories
-				}
+					URL:  "https://packages.shopware.com",
+				})
 			}
 
-			if content, err = json.MarshalIndent(composer, "", "    "); err != nil {
+			if err := composerJson.Save(); err != nil {
 				return err
 			}
 
-			if err = os.WriteFile("composer.json", content, os.ModePerm); err != nil {
+			composerAuth, err := packagist.ReadComposerAuth("auth.json", true)
+			if err != nil {
 				return err
 			}
 
-			var authJson map[string]interface{}
+			composerAuth.BearerAuth["packages.shopware.com"] = token
 
-			if content, err = os.ReadFile("auth.json"); err == nil {
-				if err := json.Unmarshal(content, &authJson); err != nil {
-					return err
-				}
-			} else {
-				authJson = make(map[string]interface{})
-			}
-
-			if _, ok := authJson["bearer"]; !ok {
-				authJson["bearer"] = make(map[string]interface{})
-			}
-
-			bearer, _ := authJson["bearer"].(map[string]interface{})
-
-			bearer["packages.shopware.com"] = token
-
-			if content, err = json.MarshalIndent(authJson, "", "    "); err != nil {
-				return err
-			}
-
-			if err = os.WriteFile("auth.json", content, os.ModePerm); err != nil {
+			if err := composerAuth.Save(); err != nil {
 				return err
 			}
 		}

@@ -99,6 +99,7 @@ type extensionMetadata struct {
 
 type Extension interface {
 	GetName() (string, error)
+	GetComposerName() (string, error)
 	GetResourcesDir() string
 
 	// GetRootDir Returns the root folder where the code is located plugin -> src, app ->

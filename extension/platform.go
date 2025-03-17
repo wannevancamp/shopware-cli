@@ -107,6 +107,10 @@ func (p PlatformPlugin) GetName() (string, error) {
 	return parts[len(parts)-1], nil
 }
 
+func (p PlatformPlugin) GetComposerName() (string, error) {
+	return p.Composer.Name, nil
+}
+
 func (p PlatformPlugin) GetExtensionConfig() *Config {
 	return p.config
 }
