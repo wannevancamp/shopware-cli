@@ -50,12 +50,8 @@ var projectMigrateFlexCmd = &cobra.Command{
 		}
 
 		fmt.Println("Project migrated to Symfony Flex")
-		fmt.Print("Please run ")
-		fmt.Print(color.GreenText.Render("composer update"))
-		fmt.Println(", to install the new dependencies")
-		fmt.Print("and ")
-		fmt.Print(color.GreenText.Render("yes | composer recipes:install --reset --force"))
-		fmt.Println(" to apply the recipes")
+		fmt.Printf("Please run %s to install the new dependencies\n", color.GreenText.Render("composer update"))
+		fmt.Printf("and %s to apply the recipes\n", color.GreenText.Render("yes | composer recipes:install --reset --force"))
 
 		return nil
 	},
