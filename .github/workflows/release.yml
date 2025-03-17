@@ -14,7 +14,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481
+      - name: Harden Runner
+        uses: step-security/harden-runner@4d991eb9b905ef189e4c376166672c3f2f230481
         with:
           egress-policy: audit
 
@@ -42,19 +43,22 @@ jobs:
       - name: Install Syft
         uses: anchore/sbom-action/download-syft@v0.18.0
 
-      - uses: octo-sts/action@v1.0.0
+      - name: Gather Frosh Homebrew Token
+        uses: octo-sts/action@v1.0.0
         id: sts-homebrew
         with:
           scope: FriendsOfShopware/homebrew-tap
           identity: release
 
-      - uses: octo-sts/action@v1.0.0
+      - name: Gather Homebrew Token
+        uses: octo-sts/action@v1.0.0
         id: sts-shopware
         with:
           scope: shopware/homebrew-tap
           identity: swcli
 
-      - uses: octo-sts/action@v1.0.0
+      - name: Gather NUR Token
+        uses: octo-sts/action@v1.0.0
         id: sts-nur
         with:
           scope: FriendsOfShopware/nur-packages
