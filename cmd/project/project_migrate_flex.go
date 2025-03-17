@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/charmbracelet/huh"
 	"github.com/shopware/shopware-cli/internal/color"
 	"github.com/shopware/shopware-cli/internal/flexmigrator"
 	"github.com/spf13/cobra"
@@ -17,6 +18,19 @@ var projectMigrateFlexCmd = &cobra.Command{
 		project, err := findClosestShopwareProject()
 		if err != nil {
 			return err
+		}
+
+		var confirmed bool
+		if err := huh.NewConfirm().
+			Title("Are you sure you want to migrate this project to Symfony Flex?").
+			Description("This will modify your composer.json and .env files. Make sure to commit your changes before running this command.").
+			Value(&confirmed).
+			Run(); err != nil {
+			return err
+		}
+
+		if !confirmed {
+			return fmt.Errorf("migration cancelled")
 		}
 
 		if _, err := os.Stat(path.Join(project, "symfony.lock")); err == nil {

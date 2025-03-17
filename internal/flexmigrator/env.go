@@ -14,7 +14,7 @@ func MigrateEnv(project string) error {
 			return err
 		}
 
-		os.WriteFile(path.Join(project, ".env"), []byte(""), os.ModePerm)
+		return os.WriteFile(path.Join(project, ".env"), []byte(""), os.ModePerm)
 	}
 
 	return nil
