@@ -74,7 +74,7 @@ type ComposerJson struct {
 	MinimumStability   string                   `json:"minimum-stability,omitempty"`
 	PreferStable       bool                     `json:"prefer-stable,omitempty"`
 	Authors            []ComposerJsonAuthor     `json:"authors,omitempty"`
-	Support            ComposerJsonSupport      `json:"support,omitempty"`
+	Support            *ComposerJsonSupport     `json:"support,omitempty"`
 	Funding            []ComposerFunding        `json:"funding,omitempty"`
 	Require            ComposerPackageLink      `json:"require,omitempty"`
 	RequireDev         ComposerPackageLink      `json:"require-dev,omitempty"`
@@ -85,7 +85,7 @@ type ComposerJson struct {
 	AutoloadDev        ComposerJsonAutoload     `json:"autoload-dev,omitempty"`
 	Repositories       ComposerJsonRepositories `json:"repositories,omitempty"`
 	Config             map[string]any           `json:"config,omitempty"`
-	Scripts            interface{}              `json:"scripts,omitempty"`
+	Scripts            map[string]any           `json:"scripts,omitempty"`
 	Extra              map[string]any           `json:"extra,omitempty"`
 	Suggest            map[string]string        `json:"suggest,omitempty"`
 	NonFeatureBranches []string                 `json:"non-feature-branches,omitempty"`
@@ -99,6 +99,35 @@ func (c *ComposerJson) HasPackage(name string) bool {
 func (c *ComposerJson) HasPackageDev(name string) bool {
 	_, ok := c.RequireDev[name]
 	return ok
+}
+
+func (c *ComposerJson) HasConfig(key string) bool {
+	_, ok := c.Config[key]
+	return ok
+}
+
+func (c *ComposerJson) EnableComposerPlugin(name string) {
+	allowedPlugins, ok := c.Config["allow-plugins"].(map[string]any)
+
+	if !ok {
+		allowedPlugins = map[string]any{}
+	}
+
+	allowedPlugins[name] = true
+
+	c.Config["allow-plugins"] = allowedPlugins
+}
+
+func (c *ComposerJson) RemoveComposerPlugin(name string) {
+	allowedPlugins, ok := c.Config["allow-plugins"].(map[string]any)
+
+	if !ok {
+		return
+	}
+
+	delete(allowedPlugins, name)
+
+	c.Config["allow-plugins"] = allowedPlugins
 }
 
 func (c *ComposerJson) Save() error {
@@ -121,6 +150,10 @@ func ReadComposerJson(composerPath string) (*ComposerJson, error) {
 
 	if err := json.Unmarshal(content, &composerJson); err != nil {
 		return nil, err
+	}
+
+	if composerJson.Extra == nil {
+		composerJson.Extra = map[string]any{}
 	}
 
 	return &composerJson, nil
