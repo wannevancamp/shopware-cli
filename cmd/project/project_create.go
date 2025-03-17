@@ -15,7 +15,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/manifoldco/promptui"
+	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 
 	"github.com/shopware/shopware-cli/logging"
@@ -64,12 +64,26 @@ var projectCreateCmd = &cobra.Command{
 		if len(args) == 2 {
 			result = args[1]
 		} else {
-			prompt := promptui.Select{
-				Label: "Select Version",
-				Items: filteredVersions,
+			options := make([]huh.Option[string], len(filteredVersions))
+			for i, v := range filteredVersions {
+				versionStr := v.String()
+				options[i] = huh.NewOption(versionStr, versionStr)
 			}
 
-			if _, result, err = prompt.Run(); err != nil {
+			// Add "latest" option
+			options = append(options, huh.NewOption("latest", "latest"))
+
+			// Create and run the select form
+			form := huh.NewForm(
+				huh.NewGroup(
+					huh.NewSelect[string]().
+						Title("Select Version").
+						Options(options...).
+						Value(&result),
+				),
+			)
+
+			if err := form.Run(); err != nil {
 				return err
 			}
 		}

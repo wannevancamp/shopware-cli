@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/manifoldco/promptui"
+	"github.com/charmbracelet/huh"
 	"github.com/spf13/cobra"
 
 	accountApi "github.com/shopware/shopware-cli/internal/account-api"
@@ -79,24 +79,23 @@ func init() {
 }
 
 func askUserForEmailAndPassword() (string, string, error) {
-	emailPrompt := promptui.Prompt{
-		Label:    "Email",
-		Validate: emptyValidator,
-	}
+	var email, password string
 
-	email, err := emailPrompt.Run()
-	if err != nil {
-		return "", "", fmt.Errorf("prompt failed %w", err)
-	}
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewInput().
+				Title("Email").
+				Validate(emptyValidator).
+				Value(&email),
+			huh.NewInput().
+				Title("Password").
+				EchoMode(huh.EchoModePassword).
+				Validate(emptyValidator).
+				Value(&password),
+		),
+	)
 
-	passwordPrompt := promptui.Prompt{
-		Label:    "Password",
-		Validate: emptyValidator,
-		Mask:     '*',
-	}
-
-	password, err := passwordPrompt.Run()
-	if err != nil {
+	if err := form.Run(); err != nil {
 		return "", "", fmt.Errorf("prompt failed %w", err)
 	}
 

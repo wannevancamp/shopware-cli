@@ -3,8 +3,8 @@ package project
 import (
 	"encoding/json"
 
+	"github.com/charmbracelet/huh"
 	adminSdk "github.com/friendsofshopware/go-shopware-admin-api-sdk"
-	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 
 	"github.com/shopware/shopware-cli/logging"
@@ -99,13 +99,22 @@ var projectConfigPushCmd = &cobra.Command{
 		}
 
 		if !autoApprove {
-			p := promptui.Prompt{
-				Label:     "You want to apply these changes to your Shop?",
-				IsConfirm: true,
+			var confirm bool
+
+			confirmForm := huh.NewForm(
+				huh.NewGroup(
+					huh.NewConfirm().
+						Title("You want to apply these changes to your Shop?").
+						Value(&confirm),
+				),
+			)
+
+			if err := confirmForm.Run(); err != nil {
+				return err
 			}
 
-			if _, err := p.Run(); err != nil {
-				return err
+			if !confirm {
+				return nil
 			}
 		}
 
