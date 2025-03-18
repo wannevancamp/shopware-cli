@@ -11,9 +11,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var projectMigrateFlexCmd = &cobra.Command{
+var projectAutofixFlexCmd = &cobra.Command{
 	Use:   "flex",
-	Short: "Migrate project to Symfony Flex",
+	Short: "Autofix project to Symfony Flex",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		project, err := findClosestShopwareProject()
 		if err != nil {
@@ -22,7 +22,7 @@ var projectMigrateFlexCmd = &cobra.Command{
 
 		var confirmed bool
 		if err := huh.NewConfirm().
-			Title("Are you sure you want to migrate this project to Symfony Flex?").
+			Title("Are you sure you want to autofix this project to Symfony Flex?").
 			Description("This will modify your composer.json and .env files. Make sure to commit your changes before running this command.").
 			Value(&confirmed).
 			Run(); err != nil {
@@ -30,7 +30,7 @@ var projectMigrateFlexCmd = &cobra.Command{
 		}
 
 		if !confirmed {
-			return fmt.Errorf("migration cancelled")
+			return fmt.Errorf("autofix cancelled")
 		}
 
 		if _, err := os.Stat(path.Join(project, "symfony.lock")); err == nil {
@@ -58,5 +58,5 @@ var projectMigrateFlexCmd = &cobra.Command{
 }
 
 func init() {
-	projectMigrateCmd.AddCommand(projectMigrateFlexCmd)
+	projectAutofixCmd.AddCommand(projectAutofixFlexCmd)
 }

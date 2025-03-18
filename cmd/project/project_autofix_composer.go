@@ -15,9 +15,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var projectMigrateComposerCmd = &cobra.Command{
-	Use:   "composer",
-	Short: "Migrate plugins from custom/plugins to Composer",
+var projectAutofixComposerCmd = &cobra.Command{
+	Use:   "composer-plugins",
+	Short: "Autofix plugins from custom/plugins to Composer",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		project, err := findClosestShopwareProject()
 		if err != nil {
@@ -133,5 +133,5 @@ var projectMigrateComposerCmd = &cobra.Command{
 }
 
 func init() {
-	projectMigrateCmd.AddCommand(projectMigrateComposerCmd)
+	projectAutofixCmd.AddCommand(projectAutofixComposerCmd)
 }
