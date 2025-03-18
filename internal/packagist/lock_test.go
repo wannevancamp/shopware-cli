@@ -22,7 +22,7 @@ func TestReadComposerLock(t *testing.T) {
 				}
 			]
 		}`
-		err := os.WriteFile(lockFile, []byte(content), 0644)
+		err := os.WriteFile(lockFile, []byte(content), 0o644)
 		assert.NoError(t, err)
 
 		// Test reading the file
@@ -45,7 +45,7 @@ func TestReadComposerLock(t *testing.T) {
 		// Create a temporary file with invalid JSON
 		dir := t.TempDir()
 		lockFile := filepath.Join(dir, "invalid.lock")
-		err := os.WriteFile(lockFile, []byte("invalid json"), 0644)
+		err := os.WriteFile(lockFile, []byte("invalid json"), 0o644)
 		assert.NoError(t, err)
 
 		lock, err := ReadComposerLock(lockFile)
