@@ -221,6 +221,18 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 				if err := InstallNPMDependencies(storefrontRoot, npmPackage, additionalNpmParameters...); err != nil {
 					return err
 				}
+
+				// As we call npm install caniuse-lite, we need to run the postinstal script manually.
+				if npmPackage.HasScript("postinstall") {
+					npmRunPostInstall := exec.Command("npm", "run", "postinstall")
+					npmRunPostInstall.Dir = storefrontRoot
+					npmRunPostInstall.Stdout = os.Stdout
+					npmRunPostInstall.Stderr = os.Stderr
+
+					if err := npmRunPostInstall.Run(); err != nil {
+						return err
+					}
+				}
 			}
 
 			envList := []string{
