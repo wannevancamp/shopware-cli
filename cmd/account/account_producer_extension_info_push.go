@@ -161,12 +161,8 @@ func updateStoreInfo(ext *accountApi.Extension, zipExt extension.Extension, cfg 
 	if cfg.Store.Localizations != nil {
 		newLocales := make([]accountApi.Locale, 0)
 
-		for _, locale := range info.Locales {
-			for _, configLocale := range *cfg.Store.Localizations {
-				if locale.Name == configLocale {
-					newLocales = append(newLocales, locale)
-				}
-			}
+		for _, configLocale := range *cfg.Store.Localizations {
+			newLocales = append(newLocales, accountApi.Locale{Name: configLocale})
 		}
 
 		ext.Localizations = newLocales
