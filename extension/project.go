@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/shopware/shopware-cli/internal/packagist"
 	"github.com/shopware/shopware-cli/internal/phpexec"
 
 	"github.com/shopware/shopware-cli/shop"
@@ -45,17 +46,13 @@ func GetShopwareProjectConstraint(project string) (*version.Constraints, error) 
 	c, err := version.NewConstraint(constraint)
 	if err != nil {
 		if strings.Contains(err.Error(), "malformed constraint") {
-			var lock composerLock
-
-			lockFile, readErr := os.ReadFile(path.Join(project, "composer.lock"))
-
-			if readErr != nil {
-				// popup real error
+			if _, statErr := os.Stat(path.Join(project, "composer.lock")); os.IsNotExist(statErr) {
 				return nil, err
 			}
 
-			if err := json.Unmarshal(lockFile, &lock); err != nil {
-				return nil, fmt.Errorf("could not parse composer.lock: %w", err)
+			lock, err := packagist.ReadComposerLock(path.Join(project, "composer.lock"))
+			if err != nil {
+				return nil, err
 			}
 
 			for _, pkg := range lock.Packages {
