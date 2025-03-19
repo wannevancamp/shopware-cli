@@ -260,6 +260,8 @@ type ConfigValidationIgnoreItem struct {
 	Identifier string `yaml:"identifier"`
 	// The path of the item to ignore.
 	Path string `yaml:"path,omitempty"`
+	// The message of the item to ignore.
+	Message string `yaml:"message,omitempty"`
 }
 
 type ConfigValidationIgnoreExtension struct {

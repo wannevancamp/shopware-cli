@@ -366,6 +366,10 @@
         "path": {
           "type": "string",
           "description": "The path of the item to ignore."
+        },
+        "message": {
+          "type": "string",
+          "description": "The message of the item to ignore."
         }
       },
       "additionalProperties": false,
