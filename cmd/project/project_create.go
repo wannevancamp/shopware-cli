@@ -16,10 +16,10 @@ import (
 	"text/template"
 
 	"github.com/charmbracelet/huh"
+	"github.com/shyim/go-version"
 	"github.com/spf13/cobra"
 
 	"github.com/shopware/shopware-cli/logging"
-	"github.com/shyim/go-version"
 )
 
 var projectCreateCmd = &cobra.Command{

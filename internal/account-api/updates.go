@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/shopware/shopware-cli/logging"
 )
 
 type UpdateCheckExtension struct {
@@ -50,7 +52,11 @@ func GetFutureExtensionUpdates(ctx context.Context, currentVersion string, futur
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			logging.FromContext(ctx).Errorf("Cannot close response body: %v", err)
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)

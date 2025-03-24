@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/invopop/jsonschema"
+
 	"github.com/shopware/shopware-cli/extension"
 	"github.com/shopware/shopware-cli/internal/changelog"
 	"github.com/shopware/shopware-cli/shop"
