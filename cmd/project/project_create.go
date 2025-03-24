@@ -65,9 +65,9 @@ var projectCreateCmd = &cobra.Command{
 			result = args[1]
 		} else {
 			options := make([]huh.Option[string], 0)
-			for i, v := range filteredVersions {
+			for _, v := range filteredVersions {
 				versionStr := v.String()
-				options[i] = huh.NewOption(versionStr, versionStr)
+				options = append(options, huh.NewOption(versionStr, versionStr))
 			}
 
 			// Add "latest" option
