@@ -77,6 +77,7 @@ var projectCreateCmd = &cobra.Command{
 			form := huh.NewForm(
 				huh.NewGroup(
 					huh.NewSelect[string]().
+						Height(10).
 						Title("Select Version").
 						Options(options...).
 						Value(&result),
