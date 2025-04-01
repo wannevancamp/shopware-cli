@@ -1,7 +1,8 @@
 module github.com/shopware/shopware-cli
 
 go 1.24.0
-replace github.com/doutorfinancas/go-mad v0.0.0-20240205120830-463c1e9760f0 => github.com/shyim/go-mad v0.0.0-20250212101107-a15f8dde1bce
+
+replace github.com/doutorfinancas/go-mad v0.0.0-20240205120830-463c1e9760f0 => github.com/shyim/go-mad v0.0.0-20250401132841-d19165fb2107
 
 require (
 	dario.cat/mergo v1.0.1
@@ -48,6 +49,7 @@ require (
 	github.com/charmbracelet/x/term v0.2.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
+	github.com/jaswdr/faker/v2 v2.3.3 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
@@ -67,7 +69,7 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/jaswdr/faker v1.19.1 // indirect
+	github.com/jaswdr/faker v1.19.1
 	github.com/klauspost/compress v1.18.0
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
