@@ -25,9 +25,9 @@ var pathToSymfonyCLI = sync.OnceValue(func() string {
 	return path
 })
 
-var symfonyCliAllowed = sync.OnceValue(func() bool {
+func symfonyCliAllowed() bool {
 	return os.Getenv("SHOPWARE_CLI_NO_SYMFONY_CLI") != "1"
-})
+}
 
 func ConsoleCommand(ctx context.Context, args ...string) *exec.Cmd {
 	consoleCommand := "bin/console"
