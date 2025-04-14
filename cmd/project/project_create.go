@@ -127,6 +127,10 @@ var projectCreateCmd = &cobra.Command{
 			return err
 		}
 
+		if err := os.WriteFile(fmt.Sprintf("%s/.env.local", projectFolder), []byte(""), os.ModePerm); err != nil {
+			return err
+		}
+
 		if err := os.WriteFile(fmt.Sprintf("%s/.gitignore", projectFolder), []byte("/.idea\n/vendor"), os.ModePerm); err != nil {
 			return err
 		}
