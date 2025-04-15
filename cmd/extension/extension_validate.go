@@ -41,6 +41,15 @@ var extensionValidateCmd = &cobra.Command{
 
 		context := extension.RunValidation(cmd.Context(), ext)
 
+		if stat.IsDir() {
+			context.ApplyIgnores([]extension.ConfigValidationIgnoreItem{
+				{
+					Identifier: "zip.disallowed_file",
+					Message:    ".gitignore is not allowed in the zip file",
+				},
+			})
+		}
+
 		if context.HasErrors() || context.HasWarnings() {
 			table := tablewriter.NewWriter(os.Stdout)
 			table.SetHeader([]string{"Type", "Identifier", "Message"})
