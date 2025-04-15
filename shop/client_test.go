@@ -1,7 +1,6 @@
 package shop
 
 import (
-	"context"
 	"testing"
 )
 
@@ -97,7 +96,7 @@ func Test_NewShopClient(t *testing.T) {
 	t.Setenv("SHOPWARE_CLI_API_CLIENT_SECRET", "secret")
 
 	cfg := &Config{}
-	client, err := NewShopClient(context.Background(), cfg)
+	client, err := NewShopClient(t.Context(), cfg)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -113,7 +112,7 @@ func Test_NewShopClient_configUrl(t *testing.T) {
 	t.Setenv("SHOPWARE_CLI_API_CLIENT_SECRET", "secret")
 
 	cfg := &Config{URL: "http://config-url"}
-	client, err := NewShopClient(context.Background(), cfg)
+	client, err := NewShopClient(t.Context(), cfg)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -130,7 +129,7 @@ func Test_NewShopClient_skipSSLCheck_env(t *testing.T) {
 	t.Setenv("SHOPWARE_CLI_API_DISABLE_SSL_CHECK", "true")
 
 	cfg := &Config{}
-	client, err := NewShopClient(context.Background(), cfg)
+	client, err := NewShopClient(t.Context(), cfg)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -152,7 +151,7 @@ func Test_NewShopClient_skipSSLCheck_config(t *testing.T) {
 			DisableSSLCheck: true,
 		},
 	}
-	client, err := NewShopClient(context.Background(), cfg)
+	client, err := NewShopClient(t.Context(), cfg)
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
@@ -170,7 +169,7 @@ func Test_NewShopClient_NoURL(t *testing.T) {
 
 	// Config with empty URL
 	cfg := &Config{URL: ""}
-	_, err := NewShopClient(context.Background(), cfg)
+	_, err := NewShopClient(t.Context(), cfg)
 	// The current implementation doesn't check for empty URL
 	// The error would come from the SDK later when it tries to make a request
 	if err != nil {
@@ -188,7 +187,7 @@ func Test_NewShopClient_CredentialsError(t *testing.T) {
 
 	// Config without credentials
 	cfg := &Config{}
-	_, err := NewShopClient(context.Background(), cfg)
+	_, err := NewShopClient(t.Context(), cfg)
 	if err == nil {
 		t.Fatal("expected error for missing credentials, got nil")
 	}
