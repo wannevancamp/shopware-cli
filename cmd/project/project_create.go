@@ -16,10 +16,9 @@ import (
 	"text/template"
 
 	"github.com/charmbracelet/huh"
+	"github.com/shopware/shopware-cli/logging"
 	"github.com/shyim/go-version"
 	"github.com/spf13/cobra"
-
-	"github.com/shopware/shopware-cli/logging"
 )
 
 var projectCreateCmd = &cobra.Command{
@@ -92,7 +91,18 @@ var projectCreateCmd = &cobra.Command{
 		chooseVersion := ""
 
 		if result == "latest" {
-			chooseVersion = filteredVersions[0].String()
+			// pick the most recent stable (non-RC) version
+			for _, v := range filteredVersions {
+				vs := v.String()
+				if !strings.Contains(strings.ToLower(vs), "rc") {
+					chooseVersion = vs
+					break
+				}
+			}
+			// if no stable found, fall back to top entry
+			if chooseVersion == "" && len(filteredVersions) > 0 {
+				chooseVersion = filteredVersions[0].String()
+			}
 		} else if strings.HasPrefix(result, "dev-") {
 			chooseVersion = result
 		} else {
