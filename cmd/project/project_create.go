@@ -276,6 +276,11 @@ func generateComposerJson(ctx context.Context, version string, rc bool) (string,
             }
         }
     ],
+	"autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
 	{{if .RC}}
     "minimum-stability": "RC",
 	{{end}}
