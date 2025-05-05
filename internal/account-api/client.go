@@ -103,7 +103,8 @@ func getApiTokenCacheFilePath() (string, error) {
 		return "", err
 	}
 
-	return fmt.Sprintf("%s/%s", cacheDir, CacheFileName), nil
+	shopwareCacheDir := filepath.Join(cacheDir, "shopware-cli")
+	return filepath.Join(shopwareCacheDir, CacheFileName), nil
 }
 
 func createApiFromTokenCache(ctx context.Context) (*Client, error) {
