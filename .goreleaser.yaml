@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema-pro.json
 version: 2
 before:
   hooks:
@@ -344,3 +345,17 @@ brews:
       bash_completion.install "completions/shopware-cli.bash" => "_shopware-cli"
       zsh_completion.install "completions/shopware-cli.zsh" => "_shopware-cli"
       fish_completion.install "completions/shopware-cli.fish"
+
+npms:
+  - name: "@shopware-ag/shopware-cli"
+    description: "Shopware CLI helps Shopware developers manage extensions"
+    license: MIT
+    homepage: https://developer.shopware.com/docs/products/cli/
+    keywords:
+      - cli
+      - shopware
+    repository: https://github.com/shopware/shopware-cli
+    bugs: https://github.com/shopware/shopware-cli/issues
+    access: public
+
+    
