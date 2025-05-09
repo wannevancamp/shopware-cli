@@ -234,6 +234,16 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 						return err
 					}
 				}
+
+				if _, err := os.Stat(path.Join(storefrontRoot, "vendor/bootstrap")); os.IsNotExist(err) {
+					npmVendor := exec.CommandContext(ctx, "node", path.Join(storefrontRoot, "copy-to-vendor.js"))
+					npmVendor.Dir = storefrontRoot
+					npmVendor.Stdout = os.Stdout
+					npmVendor.Stderr = os.Stderr
+					if err := npmVendor.Run(); err != nil {
+						return err
+					}
+				}
 			}
 
 			envList := []string{
