@@ -3,8 +3,9 @@ package admintwiglinter
 import (
 	"strings"
 
-	"github.com/shopware/shopware-cli/internal/html"
 	"github.com/shyim/go-version"
+
+	"github.com/shopware/shopware-cli/internal/html"
 )
 
 type ColorpickerFixer struct{}

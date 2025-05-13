@@ -10,10 +10,11 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/shyim/go-version"
+
 	"github.com/shopware/shopware-cli/extension"
 	"github.com/shopware/shopware-cli/logging"
 	"github.com/shopware/shopware-cli/shop"
-	"github.com/shyim/go-version"
 )
 
 func IsProject(root string) bool {

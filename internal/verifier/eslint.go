@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"golang.org/x/sync/errgroup"
+
+	"github.com/shopware/shopware-cli/logging"
 )
 
 type EslintOutput []struct {
@@ -140,7 +142,7 @@ func (e Eslint) Fix(ctx context.Context, config ToolConfig) error {
 
 			log, _ := eslint.CombinedOutput()
 
-			fmt.Println(string(log))
+			logging.FromContext(ctx).Info(string(log))
 
 			return nil
 		})

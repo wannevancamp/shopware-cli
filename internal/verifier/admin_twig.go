@@ -9,10 +9,11 @@ import (
 	"strings"
 
 	"github.com/sergi/go-diff/diffmatchpatch"
+	"github.com/shyim/go-version"
 
 	"github.com/shopware/shopware-cli/internal/html"
 	"github.com/shopware/shopware-cli/internal/verifier/admintwiglinter"
-	"github.com/shyim/go-version"
+	"github.com/shopware/shopware-cli/logging"
 )
 
 type AdminTwigLinter struct{}
@@ -143,7 +144,7 @@ func (a AdminTwigLinter) Format(ctx context.Context, config ToolConfig, dryRun b
 			if dryRun {
 				diffs := dmp.DiffMain(string(file), parsed.Dump(0), false)
 
-				fmt.Println(dmp.DiffPrettyText(diffs))
+				logging.FromContext(ctx).Info(dmp.DiffPrettyText(diffs))
 
 				return nil
 			} else {

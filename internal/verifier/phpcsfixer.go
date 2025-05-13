@@ -34,6 +34,7 @@ func (p PHPCSFixer) getConfigPath(cwd, rootDir string) string {
 func (p PHPCSFixer) Format(ctx context.Context, config ToolConfig, dryRun bool) error {
 	// Apps don't have an composer.json file, skip them
 	if _, err := os.Stat(path.Join(config.RootDir, "composer.json")); err != nil {
+		//nolint: nilerr
 		return nil
 	}
 

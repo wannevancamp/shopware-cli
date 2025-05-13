@@ -6,8 +6,9 @@ import (
 	"path"
 	"sort"
 
-	"github.com/shopware/shopware-cli/extension"
 	"github.com/shyim/go-version"
+
+	"github.com/shopware/shopware-cli/extension"
 )
 
 func ConvertExtensionToToolConfig(ext extension.Extension) (*ToolConfig, error) {

@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path"
+
+	"github.com/shopware/shopware-cli/logging"
 )
 
 type Rector struct{}
@@ -20,6 +22,7 @@ func (r Rector) Check(ctx context.Context, check *Check, config ToolConfig) erro
 
 func (r Rector) Fix(ctx context.Context, config ToolConfig) error {
 	if _, err := os.Stat(path.Join(config.RootDir, "composer.json")); err != nil {
+		//nolint: nilerr
 		return nil
 	}
 
@@ -64,7 +67,7 @@ func (r Rector) Fix(ctx context.Context, config ToolConfig) error {
 		rector.Dir = config.RootDir
 
 		log, _ := rector.CombinedOutput()
-		fmt.Println(string(log))
+		logging.FromContext(ctx).Info(string(log))
 	}
 
 	// Cleanup after execution

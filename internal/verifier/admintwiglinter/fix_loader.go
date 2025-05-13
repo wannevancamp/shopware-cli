@@ -1,8 +1,9 @@
 package admintwiglinter
 
 import (
-	"github.com/shopware/shopware-cli/internal/html"
 	"github.com/shyim/go-version"
+
+	"github.com/shopware/shopware-cli/internal/html"
 )
 
 type LoaderFixer struct{}
