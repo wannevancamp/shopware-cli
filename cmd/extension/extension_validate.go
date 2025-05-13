@@ -120,6 +120,12 @@ func init() {
 			return fmt.Errorf("invalid mode: %s. Must be either 'highest' or 'lowest'", mode)
 		}
 
-		return verifier.SetupTools(cmd.Root().Version)
+		// Dont setup tools if we dont run full validation
+		full, _ := cmd.Flags().GetBool("full")
+		if !full {
+			return nil
+		}
+
+		return verifier.SetupTools("latest")
 	}
 }
