@@ -67,7 +67,7 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 		phpstanArguments := []string{"-dmemory_limit=2G", path.Join(config.ToolDirectory, "php", "vendor", "bin", "phpstan"), "analyse", "--no-progress", "--no-interaction", "--error-format=json", sourceDirectory}
 
 		if !p.configExists(config.RootDir) {
-			phpstanArguments = append(phpstanArguments, "--configuration", path.Join(config.ToolDirectory, "php", "phpstan.neon"))
+			phpstanArguments = append(phpstanArguments, "--configuration", path.Join(config.ToolDirectory, "php", "configs", "phpstan.neon"))
 		}
 
 		phpstan := exec.CommandContext(ctx, "php", phpstanArguments...)

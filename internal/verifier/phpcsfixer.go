@@ -28,7 +28,7 @@ func (p PHPCSFixer) getConfigPath(cwd, rootDir string) string {
 		return path.Join(rootDir, ".php-cs-fixer.dist.php")
 	}
 
-	return path.Join(cwd, "tools", "php", ".php-cs-fixer.dist.php")
+	return path.Join(cwd, "tools", "php", "configs", ".php-cs-fixer.dist.php")
 }
 
 func (p PHPCSFixer) Format(ctx context.Context, config ToolConfig, dryRun bool) error {
