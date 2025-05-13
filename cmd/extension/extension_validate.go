@@ -5,8 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
+
+	"github.com/shopware/shopware-cli/internal/table"
 
 	"github.com/shopware/shopware-cli/extension"
 	"github.com/shopware/shopware-cli/logging"
@@ -51,7 +52,7 @@ var extensionValidateCmd = &cobra.Command{
 		}
 
 		if context.HasErrors() || context.HasWarnings() {
-			table := tablewriter.NewWriter(os.Stdout)
+			table := table.NewWriter(os.Stdout)
 			table.Header([]string{"Type", "Identifier", "Message"})
 
 			for _, msg := range context.Errors() {

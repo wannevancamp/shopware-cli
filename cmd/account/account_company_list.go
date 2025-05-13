@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/olekukonko/tablewriter"
+	"github.com/shopware/shopware-cli/internal/table"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +15,7 @@ var accountCompanyListCmd = &cobra.Command{
 	Aliases: []string{"ls"},
 	Long:    ``,
 	Run: func(_ *cobra.Command, _ []string) {
-		table := tablewriter.NewWriter(os.Stdout)
+		table := table.NewWriter(os.Stdout)
 		table.Header([]string{"ID", "Name", "Customer ID", "Roles"})
 
 		for _, membership := range services.AccountClient.GetMemberships() {

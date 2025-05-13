@@ -6,9 +6,9 @@ import (
 	"os"
 
 	adminSdk "github.com/friendsofshopware/go-shopware-admin-api-sdk"
-	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 
+	"github.com/shopware/shopware-cli/internal/table"
 	"github.com/shopware/shopware-cli/logging"
 	"github.com/shopware/shopware-cli/shop"
 )
@@ -58,7 +58,7 @@ var projectExtensionOutdatedCmd = &cobra.Command{
 			return nil
 		}
 
-		table := tablewriter.NewWriter(os.Stdout)
+		table := table.NewWriter(os.Stdout)
 		table.Header([]string{"Name", "Current Version", "Latest Version", "Update Source"})
 
 		for _, extension := range extensions {

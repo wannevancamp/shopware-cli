@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/olekukonko/tablewriter"
+	"github.com/shopware/shopware-cli/internal/table"
 	"github.com/spf13/cobra"
 
 	"github.com/shopware/shopware-cli/extension"
@@ -44,7 +44,7 @@ var projectDebug = &cobra.Command{
 		sources := extension.FindAssetSourcesOfProject(logging.DisableLogger(cmd.Context()), args[0], shopCfg)
 
 		fmt.Println("Following extensions/bundles has been detected")
-		table := tablewriter.NewWriter(os.Stdout)
+		table := table.NewWriter(os.Stdout)
 		table.Header([]string{"Name", "Path"})
 
 		for _, source := range sources {

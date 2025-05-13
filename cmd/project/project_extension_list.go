@@ -6,9 +6,9 @@ import (
 	"os"
 
 	adminSdk "github.com/friendsofshopware/go-shopware-admin-api-sdk"
-	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 
+	"github.com/shopware/shopware-cli/internal/table"
 	"github.com/shopware/shopware-cli/shop"
 )
 
@@ -51,7 +51,7 @@ var projectExtensionListCmd = &cobra.Command{
 			return nil
 		}
 
-		table := tablewriter.NewWriter(os.Stdout)
+		table := table.NewWriter(os.Stdout)
 		table.Header([]string{"Name", "Version", "Status"})
 
 		for _, extension := range extensions {

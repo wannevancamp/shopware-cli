@@ -4,7 +4,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/olekukonko/tablewriter"
+	"github.com/shopware/shopware-cli/internal/table"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +13,7 @@ var accountCompanyMerchantShopListCmd = &cobra.Command{
 	Short:   "List all shops",
 	Aliases: []string{"ls"},
 	RunE: func(cmd *cobra.Command, _ []string) error {
-		table := tablewriter.NewWriter(os.Stdout)
+		table := table.NewWriter(os.Stdout)
 		table.Header([]string{"ID", "Domain", "Usage"})
 
 		shops, err := services.AccountClient.Merchant().Shops(cmd.Context())

@@ -5,7 +5,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/olekukonko/tablewriter"
+	"github.com/shopware/shopware-cli/internal/table"
 	"github.com/spf13/cobra"
 
 	account_api "github.com/shopware/shopware-cli/internal/account-api"
@@ -35,7 +35,7 @@ var accountCompanyProducerExtensionListCmd = &cobra.Command{
 			return err
 		}
 
-		table := tablewriter.NewWriter(os.Stdout)
+		table := table.NewWriter(os.Stdout)
 		table.Header([]string{"ID", "Name", "Type", "Compatible with latest version", "Status"})
 
 		for _, extension := range extensions {
