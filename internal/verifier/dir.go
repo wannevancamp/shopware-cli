@@ -7,7 +7,7 @@ import (
 
 var toolDirectory = ""
 
-func SetToolDirectory(dir string) {
+func setToolDirectory(dir string) {
 	toolDirectory = dir
 }
 
