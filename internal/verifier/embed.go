@@ -3,6 +3,7 @@ package verifier
 import (
 	"embed"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -33,7 +34,9 @@ func SetupTools(currentVersion string) error {
 	}
 
 	if err := unpackFile(toolsFS, ".", toolsDir); err != nil {
-		os.RemoveAll(toolsDir)
+		if err := os.RemoveAll(toolsDir); err != nil {
+			return err
+		}
 		return fmt.Errorf("failed to unpack file: %w", err)
 	}
 
@@ -41,7 +44,7 @@ func SetupTools(currentVersion string) error {
 	composerInstall.Dir = path.Join(toolsDir, "php")
 
 	if output, err := composerInstall.CombinedOutput(); err != nil {
-		fmt.Println(string(output))
+		log.Println(string(output))
 		if err := os.RemoveAll(toolsDir); err != nil {
 			return err
 		}
@@ -52,7 +55,7 @@ func SetupTools(currentVersion string) error {
 	jsInstall.Dir = path.Join(toolsDir, "js")
 
 	if output, err := jsInstall.CombinedOutput(); err != nil {
-		fmt.Println(string(output))
+		log.Println(string(output))
 		if err := os.RemoveAll(toolsDir); err != nil {
 			return err
 		}

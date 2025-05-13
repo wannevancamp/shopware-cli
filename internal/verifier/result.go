@@ -82,3 +82,8 @@ type CheckResult struct {
 
 	Identifier string `json:"identifier"`
 }
+
+const (
+	CheckSeverityError = "error"
+	CheckSeverityWarn  = "warning"
+)

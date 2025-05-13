@@ -10,8 +10,7 @@ import (
 
 func TestCopyFiles(t *testing.T) {
 	// Create a temporary directory for testing
-	tempDir, err := os.MkdirTemp("", "copyfiles-test")
-	assert.NoError(t, err, "Failed to create temp directory")
+	tempDir := t.TempDir()
 	defer func() {
 		err := os.RemoveAll(tempDir)
 		assert.NoError(t, err, "Failed to remove temporary directory")
@@ -19,7 +18,7 @@ func TestCopyFiles(t *testing.T) {
 
 	// Create source directory structure
 	srcDir := filepath.Join(tempDir, "src")
-	err = os.MkdirAll(srcDir, 0o755)
+	err := os.MkdirAll(srcDir, 0o755)
 	assert.NoError(t, err, "Failed to create source directory")
 
 	// Create a normal file

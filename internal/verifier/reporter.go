@@ -54,19 +54,22 @@ func doSummaryReport(result *Check) error {
 	warningCount := 0
 
 	for file, results := range fileGroups {
+		//nolint:forbidigo
 		fmt.Printf("\n%s\n", file)
 		for _, r := range results {
 			totalProblems++
 			switch r.Severity {
-			case "error":
+			case CheckSeverityError:
 				errorCount++
-			case "warning":
+			case CheckSeverityWarn:
 				warningCount++
 			}
+			//nolint:forbidigo
 			fmt.Printf("  %d  %-7s  %s  %s\n", r.Line, r.Severity, r.Message, r.Identifier)
 		}
 	}
 
+	//nolint:forbidigo
 	fmt.Printf("\n✖ %d problems (%d errors, %d warnings)\n", totalProblems, errorCount, warningCount)
 
 	return nil
@@ -96,8 +99,10 @@ func doGitHubReport(result *Check) error {
 
 	for _, res := range result.Results {
 		if res.Line == 0 {
+			//nolint:forbidigo
 			fmt.Printf("::%s file=%s::%s\n", res.Severity, res.Path, res.Message)
 		} else {
+			//nolint:forbidigo
 			fmt.Printf("::%s file=%s,line=%d::%s\n", res.Severity, res.Path, res.Line, res.Message)
 		}
 	}
