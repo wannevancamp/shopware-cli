@@ -47,7 +47,7 @@ func (p PasswordFieldFixer) Fix(nodes []html.Node) error {
 					case "value":
 						attr.Key = "model-value"
 						newAttrs = append(newAttrs, attr)
-					case "v-model:value":
+					case VModelValueAttr:
 						attr.Key = "v-model"
 						newAttrs = append(newAttrs, attr)
 					case "size":

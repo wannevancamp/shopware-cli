@@ -43,13 +43,13 @@ func (n NumberFieldFixer) Fix(nodes []html.Node) error {
 				// Check if the attribute is an html.Attribute
 				if attr, ok := attrNode.(html.Attribute); ok {
 					switch attr.Key {
-					case ":value":
+					case ColonValueAttr:
 						newAttrs = append(newAttrs, html.Attribute{
 							Key:   ":model-value",
 							Value: attr.Value,
 						})
-					case "v-model:value":
-						attr.Key = "v-model"
+					case VModelValueAttr:
+						attr.Key = VModelAttr
 						newAttrs = append(newAttrs, attr)
 					case "@update:value":
 						newAttrs = append(newAttrs, html.Attribute{
@@ -69,10 +69,10 @@ func (n NumberFieldFixer) Fix(nodes []html.Node) error {
 			var label string
 			var remainingChildren html.NodeList
 			for _, child := range node.Children {
-				if elem, ok := child.(*html.ElementNode); ok && elem.Tag == "template" {
+				if elem, ok := child.(*html.ElementNode); ok && elem.Tag == TemplateTag {
 					for _, a := range elem.Attributes {
 						if attr, ok := a.(html.Attribute); ok {
-							if attr.Key == "#label" {
+							if attr.Key == LabelSlotAttr {
 								var sb strings.Builder
 								for _, inner := range elem.Children {
 									sb.WriteString(strings.TrimSpace(inner.Dump(0)))

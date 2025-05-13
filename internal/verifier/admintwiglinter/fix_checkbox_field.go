@@ -45,15 +45,15 @@ func (c CheckboxFieldFixer) Fix(nodes []html.Node) error {
 				// Check if the attribute is an html.Attribute
 				if attr, ok := attrNode.(html.Attribute); ok {
 					switch attr.Key {
-					case ":value":
+					case ColonValueAttr:
 						newAttrs = append(newAttrs, html.Attribute{Key: ":checked", Value: attr.Value})
-					case "v-model", "v-model:value":
+					case VModelAttr, VModelValueAttr:
 						newAttrs = append(newAttrs, html.Attribute{Key: "v-model:checked", Value: attr.Value})
 					case "id", "ghostValue", "padded":
 						// remove these attributes without replacement
 					case "partlyChecked":
 						newAttrs = append(newAttrs, html.Attribute{Key: "partial"})
-					case "@update:value":
+					case UpdateValueAttr:
 						newAttrs = append(newAttrs, html.Attribute{Key: "@update:checked", Value: attr.Value})
 					default:
 						newAttrs = append(newAttrs, attr)

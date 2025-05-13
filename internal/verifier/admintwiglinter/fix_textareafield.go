@@ -43,11 +43,11 @@ func (t TextareaFieldFixer) Fix(nodes []html.Node) error {
 				// Check if the attribute is an html.Attribute
 				if attr, ok := attrNode.(html.Attribute); ok {
 					switch attr.Key {
-					case "value":
-						attr.Key = "model-value"
+					case ValueAttr:
+						attr.Key = ModelValueAttr
 						newAttrs = append(newAttrs, attr)
-					case "v-model:value":
-						attr.Key = "v-model"
+					case VModelValueAttr:
+						attr.Key = VModelAttr
 						newAttrs = append(newAttrs, attr)
 					case "update:value":
 						attr.Key = "update:model-value"
@@ -66,10 +66,10 @@ func (t TextareaFieldFixer) Fix(nodes []html.Node) error {
 			var remainingChildren html.NodeList
 
 			for _, child := range node.Children {
-				if element, ok := child.(*html.ElementNode); ok && element.Tag == "template" {
+				if element, ok := child.(*html.ElementNode); ok && element.Tag == TemplateTag {
 					for _, a := range element.Attributes {
 						if attr, ok := a.(html.Attribute); ok {
-							if attr.Key == "#label" {
+							if attr.Key == LabelSlotAttr {
 								var sb strings.Builder
 								for _, inner := range element.Children {
 									sb.WriteString(strings.TrimSpace(inner.Dump(0)))

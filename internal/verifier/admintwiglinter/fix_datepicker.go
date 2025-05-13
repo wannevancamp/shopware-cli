@@ -47,10 +47,10 @@ func (d DatepickerFixer) Fix(nodes []html.Node) error {
 					case ":value":
 						attr.Key = ":model-value"
 						newAttrs = append(newAttrs, attr)
-					case "v-model:value":
-						attr.Key = "v-model"
+					case VModelValueAttr:
+						attr.Key = VModelAttr
 						newAttrs = append(newAttrs, attr)
-					case "@update:value":
+					case UpdateValueAttr:
 						attr.Key = "@update:model-value"
 						newAttrs = append(newAttrs, attr)
 					default:
@@ -68,10 +68,10 @@ func (d DatepickerFixer) Fix(nodes []html.Node) error {
 			var remainingChildren html.NodeList
 			for _, child := range node.Children {
 				if elem, ok := child.(*html.ElementNode); ok {
-					if elem.Tag == "template" {
+					if elem.Tag == TemplateTag {
 						for _, a := range elem.Attributes {
 							if attr, ok := a.(html.Attribute); ok {
-								if attr.Key == "#label" {
+								if attr.Key == LabelSlotAttr {
 									var sb strings.Builder
 									for _, inner := range elem.Children {
 										sb.WriteString(strings.TrimSpace(inner.Dump(0)))

@@ -48,7 +48,8 @@ func (e Eslint) Name() string {
 }
 
 func (e Eslint) Check(ctx context.Context, check *Check, config ToolConfig) error {
-	paths := append(config.StorefrontDirectories, config.AdminDirectories...)
+	paths := append([]string{}, config.StorefrontDirectories...)
+	paths = append(paths, config.AdminDirectories...)
 
 	var gr errgroup.Group
 
@@ -113,7 +114,8 @@ func (e Eslint) Fix(ctx context.Context, config ToolConfig) error {
 		return err
 	}
 
-	paths := append(config.StorefrontDirectories, config.AdminDirectories...)
+	paths := append([]string{}, config.StorefrontDirectories...)
+	paths = append(paths, config.AdminDirectories...)
 	env := append(os.Environ(), fmt.Sprintf("SHOPWARE_VERSION=%s", config.MinShopwareVersion))
 
 	var gr errgroup.Group

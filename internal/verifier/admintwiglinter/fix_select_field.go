@@ -59,8 +59,8 @@ func (s SelectFieldFixer) Fix(nodes []html.Node) error {
 						converted = strings.ReplaceAll(converted, "id", "value")
 						newAttrs = append(newAttrs, html.Attribute{Key: ":options", Value: converted})
 						optionsSet = true
-					case "@update:value":
-						newAttrs = append(newAttrs, html.Attribute{Key: "@update:model-value", Value: attr.Value})
+					case UpdateValueAttr:
+						newAttrs = append(newAttrs, html.Attribute{Key: UpdateModelValueAttr, Value: attr.Value})
 					default:
 						newAttrs = append(newAttrs, attr)
 					}
@@ -78,10 +78,10 @@ func (s SelectFieldFixer) Fix(nodes []html.Node) error {
 			for _, child := range node.Children {
 				if elem, ok := child.(*html.ElementNode); ok {
 					// Convert label slot to label prop.
-					if elem.Tag == "template" {
+					if elem.Tag == TemplateTag {
 						for _, a := range elem.Attributes {
 							if attr, ok := a.(html.Attribute); ok {
-								if attr.Key == "#label" || attr.Key == "v-slot:label" {
+								if attr.Key == LabelSlotAttr || attr.Key == "v-slot:label" {
 									var sb strings.Builder
 									for _, inner := range elem.Children {
 										sb.WriteString(strings.TrimSpace(inner.Dump(0)))

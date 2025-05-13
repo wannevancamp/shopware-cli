@@ -37,7 +37,8 @@ func (s StyleLint) Name() string {
 }
 
 func (s StyleLint) Check(ctx context.Context, check *Check, config ToolConfig) error {
-	paths := append(config.StorefrontDirectories, config.AdminDirectories...)
+	paths := append([]string{}, config.StorefrontDirectories...)
+	paths = append(paths, config.AdminDirectories...)
 
 	var gr errgroup.Group
 
@@ -108,7 +109,8 @@ func (s StyleLint) Fix(ctx context.Context, config ToolConfig) error {
 		return err
 	}
 
-	paths := append(config.StorefrontDirectories, config.AdminDirectories...)
+	paths := append([]string{}, config.StorefrontDirectories...)
+	paths = append(paths, config.AdminDirectories...)
 
 	var gr errgroup.Group
 

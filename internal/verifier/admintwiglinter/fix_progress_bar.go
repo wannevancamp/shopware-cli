@@ -41,14 +41,14 @@ func (p ProgressBarFixer) Fix(nodes []html.Node) error {
 				// Check if the attribute is an html.Attribute
 				if attr, ok := attrNode.(html.Attribute); ok {
 					switch attr.Key {
-					case "value":
-						attr.Key = "model-value"
+					case ValueAttr:
+						attr.Key = ModelValueAttr
 						newAttrs = append(newAttrs, attr)
-					case "v-model:value":
-						attr.Key = "v-model"
+					case VModelValueAttr:
+						attr.Key = VModelAttr
 						newAttrs = append(newAttrs, attr)
-					case "@update:value":
-						attr.Key = "@update:model-value"
+					case UpdateValueAttr:
+						attr.Key = UpdateModelValueAttr
 						newAttrs = append(newAttrs, attr)
 					default:
 						newAttrs = append(newAttrs, attr)

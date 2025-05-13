@@ -56,11 +56,11 @@ func (b ButtonFixer) Fix(nodes []html.Node) error {
 							addGhost = true
 						case "danger":
 							// Change value to critical.
-							attr.Value = "critical"
+							attr.Value = CriticalValue
 							newAttrs = append(newAttrs, attr)
 						case "ghost-danger":
 							// Set critical and also ghost.
-							attr.Value = "critical"
+							attr.Value = CriticalValue
 							newAttrs = append(newAttrs, attr)
 							addGhost = true
 						case "contrast", "context":

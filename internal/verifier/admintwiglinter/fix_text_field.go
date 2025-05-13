@@ -43,21 +43,21 @@ func (t TextFieldFixer) Fix(nodes []html.Node) error {
 				// Check if the attribute is an html.Attribute
 				if attr, ok := attrNode.(html.Attribute); ok {
 					switch attr.Key {
-					case "value":
-						attr.Key = "model-value"
+					case ValueAttr:
+						attr.Key = ModelValueAttr
 						newAttrs = append(newAttrs, attr)
-					case "v-model:value":
-						attr.Key = "v-model"
+					case VModelValueAttr:
+						attr.Key = VModelAttr
 						newAttrs = append(newAttrs, attr)
-					case "size":
-						if attr.Value == "medium" {
-							attr.Value = "default"
+					case SizeAttr:
+						if attr.Value == MediumValue {
+							attr.Value = DefaultValue
 						}
 						newAttrs = append(newAttrs, attr)
-					case "isInvalid", "aiBadge", "@base-field-mounted":
+					case IsInvalidAttr, AiBadgeAttr, BaseFieldMountedAttr:
 						// remove these attributes
-					case "@update:value":
-						attr.Key = "@update:model-value"
+					case UpdateValueAttr:
+						attr.Key = UpdateModelValueAttr
 						newAttrs = append(newAttrs, attr)
 					default:
 						newAttrs = append(newAttrs, attr)
@@ -73,10 +73,10 @@ func (t TextFieldFixer) Fix(nodes []html.Node) error {
 			label := ""
 			var remainingChildren html.NodeList
 			for _, child := range node.Children {
-				if elem, ok := child.(*html.ElementNode); ok && elem.Tag == "template" {
+				if elem, ok := child.(*html.ElementNode); ok && elem.Tag == TemplateTag {
 					for _, a := range elem.Attributes {
 						if attr, ok := a.(html.Attribute); ok {
-							if attr.Key == "#label" {
+							if attr.Key == LabelSlotAttr {
 								var sb strings.Builder
 								for _, inner := range elem.Children {
 									sb.WriteString(strings.TrimSpace(inner.Dump(0)))

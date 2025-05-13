@@ -35,7 +35,7 @@ func (a AdminTwigLinter) Check(ctx context.Context, check *Check, config ToolCon
 				return nil
 			}
 
-			if filepath.Ext(path) != ".twig" {
+			if filepath.Ext(path) != admintwiglinter.TwigExtension {
 				return nil
 			}
 
@@ -84,7 +84,7 @@ func (a AdminTwigLinter) Fix(ctx context.Context, config ToolConfig) error {
 				return nil
 			}
 
-			if filepath.Ext(path) != ".twig" {
+			if filepath.Ext(path) != admintwiglinter.TwigExtension {
 				return nil
 			}
 
@@ -127,7 +127,7 @@ func (a AdminTwigLinter) Format(ctx context.Context, config ToolConfig, dryRun b
 				return nil
 			}
 
-			if filepath.Ext(path) != ".twig" {
+			if filepath.Ext(path) != admintwiglinter.TwigExtension {
 				return nil
 			}
 

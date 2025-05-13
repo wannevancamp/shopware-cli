@@ -45,12 +45,12 @@ func (s SwitchFixer) Fix(nodes []html.Node) error {
 					switch attr.Key {
 					case "noMarginTop":
 						newAttrs = append(newAttrs, html.Attribute{Key: "removeTopMargin"})
-					case "size", "id", "ghostValue", "padded", "partlyChecked":
+					case SizeAttr, "id", "ghostValue", "padded", "partlyChecked":
 						// remove these attributes
-					case "value":
+					case ValueAttr:
 						newAttrs = append(newAttrs, html.Attribute{Key: "checked", Value: attr.Value})
-					case "v-model:value":
-						attr.Key = "v-model"
+					case VModelValueAttr:
+						attr.Key = VModelAttr
 						newAttrs = append(newAttrs, attr)
 					default:
 						newAttrs = append(newAttrs, attr)
@@ -67,10 +67,10 @@ func (s SwitchFixer) Fix(nodes []html.Node) error {
 			var remainingChildren html.NodeList
 			for _, child := range node.Children {
 				// Check if child is a slot element.
-				if elem, ok := child.(*html.ElementNode); ok && elem.Tag == "template" {
+				if elem, ok := child.(*html.ElementNode); ok && elem.Tag == TemplateTag {
 					for _, a := range elem.Attributes {
 						if attr, ok := a.(html.Attribute); ok {
-							if attr.Key == "#label" {
+							if attr.Key == LabelSlotAttr {
 								var sb strings.Builder
 								for _, inner := range elem.Children {
 									sb.WriteString(strings.TrimSpace(inner.Dump(0)))
@@ -78,7 +78,7 @@ func (s SwitchFixer) Fix(nodes []html.Node) error {
 								labelText = sb.String()
 								goto SkipChild
 							}
-							if attr.Key == "#hint" {
+							if attr.Key == HintSlotAttr {
 								goto SkipChild
 							}
 						}
