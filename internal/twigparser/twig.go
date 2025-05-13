@@ -6,6 +6,11 @@ import (
 	"unicode"
 )
 
+const (
+	tagTypeExpr  = "expr"
+	tagTypeBlock = "block"
+)
+
 // tokenizeText splits a text string into a slice of Nodes. Each continuous
 // segment of pure whitespace becomes a WhitespaceNode, whereas every other
 // segment becomes a TextNode.
@@ -84,20 +89,21 @@ func parseNodes(input string, pos *int, stopOnEndBlock bool) ([]Node, error) {
 		var nextTagIndex int
 		var tagType string
 
-		if relativeBlock == -1 && relativeExpr == -1 {
+		switch {
+		case relativeBlock == -1 && relativeExpr == -1:
 			nextTagIndex = -1
-		} else if relativeBlock == -1 {
+		case relativeBlock == -1:
 			nextTagIndex = relativeExpr
-			tagType = "expr"
-		} else if relativeExpr == -1 {
+			tagType = tagTypeExpr
+		case relativeExpr == -1:
 			nextTagIndex = relativeBlock
-			tagType = "block"
-		} else if relativeBlock < relativeExpr {
+			tagType = tagTypeBlock
+		case relativeBlock < relativeExpr:
 			nextTagIndex = relativeBlock
-			tagType = "block"
-		} else {
+			tagType = tagTypeBlock
+		default:
 			nextTagIndex = relativeExpr
-			tagType = "expr"
+			tagType = tagTypeExpr
 		}
 
 		if nextTagIndex == -1 {
@@ -113,7 +119,7 @@ func parseNodes(input string, pos *int, stopOnEndBlock bool) ([]Node, error) {
 			nodes = append(nodes, tokenizeText(text)...)
 		}
 
-		if tagType == "block" {
+		if tagType == tagTypeBlock {
 			closeTagIndex := strings.Index(input[tagStart:], "%}")
 			if closeTagIndex == -1 {
 				return nil, errors.New("unclosed block tag")
@@ -207,8 +213,9 @@ func parseNodes(input string, pos *int, stopOnEndBlock bool) ([]Node, error) {
 				continue
 			}
 
-			// For node.
-			if strings.HasPrefix(tagContent, "block ") {
+			// Handle block tags
+			switch {
+			case strings.HasPrefix(tagContent, "block "):
 				parts := strings.Fields(tagContent)
 				if len(parts) < 2 {
 					return nil, errors.New("invalid block tag: no block name")
@@ -224,8 +231,8 @@ func parseNodes(input string, pos *int, stopOnEndBlock bool) ([]Node, error) {
 					Children: children,
 				}
 				nodes = append(nodes, block)
-				continue
-			} else if strings.HasPrefix(tagContent, "sw_extends") {
+
+			case strings.HasPrefix(tagContent, "sw_extends"):
 				// New support for sw_extends.
 				remainder := strings.TrimSpace(tagContent[len("sw_extends"):])
 				var tmpl string
@@ -253,8 +260,8 @@ func parseNodes(input string, pos *int, stopOnEndBlock bool) ([]Node, error) {
 				}
 				nodes = append(nodes, &SwExtendsNode{Template: tmpl, Scopes: scopes})
 				*pos = tagEnd
-				continue
-			} else if strings.HasPrefix(tagContent, "endblock") || strings.HasPrefix(tagContent, "endfor") {
+
+			case strings.HasPrefix(tagContent, "endblock") || strings.HasPrefix(tagContent, "endfor"):
 				if stopOnEndBlock {
 					*pos = tagEnd
 					return nodes, nil
@@ -262,14 +269,14 @@ func parseNodes(input string, pos *int, stopOnEndBlock bool) ([]Node, error) {
 				// If an endblock appears unexpectedly, treat it as literal text.
 				nodes = append(nodes, tokenizeText(input[tagStart:tagEnd])...)
 				*pos = tagEnd
-				continue
-			} else {
+
+			default:
 				// Unrecognized block tag: treat it as literal text.
 				nodes = append(nodes, tokenizeText(input[tagStart:tagEnd])...)
 				*pos = tagEnd
-				continue
 			}
-		} else if tagType == "expr" {
+			continue
+		} else if tagType == tagTypeExpr {
 			closeExprIndex := strings.Index(input[tagStart:], "}}")
 			if closeExprIndex == -1 {
 				return nil, errors.New("unclosed expression tag")
