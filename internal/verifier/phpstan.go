@@ -69,6 +69,7 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 		}
 
 		phpstan := exec.CommandContext(ctx, "php", phpstanArguments...)
+		phpstan.Env = append(os.Environ(), fmt.Sprintf("PHP_DIR=%s", path.Join(config.ToolDirectory, "php")))
 		phpstan.Dir = config.RootDir
 
 		var stderr bytes.Buffer
