@@ -6,6 +6,8 @@ import (
 	"unicode"
 )
 
+const htmlCommentStart = "<!--"
+
 // Attribute represents an HTML attribute with key and value.
 type Attribute struct {
 	Key   string
@@ -157,6 +159,8 @@ type ElementNode struct {
 }
 
 // Dump returns the HTML representation of the element and its children.
+//
+//nolint:gocyclo
 func (e *ElementNode) Dump(indent int) string {
 	var builder strings.Builder
 	indentStr := indentConfig.GetIndent()
@@ -401,6 +405,8 @@ type TwigIfNode struct {
 }
 
 // Dump returns the twig if block with proper formatting
+//
+//nolint:gocyclo
 func (t *TwigIfNode) Dump(indent int) string {
 	var builder strings.Builder
 	indentStr := indentConfig.GetIndent()
@@ -591,7 +597,8 @@ func (p *Parser) getLineAt(pos int) int {
 
 // parseComment parses an HTML comment and returns a CommentNode
 func (p *Parser) parseComment() (*CommentNode, error) {
-	if p.peek(4) != "<!--" {
+	if p.peek(4) != htmlCommentStart {
+		//nolint: nilnil
 		return nil, nil
 	}
 	startPos := p.pos
@@ -613,6 +620,8 @@ func (p *Parser) parseComment() (*CommentNode, error) {
 }
 
 // parseNodes parses a list of nodes until an optional stop tag (used for element children).
+//
+//nolint:gocyclo
 func (p *Parser) parseNodes(stopTag string) (NodeList, error) {
 	var nodes NodeList
 	rawStart := p.pos
@@ -698,7 +707,7 @@ func (p *Parser) parseNodes(stopTag string) (NodeList, error) {
 			continue
 		}
 
-		if p.peek(4) == "<!--" {
+		if p.peek(4) == htmlCommentStart {
 			if p.pos > rawStart {
 				text := p.input[rawStart:p.pos]
 				if strings.TrimSpace(text) != "" {
@@ -729,7 +738,7 @@ func (p *Parser) parseNodes(stopTag string) (NodeList, error) {
 			}
 		}
 
-		if p.current() == '<' && p.peek(2) != "<!--" {
+		if p.current() == '<' && p.peek(2) != htmlCommentStart {
 			if p.pos > rawStart {
 				text := p.input[rawStart:p.pos]
 				if strings.TrimSpace(text) != "" {
@@ -776,6 +785,7 @@ func (p *Parser) parseElement() (Node, error) {
 	// Record start position for line number.
 	startPos := p.pos
 	if p.current() != '<' {
+		//nolint: nilnil
 		return nil, nil
 	}
 	p.pos++ // skip '<'
@@ -875,7 +885,7 @@ func (p *Parser) parseElementChildren(tag string) (NodeList, error) {
 	rawStart := p.pos
 
 	for p.pos < p.length {
-		if p.peek(4) == "<!--" {
+		if p.peek(4) == htmlCommentStart {
 			if p.pos > rawStart {
 				text := p.input[rawStart:p.pos]
 				if text != "" {
@@ -947,7 +957,7 @@ func (p *Parser) parseElementChildren(tag string) (NodeList, error) {
 			}
 		}
 
-		if p.current() == '<' && p.peek(2) != "<!--" {
+		if p.current() == '<' && p.peek(2) != htmlCommentStart {
 			if p.pos > rawStart {
 				text := p.input[rawStart:p.pos]
 				if text != "" {
@@ -1025,6 +1035,7 @@ func (p *Parser) parseAttrValue() string {
 
 func (p *Parser) parseTwigDirective() (Node, error) {
 	if p.peek(2) != "{%" {
+		//nolint: nilnil
 		return nil, nil
 	}
 
@@ -1056,11 +1067,13 @@ func (p *Parser) parseTwigDirective() (Node, error) {
 
 	// Reset position if it's not a recognized directive
 	p.pos = startPos
+	//nolint: nilnil
 	return nil, nil
 }
 
 func (p *Parser) parseTwigBlock() (Node, error) {
 	if p.peek(2) != "{%" {
+		//nolint: nilnil
 		return nil, nil
 	}
 
@@ -1071,6 +1084,7 @@ func (p *Parser) parseTwigBlock() (Node, error) {
 	// Check if it's a block
 	if !strings.HasPrefix(p.input[p.pos:], "block") {
 		p.pos = startPos
+		//nolint: nilnil
 		return nil, nil
 	}
 	p.pos += 5 // skip "block"
@@ -1130,6 +1144,7 @@ func (p *Parser) parseTwigBlock() (Node, error) {
 // parseTwigIf parses a {% if ... %} ... {% endif %} block and returns a TwigIfNode
 func (p *Parser) parseTwigIf() (Node, error) {
 	if p.peek(2) != "{%" {
+		//nolint: nilnil
 		return nil, nil
 	}
 
@@ -1140,6 +1155,7 @@ func (p *Parser) parseTwigIf() (Node, error) {
 	// Check if it's an if statement
 	if !strings.HasPrefix(p.input[p.pos:], "if") {
 		p.pos = startPos
+		//nolint: nilnil
 		return nil, nil
 	}
 	p.pos += 2 // skip "if"
@@ -1276,7 +1292,7 @@ func (p *Parser) parseIfBranch() (NodeList, error) {
 
 		// Handle raw text
 		if p.pos > rawStart {
-			if p.peek(2) == "{%" || p.peek(2) == "{{" || p.peek(4) == "<!--" || p.current() == '<' {
+			if p.peek(2) == "{%" || p.peek(2) == "{{" || p.peek(4) == htmlCommentStart || p.current() == '<' {
 				text := p.input[rawStart:p.pos]
 				if text != "" {
 					nodes = append(nodes, &RawNode{
@@ -1368,6 +1384,7 @@ func (p *Parser) parseIfBranch() (NodeList, error) {
 // parseTemplateExpression parses a {{...}} template expression and returns a TemplateExpressionNode
 func (p *Parser) parseTemplateExpression() (*TemplateExpressionNode, error) {
 	if p.peek(2) != "{{" {
+		//nolint: nilnil
 		return nil, nil
 	}
 
