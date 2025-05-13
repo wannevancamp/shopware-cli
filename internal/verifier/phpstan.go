@@ -10,8 +10,6 @@ import (
 	"os/exec"
 	"path"
 	"strings"
-
-	"github.com/shopware/shopware-cli/logging"
 )
 
 var possiblePHPStanConfigs = []string{
@@ -83,8 +81,10 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 		var phpstanResult PhpStanOutput
 
 		if err := json.Unmarshal(log, &phpstanResult); err != nil {
-			logging.FromContext(ctx).Error(stderr.String())
-			logging.FromContext(ctx).Error(string(log))
+			//nolint: forbidigo
+			fmt.Print(stderr.String())
+			//nolint: forbidigo
+			fmt.Print(string(log))
 			return fmt.Errorf("failed to unmarshal phpstan output: %w", err)
 		}
 

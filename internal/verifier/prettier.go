@@ -43,7 +43,7 @@ func (b Prettier) Format(ctx context.Context, config ToolConfig, dryRun bool) er
 		args := []string{
 			path.Join(config.ToolDirectory, "js", "node_modules", ".bin", "prettier"),
 			"--config",
-			path.Join(config.ToolDirectory, "js", ".prettierrc.js"),
+			path.Join(config.ToolDirectory, "js", "configs", "prettierrc.js"),
 			".",
 		}
 

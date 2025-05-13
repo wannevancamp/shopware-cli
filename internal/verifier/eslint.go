@@ -10,8 +10,6 @@ import (
 	"strings"
 
 	"golang.org/x/sync/errgroup"
-
-	"github.com/shopware/shopware-cli/logging"
 )
 
 type EslintOutput []struct {
@@ -109,11 +107,6 @@ func (e Eslint) Check(ctx context.Context, check *Check, config ToolConfig) erro
 }
 
 func (e Eslint) Fix(ctx context.Context, config ToolConfig) error {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
 	paths := append([]string{}, config.StorefrontDirectories...)
 	paths = append(paths, config.AdminDirectories...)
 	env := append(os.Environ(), fmt.Sprintf("SHOPWARE_VERSION=%s", config.MinShopwareVersion))
@@ -123,15 +116,11 @@ func (e Eslint) Fix(ctx context.Context, config ToolConfig) error {
 	for _, p := range paths {
 		p := p
 
-		if !path.IsAbs(p) {
-			p = path.Join(cwd, p)
-		}
-
 		gr.Go(func() error {
 			eslint := exec.CommandContext(ctx,
 				"node",
-				path.Join(cwd, "tools", "js", "node_modules", ".bin", "eslint"),
-				"--config", path.Join(cwd, "tools", "js", "configs", fmt.Sprintf("eslint.config.%s.mjs", path.Base(p))),
+				path.Join(config.ToolDirectory, "js", "node_modules", ".bin", "eslint"),
+				"--config", path.Join(config.ToolDirectory, "js", "configs", fmt.Sprintf("eslint.config.%s.mjs", path.Base(p))),
 				"--ignore-pattern", "dist/**",
 				"--ignore-pattern", "vendor/**",
 				"--ignore-pattern", "test/e2e/**",
@@ -144,7 +133,8 @@ func (e Eslint) Fix(ctx context.Context, config ToolConfig) error {
 
 			log, _ := eslint.CombinedOutput()
 
-			logging.FromContext(ctx).Info(string(log))
+			//nolint: forbidigo
+			fmt.Print(string(log))
 
 			return nil
 		})

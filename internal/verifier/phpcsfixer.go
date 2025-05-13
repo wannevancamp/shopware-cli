@@ -23,12 +23,12 @@ func (p PHPCSFixer) Fix(ctx context.Context, config ToolConfig) error {
 	return nil
 }
 
-func (p PHPCSFixer) getConfigPath(cwd, rootDir string) string {
+func (p PHPCSFixer) getConfigPath(toolDirectory, rootDir string) string {
 	if _, err := os.Stat(path.Join(rootDir, ".php-cs-fixer.dist.php")); err == nil {
 		return path.Join(rootDir, ".php-cs-fixer.dist.php")
 	}
 
-	return path.Join(cwd, "tools", "php", "configs", ".php-cs-fixer.dist.php")
+	return path.Join(toolDirectory, "php", "configs", "php-cs-fixer.dist.php")
 }
 
 func (p PHPCSFixer) Format(ctx context.Context, config ToolConfig, dryRun bool) error {
@@ -38,22 +38,18 @@ func (p PHPCSFixer) Format(ctx context.Context, config ToolConfig, dryRun bool) 
 		return nil
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
 	var gr errgroup.Group
 
 	for _, sourceDirectory := range config.SourceDirectories {
 		fixDir := sourceDirectory
 
-		args := []string{"fix", "--config", p.getConfigPath(cwd, config.RootDir), fixDir}
+		args := []string{"fix", "--config", p.getConfigPath(config.ToolDirectory, config.RootDir), fixDir}
 		if dryRun {
 			args = append(args, "--dry-run")
 		}
 
 		cmd := exec.CommandContext(ctx, path.Join(config.ToolDirectory, "php", "vendor", "bin", "php-cs-fixer"), args...)
+		cmd.Env = append(os.Environ(), "PHP_CS_FIXER_IGNORE_ENV=1")
 		cmd.Dir = config.RootDir
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
