@@ -2,23 +2,29 @@ package verifier
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/shopware/shopware-cli/extension"
 )
 
-var availableTools = []Tool{}
+type ToolList []Tool
+
+var availableTools = ToolList{}
 
 func AddTool(tool Tool) {
 	availableTools = append(availableTools, tool)
 }
 
-func GetTools() []Tool {
+func GetTools() ToolList {
 	return availableTools
 }
 
 type ToolConfig struct {
 	// Path to the tool directory
 	ToolDirectory string
+
+	InputWasDirectory bool
 
 	// The minimum version of Shopware that is supported
 	MinShopwareVersion string
@@ -51,4 +57,41 @@ type Tool interface {
 	Check(ctx context.Context, check *Check, config ToolConfig) error
 	Fix(ctx context.Context, config ToolConfig) error
 	Format(ctx context.Context, config ToolConfig, dryRun bool) error
+}
+
+func (tl ToolList) Only(only string) (ToolList, error) {
+	if only == "" {
+		return tl, nil
+	}
+
+	var filteredTools []Tool
+	requestedTools := strings.Split(only, ",")
+
+	for _, requestedTool := range requestedTools {
+		requestedTool = strings.TrimSpace(requestedTool)
+		found := false
+
+		for _, t := range tl {
+			if t.Name() == requestedTool {
+				filteredTools = append(filteredTools, t)
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return nil, fmt.Errorf("tool with name %q not found, possible tools: %s", requestedTool, tl.PossibleString())
+		}
+	}
+
+	return filteredTools, nil
+}
+
+func (tl ToolList) PossibleString() string {
+	var possibleTools []string
+	for _, t := range tl {
+		possibleTools = append(possibleTools, t.Name())
+	}
+
+	return strings.Join(possibleTools, ",")
 }

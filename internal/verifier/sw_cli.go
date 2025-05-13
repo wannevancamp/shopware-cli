@@ -21,6 +21,15 @@ func (s SWCLI) Check(ctx context.Context, check *Check, config ToolConfig) error
 
 	config.Extension.Validate(ctx, &validationContext)
 
+	if config.InputWasDirectory {
+		validationContext.ApplyIgnores([]extension.ConfigValidationIgnoreItem{
+			{
+				Identifier: "zip.disallowed_file",
+				Message:    ".gitignore is not allowed in the zip file",
+			},
+		})
+	}
+
 	for _, err := range validationContext.Errors() {
 		check.AddResult(CheckResult{
 			Path:       "",
