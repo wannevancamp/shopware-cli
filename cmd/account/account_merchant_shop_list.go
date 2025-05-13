@@ -4,8 +4,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/shopware/shopware-cli/internal/table"
 	"github.com/spf13/cobra"
+
+	"github.com/shopware/shopware-cli/internal/table"
 )
 
 var accountCompanyMerchantShopListCmd = &cobra.Command{

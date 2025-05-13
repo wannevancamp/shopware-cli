@@ -5,10 +5,10 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/shopware/shopware-cli/internal/table"
 	"github.com/spf13/cobra"
 
 	account_api "github.com/shopware/shopware-cli/internal/account-api"
+	"github.com/shopware/shopware-cli/internal/table"
 )
 
 var accountCompanyProducerExtensionListCmd = &cobra.Command{

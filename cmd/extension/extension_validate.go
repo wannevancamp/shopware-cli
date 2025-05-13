@@ -7,9 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/shopware/shopware-cli/internal/table"
-
 	"github.com/shopware/shopware-cli/extension"
+	"github.com/shopware/shopware-cli/internal/table"
 	"github.com/shopware/shopware-cli/logging"
 )
 
