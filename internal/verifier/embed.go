@@ -10,7 +10,7 @@ import (
 	"github.com/shopware/shopware-cli/internal/system"
 )
 
-//go:embed tools/php/composer.json tools/php/composer.lock tools/php/configs tools/js/configs tools/js/packages tools/js/package-*.json
+//go:embed php/composer.json php/composer.lock php/configs js/configs js/packages js/package*.json
 var toolsFS embed.FS
 
 func SetupTools(currentVersion string) error {
@@ -28,27 +28,42 @@ func SetupTools(currentVersion string) error {
 		return nil
 	}
 
-	if err := os.MkdirAll(toolsDir, 0o755); err != nil {
-		return err
+	if err := os.MkdirAll(toolsDir, os.ModePerm); err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", toolsDir, err)
 	}
 
-	if err := unpackFile(toolsFS, "."); err != nil {
+	if err := unpackFile(toolsFS, ".", toolsDir); err != nil {
 		os.RemoveAll(toolsDir)
-		return err
+		return fmt.Errorf("failed to unpack file: %w", err)
 	}
 
-	composerInstall, err := exec.Command("composer", "install", "--no-dev").CombinedOutput()
-	if err != nil {
-		os.RemoveAll(toolsDir)
-		fmt.Println(string(composerInstall))
-		return err
+	composerInstall := exec.Command("composer", "install", "--no-dev")
+	composerInstall.Dir = path.Join(toolsDir, "php")
+
+	if output, err := composerInstall.CombinedOutput(); err != nil {
+		fmt.Println(string(output))
+		if err := os.RemoveAll(toolsDir); err != nil {
+			return err
+		}
+		return fmt.Errorf("failed to install composer dependencies: %w", err)
+	}
+
+	jsInstall := exec.Command("npm", "install")
+	jsInstall.Dir = path.Join(toolsDir, "js")
+
+	if output, err := jsInstall.CombinedOutput(); err != nil {
+		fmt.Println(string(output))
+		if err := os.RemoveAll(toolsDir); err != nil {
+			return err
+		}
+		return fmt.Errorf("failed to install npm dependencies: %w", err)
 	}
 
 	setToolDirectory(toolsDir)
 	return nil
 }
 
-func unpackFile(fs embed.FS, filePath string) error {
+func unpackFile(fs embed.FS, filePath, unpackDir string) error {
 	f, err := fs.ReadDir(filePath)
 	if err != nil {
 		return err
@@ -56,21 +71,21 @@ func unpackFile(fs embed.FS, filePath string) error {
 
 	for _, file := range f {
 		if file.IsDir() {
-			if err := os.Mkdir(path.Join(filePath, file.Name()), 0o755); err != nil {
-				return err
+			if err := os.MkdirAll(path.Join(unpackDir, file.Name()), os.ModePerm); err != nil {
+				return fmt.Errorf("failed to create directory %s: %w", path.Join(unpackDir, file.Name()), err)
 			}
 
-			if err := unpackFile(fs, path.Join(filePath, file.Name())); err != nil {
-				return err
+			if err := unpackFile(fs, path.Join(filePath, file.Name()), path.Join(unpackDir, file.Name())); err != nil {
+				return fmt.Errorf("failed to unpack file %s: %w", path.Join(filePath, file.Name()), err)
 			}
 		} else {
 			content, err := fs.ReadFile(path.Join(filePath, file.Name()))
 			if err != nil {
-				return err
+				return fmt.Errorf("failed to read file %s: %w", path.Join(filePath, file.Name()), err)
 			}
 
-			if err := os.WriteFile(path.Join(filePath, file.Name()), content, 0o644); err != nil {
-				return err
+			if err := os.WriteFile(path.Join(unpackDir, file.Name()), content, os.ModePerm); err != nil {
+				return fmt.Errorf("failed to write file %s: %w", path.Join(unpackDir, file.Name()), err)
 			}
 		}
 	}
