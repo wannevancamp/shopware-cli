@@ -65,6 +65,7 @@ func (r Rector) Fix(ctx context.Context, config ToolConfig) error {
 		rector.Dir = config.RootDir
 
 		log, _ := rector.CombinedOutput()
+		//nolint: forbidigo
 		fmt.Print(string(log))
 	}
 
