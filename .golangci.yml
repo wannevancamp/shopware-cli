@@ -17,7 +17,6 @@ linters:
     - unused
     - whitespace
     - asciicheck
-    - godot
     - gocyclo
     - gocritic
     - errcheck
@@ -40,7 +39,6 @@ linters:
     - ginkgolinter
     - gocheckcompilerdirectives
     - goconst
-    - godot
     - godox
     - nilnil
   exclusions:
