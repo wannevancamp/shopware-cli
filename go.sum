@@ -142,6 +142,10 @@ github.com/shyim/go-version v0.0.0-20250513054659-15e244b52011 h1:Fv97bFEM3NPyDW
 github.com/shyim/go-version v0.0.0-20250513054659-15e244b52011/go.mod h1:z47ygE4N7EC0H58FP5j5cXZtl1pSnfjwYJsHtiVtcwU=
 github.com/shyim/go-version v0.0.0-20250514104457-ded98488bd6f h1:0zgN0ZKq9EmT7sL0MEn9V70rGiwkj78Vv1WD0xmys8c=
 github.com/shyim/go-version v0.0.0-20250514104457-ded98488bd6f/go.mod h1:z47ygE4N7EC0H58FP5j5cXZtl1pSnfjwYJsHtiVtcwU=
+github.com/shyim/go-version v0.0.0-20250514131704-4ce943532a2c h1:gJ1D2/OkhbH/TOFffIx42cSBAF2qbuJ0JXlDr4zljrM=
+github.com/shyim/go-version v0.0.0-20250514131704-4ce943532a2c/go.mod h1:z47ygE4N7EC0H58FP5j5cXZtl1pSnfjwYJsHtiVtcwU=
+github.com/shyim/go-version v0.0.0-20250514132108-aa2854d2c40b h1:BBiMTvsse8YOfQuP/bFqxJjeqhkJtY1M0ZlGiwP5xtA=
+github.com/shyim/go-version v0.0.0-20250514132108-aa2854d2c40b/go.mod h1:z47ygE4N7EC0H58FP5j5cXZtl1pSnfjwYJsHtiVtcwU=
 github.com/spf13/cobra v1.9.1 h1:CXSaggrXdbHK9CF+8ywj8Amf7PBRmPCOJugH954Nnlo=
 github.com/spf13/cobra v1.9.1/go.mod h1:nDyEzZ8ogv936Cinf6g1RU9MRY64Ir93oCnqb9wxYW0=
 github.com/spf13/pflag v1.0.6 h1:jFzHGLGAlb3ruxLB8MhbI6A8+AQX/2eW4qeyNZXNp2o=

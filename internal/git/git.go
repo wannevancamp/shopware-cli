@@ -6,9 +6,11 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"sort"
 	"strings"
 
 	"github.com/shopware/shopware-cli/logging"
+	"github.com/shyim/go-version"
 )
 
 type GitCommit struct {
@@ -34,13 +36,47 @@ func runGit(ctx context.Context, repo string, args ...string) (string, error) {
 }
 
 func getPreviousTag(ctx context.Context, currentTag, repo string) (string, error) {
-	if err := unshallowRepository(ctx, repo); err != nil {
-		return "", err
-	}
-
 	previousVersion := os.Getenv("SHOPWARE_CLI_PREVIOUS_TAG")
 	if previousVersion != "" {
 		return previousVersion, nil
+	}
+
+	tags, err := runGit(ctx, repo, "tag", "--list")
+	if err != nil {
+		return "", fmt.Errorf("failed to run git command: %w", err)
+	}
+
+	// direct tag match
+	tagsArray := strings.Split(tags, "\n")
+
+	var tagList []*version.Version
+
+	for _, tag := range tagsArray {
+		v, err := version.NewVersion(tag)
+		if err != nil {
+			continue
+		}
+
+		tagList = append(tagList, v)
+	}
+
+	currentVersion := version.Must(version.NewVersion(currentTag))
+
+	sort.Sort(sort.Reverse(version.Collection(tagList)))
+
+	// same major version
+	currentMajor := currentVersion.Segments()[0]
+	for _, tag := range tagList {
+		if tag.Segments()[0] == currentMajor && tag.LessThan(currentVersion) {
+			return tag.String(), nil
+		}
+	}
+
+	// Look at previous major version
+	for _, tag := range tagList {
+		if tag.Segments()[0] == currentMajor-1 {
+			return tag.String(), nil
+		}
 	}
 
 	commits, err := runGit(ctx, repo, "log", "--pretty=format:%h", "--no-merges")
@@ -49,28 +85,6 @@ func getPreviousTag(ctx context.Context, currentTag, repo string) (string, error
 	}
 
 	commitsArray := strings.Split(commits, "\n")
-	for commit := range commitsArray {
-		contains, err := runGit(ctx, repo, "tag", "--contains", commitsArray[commit])
-		if err != nil {
-			return "", fmt.Errorf("cannot get previous tag: %w", err)
-		}
-
-		if contains == "" {
-			continue
-		}
-
-		matchingTags := strings.Split(contains, "\n")
-
-		if len(matchingTags) == 0 {
-			continue
-		}
-
-		if matchingTags[0] == currentTag {
-			continue
-		}
-
-		return matchingTags[0], nil
-	}
 
 	// if no tag was found, return the first commit
 	return commitsArray[len(commitsArray)-1], nil
@@ -94,6 +108,7 @@ func GetCommits(ctx context.Context, currentVersion, repo string) ([]GitCommit, 
 	}
 
 	logging.FromContext(ctx).Debugf("Previous tag: %s", previousTag)
+	logging.FromContext(ctx).Debugf("Diffing %s..HEAD", previousTag)
 
 	commits, err := runGit(ctx, repo, "log", "--pretty=format:%h|%s", previousTag+"..HEAD", "--no-merges")
 	if err != nil {
@@ -142,7 +157,7 @@ func getTagForVersion(ctx context.Context, version, repo string) (string, error)
 		}
 	}
 
-	return "", nil
+	return version, nil
 }
 
 func GetPublicVCSURL(ctx context.Context, repo string) (string, error) {

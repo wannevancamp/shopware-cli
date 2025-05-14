@@ -521,14 +521,16 @@ func PrepareExtensionForRelease(ctx context.Context, sourceRoot, extensionRoot s
 	if ext.GetExtensionConfig().Changelog.Enabled {
 		v, _ := ext.GetVersion()
 
-		logging.FromContext(ctx).Infof("Generated changelog for version %s", v.Original())
+		logging.FromContext(ctx).Infof("Generated changelog for version %s", v.String())
 
-		content, err := changelog.GenerateChangelog(ctx, v.Original(), sourceRoot, ext.GetExtensionConfig().Changelog)
+		content, err := changelog.GenerateChangelog(ctx, v.String(), sourceRoot, ext.GetExtensionConfig().Changelog)
 		if err != nil {
 			return err
 		}
 
-		changelogFile := fmt.Sprintf("# %s\n%s", v.Original(), content)
+		changelogFile := fmt.Sprintf("# %s\n%s", v.String(), content)
+
+		logging.FromContext(ctx).Debugf("Changelog:\n%s", changelogFile)
 
 		if err := os.WriteFile(path.Join(extensionRoot, "CHANGELOG_en-GB.md"), []byte(changelogFile), os.ModePerm); err != nil {
 			return err

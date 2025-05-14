@@ -185,7 +185,7 @@ var projectExtensionUploadCmd = &cobra.Command{
 			}
 		}
 
-		logging.FromContext(cmd.Context()).Infof("Uploaded extension %s with version %s", name, version)
+		logging.FromContext(cmd.Context()).Infof("Uploaded extension %s with version %s", name, version.String())
 
 		if _, err := client.ExtensionManager.Refresh(adminCtx); err != nil {
 			return fmt.Errorf("cannot refresh extension list: %w", err)
