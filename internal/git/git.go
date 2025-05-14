@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+
+	"github.com/shopware/shopware-cli/logging"
 )
 
 type GitCommit struct {
@@ -31,7 +33,7 @@ func runGit(ctx context.Context, repo string, args ...string) (string, error) {
 	return strings.Trim(gitOuput, " "), nil
 }
 
-func getPreviousTag(ctx context.Context, repo string) (string, error) {
+func getPreviousTag(ctx context.Context, currentTag, repo string) (string, error) {
 	if err := unshallowRepository(ctx, repo); err != nil {
 		return "", err
 	}
@@ -63,6 +65,10 @@ func getPreviousTag(ctx context.Context, repo string) (string, error) {
 			continue
 		}
 
+		if matchingTags[0] == currentTag {
+			continue
+		}
+
 		return matchingTags[0], nil
 	}
 
@@ -70,15 +76,24 @@ func getPreviousTag(ctx context.Context, repo string) (string, error) {
 	return commitsArray[len(commitsArray)-1], nil
 }
 
-func GetCommits(ctx context.Context, repo string) ([]GitCommit, error) {
+func GetCommits(ctx context.Context, currentVersion, repo string) ([]GitCommit, error) {
 	if err := unshallowRepository(ctx, repo); err != nil {
 		return nil, err
 	}
 
-	previousTag, err := getPreviousTag(ctx, repo)
+	currentTag, err := getTagForVersion(ctx, currentVersion, repo)
 	if err != nil {
 		return nil, err
 	}
+
+	logging.FromContext(ctx).Debugf("Current tag: %s", currentTag)
+
+	previousTag, err := getPreviousTag(ctx, currentTag, repo)
+	if err != nil {
+		return nil, err
+	}
+
+	logging.FromContext(ctx).Debugf("Previous tag: %s", previousTag)
 
 	commits, err := runGit(ctx, repo, "log", "--pretty=format:%h|%s", previousTag+"..HEAD", "--no-merges")
 	if err != nil {
@@ -101,6 +116,33 @@ func GetCommits(ctx context.Context, repo string) ([]GitCommit, error) {
 	}
 
 	return gitCommits, nil
+}
+
+func getTagForVersion(ctx context.Context, version, repo string) (string, error) {
+	version = strings.TrimPrefix(version, "v")
+
+	tags, err := runGit(ctx, repo, "tag", "--list")
+	if err != nil {
+		return "", fmt.Errorf("failed to run git command: %w", err)
+	}
+
+	// direct tag match
+	tagsArray := strings.Split(tags, "\n")
+	for _, tag := range tagsArray {
+		if tag == version {
+			return tag, nil
+		}
+	}
+
+	// tag prefix match
+	for _, tag := range tagsArray {
+		tag = strings.TrimPrefix(tag, "v")
+		if strings.HasPrefix(tag, version) {
+			return tag, nil
+		}
+	}
+
+	return "", nil
 }
 
 func GetPublicVCSURL(ctx context.Context, repo string) (string, error) {

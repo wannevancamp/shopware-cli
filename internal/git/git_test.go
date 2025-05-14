@@ -13,7 +13,7 @@ func TestInvalidGitRepository(t *testing.T) {
 	repo := "invalid"
 	ctx := t.Context()
 
-	tag, err := getPreviousTag(ctx, repo)
+	tag, err := getPreviousTag(ctx, "", repo)
 	assert.Error(t, err)
 	assert.Empty(t, tag)
 }
@@ -25,11 +25,15 @@ func TestNoTags(t *testing.T) {
 	runCommand(t, tmpDir, "add", "a")
 	runCommand(t, tmpDir, "commit", "-m", "initial commit", "--no-verify", "--no-gpg-sign")
 
-	tag, err := getPreviousTag(t.Context(), tmpDir)
+	tag, err := getPreviousTag(t.Context(), "", tmpDir)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, tag)
 
-	commits, err := GetCommits(t.Context(), tmpDir)
+	currentTag, err := getTagForVersion(t.Context(), "1.0.0", tmpDir)
+	assert.NoError(t, err)
+	assert.Equal(t, "", currentTag)
+
+	commits, err := GetCommits(t.Context(), "", tmpDir)
 	assert.NoError(t, err)
 	assert.Len(t, commits, 0)
 }
@@ -45,11 +49,15 @@ func TestWithOneTagAndCommit(t *testing.T) {
 	runCommand(t, tmpDir, "add", "b")
 	runCommand(t, tmpDir, "commit", "-m", "second commit", "--no-verify", "--no-gpg-sign")
 
-	tag, err := getPreviousTag(t.Context(), tmpDir)
+	tag, err := getPreviousTag(t.Context(), "", tmpDir)
 	assert.NoError(t, err)
 	assert.Equal(t, tag, "v1.0.0")
 
-	commits, err := GetCommits(t.Context(), tmpDir)
+	currentTag, err := getTagForVersion(t.Context(), "1.0.0", tmpDir)
+	assert.NoError(t, err)
+	assert.Equal(t, "1.0.0", currentTag)
+
+	commits, err := GetCommits(t.Context(), "", tmpDir)
 	assert.NoError(t, err)
 	assert.Len(t, commits, 1)
 	assert.Equal(t, commits[0].Message, "second commit")

@@ -35,7 +35,7 @@ type Commit struct {
 }
 
 // GenerateChangelog generates a changelog from the git repository.
-func GenerateChangelog(ctx context.Context, repository string, cfg Config) (string, error) {
+func GenerateChangelog(ctx context.Context, currentVersion string, repository string, cfg Config) (string, error) {
 	var err error
 
 	if cfg.Template == "" {
@@ -50,7 +50,7 @@ func GenerateChangelog(ctx context.Context, repository string, cfg Config) (stri
 		return "", err
 	}
 
-	commits, err := git.GetCommits(ctx, repository)
+	commits, err := git.GetCommits(ctx, currentVersion, repository)
 	if err != nil {
 		return "", err
 	}
