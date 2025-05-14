@@ -13,31 +13,31 @@ import (
 )
 
 func validateStorefrontSnippets(context *ValidationContext) {
-	rootDir := context.Extension.GetRootDir()
+	// rootDir := context.Extension.GetRootDir()
 
-	for _, val := range context.Extension.GetResourcesDirs() {
-		storefrontFolder := path.Join(val, "snippet")
+	// for _, val := range context.Extension.GetResourcesDirs() {
+	// 	storefrontFolder := path.Join(val, "snippet")
 
-		if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, context); err != nil {
-			return
-		}
-	}
+	// 	if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, context); err != nil {
+	// 		return
+	// 	}
+	// }
 
-	for _, extraBundle := range context.Extension.GetExtensionConfig().Build.ExtraBundles {
-		bundlePath := rootDir
+	// for _, extraBundle := range context.Extension.GetExtensionConfig().Build.ExtraBundles {
+	// 	bundlePath := rootDir
 
-		if extraBundle.Path != "" {
-			bundlePath = path.Join(bundlePath, extraBundle.Path)
-		} else {
-			bundlePath = path.Join(bundlePath, extraBundle.Name)
-		}
+	// 	if extraBundle.Path != "" {
+	// 		bundlePath = path.Join(bundlePath, extraBundle.Path)
+	// 	} else {
+	// 		bundlePath = path.Join(bundlePath, extraBundle.Name)
+	// 	}
 
-		storefrontFolder := path.Join(bundlePath, "Resources", "snippet")
+	// 	storefrontFolder := path.Join(bundlePath, "Resources", "snippet")
 
-		if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, context); err != nil {
-			return
-		}
-	}
+	// 	if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, context); err != nil {
+	// 		return
+	// 	}
+	// }
 }
 
 func validateStorefrontSnippetsByPath(snippetFolder, rootDir string, context *ValidationContext) error {
@@ -106,7 +106,7 @@ func validateStorefrontSnippetsByPath(snippetFolder, rootDir string, context *Va
 				continue
 			}
 
-			compareSnippets(mainFileContent, file, context, rootDir)
+			compareSnippets(mainFileContent, mainFile, file, context, rootDir)
 		}
 	}
 
@@ -190,7 +190,7 @@ func validateAdministrationByPath(adminFolder, rootDir string, context *Validati
 		}
 
 		if len(mainFile) == 0 {
-			context.AddWarning("snippet.validator", fmt.Sprintf("No en-GB.json file found in %s, using %s", folder, files[0]))
+			context.AddWarning("snippet.validator", fmt.Sprintf("No en-GB.json file found in %s, using %s", strings.ReplaceAll(folder, rootDir+"/", ""), strings.ReplaceAll(files[0], rootDir+"/", "")))
 			mainFile = files[0]
 		}
 
@@ -211,14 +211,14 @@ func validateAdministrationByPath(adminFolder, rootDir string, context *Validati
 				continue
 			}
 
-			compareSnippets(mainFileContent, file, context, rootDir)
+			compareSnippets(mainFileContent, mainFile, file, context, rootDir)
 		}
 	}
 
 	return nil
 }
 
-func compareSnippets(mainFile []byte, file string, context *ValidationContext, extensionRoot string) {
+func compareSnippets(mainFile []byte, mainFilePath, file string, context *ValidationContext, extensionRoot string) {
 	checkFile, err := os.ReadFile(file)
 	if err != nil {
 		context.AddError("snippet.validator", fmt.Sprintf("Cannot read file '%s', due '%s'", file, err))
@@ -239,6 +239,8 @@ func compareSnippets(mainFile []byte, file string, context *ValidationContext, e
 		return
 	}
 
+	normalizedMainFilePath := strings.ReplaceAll(mainFilePath, extensionRoot+"/", "")
+
 	for _, diff := range compare {
 		normalizedPath := strings.ReplaceAll(file, extensionRoot+"/", "")
 
@@ -248,7 +250,7 @@ func compareSnippets(mainFile []byte, file string, context *ValidationContext, e
 		}
 
 		if diff.Type == jsondiff.OperationAdd {
-			context.AddWarning("snippet.validator", fmt.Sprintf("Snippet file: %s, missing key \"%s\" in this snippet file, but defined in the main language (\"%s\")", normalizedPath, diff.Path, mainFile))
+			context.AddWarning("snippet.validator", fmt.Sprintf("Snippet file: %s, missing key \"%s\" in this snippet file, but defined in the main language (%s)", normalizedPath, diff.Path, normalizedMainFilePath))
 			continue
 		}
 
