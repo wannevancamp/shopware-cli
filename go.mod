@@ -23,7 +23,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/otiai10/copy v1.14.1
-	github.com/shyim/go-version v0.0.0-20250513054659-15e244b52011
+	github.com/shyim/go-version v0.0.0-20250514104457-ded98488bd6f
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	github.com/tetratelabs/wazero v1.9.0
