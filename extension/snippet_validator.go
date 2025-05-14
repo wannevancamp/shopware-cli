@@ -13,31 +13,31 @@ import (
 )
 
 func validateStorefrontSnippets(context *ValidationContext) {
-	// rootDir := context.Extension.GetRootDir()
+	rootDir := context.Extension.GetRootDir()
 
-	// for _, val := range context.Extension.GetResourcesDirs() {
-	// 	storefrontFolder := path.Join(val, "snippet")
+	for _, val := range context.Extension.GetResourcesDirs() {
+		storefrontFolder := path.Join(val, "snippet")
 
-	// 	if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, context); err != nil {
-	// 		return
-	// 	}
-	// }
+		if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, context); err != nil {
+			return
+		}
+	}
 
-	// for _, extraBundle := range context.Extension.GetExtensionConfig().Build.ExtraBundles {
-	// 	bundlePath := rootDir
+	for _, extraBundle := range context.Extension.GetExtensionConfig().Build.ExtraBundles {
+		bundlePath := rootDir
 
-	// 	if extraBundle.Path != "" {
-	// 		bundlePath = path.Join(bundlePath, extraBundle.Path)
-	// 	} else {
-	// 		bundlePath = path.Join(bundlePath, extraBundle.Name)
-	// 	}
+		if extraBundle.Path != "" {
+			bundlePath = path.Join(bundlePath, extraBundle.Path)
+		} else {
+			bundlePath = path.Join(bundlePath, extraBundle.Name)
+		}
 
-	// 	storefrontFolder := path.Join(bundlePath, "Resources", "snippet")
+		storefrontFolder := path.Join(bundlePath, "Resources", "snippet")
 
-	// 	if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, context); err != nil {
-	// 		return
-	// 	}
-	// }
+		if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, context); err != nil {
+			return
+		}
+	}
 }
 
 func validateStorefrontSnippetsByPath(snippetFolder, rootDir string, context *ValidationContext) error {
