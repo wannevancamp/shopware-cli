@@ -78,4 +78,5 @@ func init() {
 	projectStorefrontBuildCmd.PersistentFlags().Bool("force-install-dependencies", false, "Force install NPM dependencies")
 	projectStorefrontBuildCmd.PersistentFlags().String("only-extensions", "", "Only watch the given extensions (comma separated)")
 	projectStorefrontBuildCmd.PersistentFlags().String("skip-extensions", "", "Skips the given extensions (comma separated)")
+	projectStorefrontBuildCmd.PersistentFlags().Bool("only-custom-static-extensions", false, "Only build extensions from custom/static-plugins directory")
 }
