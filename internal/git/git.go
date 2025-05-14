@@ -9,8 +9,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/shopware/shopware-cli/logging"
 	"github.com/shyim/go-version"
+
+	"github.com/shopware/shopware-cli/logging"
 )
 
 type GitCommit struct {
