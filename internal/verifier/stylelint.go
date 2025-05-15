@@ -104,11 +104,6 @@ func (s StyleLint) Check(ctx context.Context, check *Check, config ToolConfig) e
 }
 
 func (s StyleLint) Fix(ctx context.Context, config ToolConfig) error {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
 	paths := append([]string{}, config.StorefrontDirectories...)
 	paths = append(paths, config.AdminDirectories...)
 
@@ -116,10 +111,6 @@ func (s StyleLint) Fix(ctx context.Context, config ToolConfig) error {
 
 	for _, p := range paths {
 		p := p
-
-		if !path.IsAbs(p) {
-			p = path.Join(cwd, p)
-		}
 
 		hasSCSS, err := hasSCSSFiles(p)
 		if err != nil {
@@ -131,8 +122,8 @@ func (s StyleLint) Fix(ctx context.Context, config ToolConfig) error {
 		}
 
 		gr.Go(func() error {
-			stylelint := exec.CommandContext(ctx, "node", path.Join(cwd, "tools", "js", "node_modules", ".bin", "stylelint"),
-				"--config", path.Join(cwd, "tools", "js", "configs", fmt.Sprintf("stylelint.config.%s.mjs", path.Base(p))),
+			stylelint := exec.CommandContext(ctx, "node", path.Join(config.ToolDirectory, "js", "node_modules", ".bin", "stylelint"),
+				"--config", path.Join(config.ToolDirectory, "js", "configs", fmt.Sprintf("stylelint.config.%s.mjs", path.Base(p))),
 				"--ignore-pattern", "dist/**",
 				"--ignore-pattern", "vendor/**",
 				"**/*.scss",
