@@ -13,6 +13,8 @@ import (
 	"github.com/invopop/jsonschema"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 	"gopkg.in/yaml.v3"
+
+	"github.com/shopware/shopware-cli/internal/system"
 )
 
 type Config struct {
@@ -291,7 +293,7 @@ func ReadConfig(fileName string, allowFallback bool) (*Config, error) {
 
 	config.foundConfig = true
 
-	substitutedConfig := os.ExpandEnv(string(fileHandle))
+	substitutedConfig := system.ExpandEnv(string(fileHandle))
 	err = yaml.Unmarshal([]byte(substitutedConfig), &config)
 
 	if len(config.AdditionalConfigs) > 0 {
