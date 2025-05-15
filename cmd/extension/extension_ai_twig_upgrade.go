@@ -10,16 +10,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
+
 	"github.com/shopware/shopware-cli/extension"
 	"github.com/shopware/shopware-cli/internal/llm"
 	"github.com/shopware/shopware-cli/internal/twigparser"
 	"github.com/shopware/shopware-cli/internal/verifier"
 	"github.com/shopware/shopware-cli/logging"
-	"github.com/spf13/cobra"
 )
 
 const systemPrompt = `
-You are a helper agent to help to upgrade Twig templates. I will give you the old and new template happend in the Software and as third the extended template. Apply the changes happen between old and new template to the extended template.
+You are a helper agent to help to upgrade Twig templates. I will give you the old and new template happened in the Software and as third the extended template. Apply the changes happen between old and new template to the extended template.
 - Do only the necessary changes to the extended template.
 - Do only modify the content inside the block and dont add new blocks
 - Please also only output the modified extended template nothing more.
