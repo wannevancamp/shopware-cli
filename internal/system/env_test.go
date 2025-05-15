@@ -14,6 +14,7 @@ func TestExpandEnv(t *testing.T) {
 		want  string
 	}{
 		{"${TEST}", "yea"},
+		//nolint:dupword
 		{"${TEST} ${TEST}", "yea yea"},
 		{"$TEST", "$TEST"},
 		{"$$TEST", "$$TEST"},
