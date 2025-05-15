@@ -21,11 +21,14 @@
     "files.exclude": {
         ".devenv": true,
         ".direnv": true,
-        ".idea": true
+        ".idea": true,
+    },
+    "php.problems.exclude": {
+        "internal/phplint/testdata/invalid.php": true
     },
     "go.toolsManagement.autoUpdate": false,
     "go.toolsManagement.checkForUpdates": "off",
     "yaml.schemas": {
         "https://raw.githubusercontent.com/shopware/shopware-cli/main/extension/shopware-extension-schema.json": "file:///workspaces/shopware-cli/.shopware-extension.yml"
-    }
+    },
 }
