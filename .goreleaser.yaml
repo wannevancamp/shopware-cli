@@ -218,6 +218,15 @@ changelog:
       - '^docs:'
       - '^test:'
       - '^Merge pull request:'
+  groups:
+    - title: 🚀 Features
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: "🐛 Bug Fixes"
+      regexp: '^.*?bug(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: 🧰 Maintenance
+      order: 999
 
 aurs:
   - homepage: https://developer.shopware.com/
