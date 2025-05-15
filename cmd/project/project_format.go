@@ -13,6 +13,9 @@ import (
 var projectFormatCmd = &cobra.Command{
 	Use:   "format",
 	Short: "Format project",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		return verifier.SetupTools(cmd.Context(), cmd.Root().Version)
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var err error
 		only, _ := cmd.Flags().GetString("only")

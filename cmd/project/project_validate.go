@@ -15,6 +15,9 @@ import (
 var projectValidateCmd = &cobra.Command{
 	Use:   "validate",
 	Short: "Validate project",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		return verifier.SetupTools(cmd.Context(), cmd.Root().Version)
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		reportingFormat, _ := cmd.Flags().GetString("reporter")
 		only, _ := cmd.Flags().GetString("only")

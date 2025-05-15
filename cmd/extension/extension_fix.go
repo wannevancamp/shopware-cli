@@ -17,7 +17,7 @@ var extensionFixCmd = &cobra.Command{
 	Use:   "fix",
 	Short: "Fix an extension",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return verifier.SetupTools(cmd.Root().Version)
+		return verifier.SetupTools(cmd.Context(), cmd.Root().Version)
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		allowNonGit, _ := cmd.Flags().GetBool("allow-non-git")

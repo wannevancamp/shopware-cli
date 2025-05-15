@@ -16,7 +16,7 @@ var extensionFormat = &cobra.Command{
 	Use:   "format",
 	Short: "Format an extension",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		return verifier.SetupTools(cmd.Root().Version)
+		return verifier.SetupTools(cmd.Context(), cmd.Root().Version)
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		dryRun, _ := cmd.Flags().GetBool("dry-run")

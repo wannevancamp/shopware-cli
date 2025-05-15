@@ -71,7 +71,6 @@ EOF
 
 ENV SHOPWARE_CLI_TOOLS_DIR=/opt/verifier
 
-
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 
 CMD ["sh"]

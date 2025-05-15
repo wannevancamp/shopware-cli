@@ -1,6 +1,7 @@
 package verifier
 
 import (
+	"context"
 	"embed"
 	"fmt"
 	"log"
@@ -9,14 +10,16 @@ import (
 	"path"
 
 	"github.com/shopware/shopware-cli/internal/system"
+	"github.com/shopware/shopware-cli/logging"
 )
 
 //go:embed php/composer.json php/composer.lock php/configs js/configs js/packages js/package*.json
 var toolsFS embed.FS
 
-func SetupTools(currentVersion string) error {
+func SetupTools(ctx context.Context, currentVersion string) error {
 	customToolDir := os.Getenv("SHOPWARE_CLI_TOOLS_DIR")
 	if customToolDir != "" {
+		logging.FromContext(ctx).Debugf("Using custom tool directory: %s", customToolDir)
 		setToolDirectory(customToolDir)
 		return nil
 	}
@@ -25,10 +28,12 @@ func SetupTools(currentVersion string) error {
 	toolsDir := path.Join(cacheDir, "tools", currentVersion)
 
 	if _, err := os.Stat(toolsDir); err == nil {
+		logging.FromContext(ctx).Debugf("Using cached tool directory: %s", toolsDir)
 		setToolDirectory(toolsDir)
 		return nil
 	}
 
+	logging.FromContext(ctx).Debugf("Using tool directory: %s", toolsDir)
 	if err := os.MkdirAll(toolsDir, os.ModePerm); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", toolsDir, err)
 	}

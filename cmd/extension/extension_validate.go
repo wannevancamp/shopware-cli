@@ -11,6 +11,7 @@ import (
 	"github.com/shopware/shopware-cli/extension"
 	"github.com/shopware/shopware-cli/internal/system"
 	"github.com/shopware/shopware-cli/internal/verifier"
+	"github.com/shopware/shopware-cli/logging"
 )
 
 var extensionValidateCmd = &cobra.Command{
@@ -49,8 +50,18 @@ var extensionValidateCmd = &cobra.Command{
 		var toolCfg *verifier.ToolConfig
 
 		if stat.IsDir() {
-			if err := system.CopyFiles(args[0], tmpDir); err != nil {
-				return err
+			if isFull {
+				if err := system.CopyFiles(args[0], tmpDir); err != nil {
+					return err
+				}
+
+				defer func() {
+					if err := os.RemoveAll(tmpDir); err != nil {
+						logging.FromContext(cmd.Context()).Error("Failed to remove temporary directory:", err)
+					}
+				}()
+			} else {
+				tmpDir = args[0]
 			}
 
 			ext, err := extension.GetExtensionByFolder(path)
@@ -126,6 +137,6 @@ func init() {
 			return nil
 		}
 
-		return verifier.SetupTools("latest")
+		return verifier.SetupTools(cmd.Context(), cmd.Root().Version)
 	}
 }

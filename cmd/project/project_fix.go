@@ -14,6 +14,9 @@ import (
 var projectFixCmd = &cobra.Command{
 	Use:   "fix",
 	Short: "Fix project",
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		return verifier.SetupTools(cmd.Context(), cmd.Root().Version)
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		allowNonGit, _ := cmd.Flags().GetBool("allow-non-git")
 		gitPath := filepath.Join(args[0], ".git")
