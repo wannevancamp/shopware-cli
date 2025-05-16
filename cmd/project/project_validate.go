@@ -10,6 +10,7 @@ import (
 
 	"github.com/shopware/shopware-cli/internal/system"
 	"github.com/shopware/shopware-cli/internal/verifier"
+	"github.com/shopware/shopware-cli/logging"
 )
 
 var projectValidateCmd = &cobra.Command{
@@ -22,6 +23,7 @@ var projectValidateCmd = &cobra.Command{
 		reportingFormat, _ := cmd.Flags().GetString("reporter")
 		only, _ := cmd.Flags().GetString("only")
 		tmpDir, err := os.MkdirTemp(os.TempDir(), "analyse-project-*")
+		noCopy, _ := cmd.Flags().GetBool("no-copy")
 		if err != nil {
 			return fmt.Errorf("cannot create temporary directory: %w", err)
 		}
@@ -46,8 +48,18 @@ var projectValidateCmd = &cobra.Command{
 			reportingFormat = verifier.DetectDefaultReporter()
 		}
 
-		if err := system.CopyFiles(projectPath, tmpDir); err != nil {
-			return err
+		if !noCopy {
+			if err := system.CopyFiles(projectPath, tmpDir); err != nil {
+				return err
+			}
+
+			defer func() {
+				if err := os.RemoveAll(tmpDir); err != nil {
+					logging.FromContext(cmd.Context()).Error("Failed to remove temporary directory:", err)
+				}
+			}()
+		} else {
+			tmpDir = projectPath
 		}
 
 		toolCfg, err := verifier.GetConfigFromProject(tmpDir)
@@ -85,4 +97,5 @@ func init() {
 	projectRootCmd.AddCommand(projectValidateCmd)
 	projectValidateCmd.PersistentFlags().String("reporter", "", "Reporting format (summary, json, github, junit, markdown)")
 	projectValidateCmd.PersistentFlags().String("only", "", "Run only specific tools by name (comma-separated, e.g. phpstan,eslint)")
+	projectValidateCmd.PersistentFlags().Bool("no-copy", false, "Do not copy project files to temporary directory")
 }
