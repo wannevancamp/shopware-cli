@@ -33,6 +33,18 @@ func SetupTools(ctx context.Context, currentVersion string) error {
 		return nil
 	}
 
+	if ok, err := system.IsPHPVersionAtLeast("8.2.0"); err != nil {
+		return fmt.Errorf("failed to check installed PHP version: %w", err)
+	} else if !ok {
+		return fmt.Errorf("PHP version must be at least 8.2.0 to use this. Update your PHP version or use the shopware-cli docker image")
+	}
+
+	if ok, err := system.IsNodeVersionAtLeast("22.0.0"); err != nil {
+		return fmt.Errorf("failed to check installed Node.js version: %w", err)
+	} else if !ok {
+		return fmt.Errorf("Node.js version must be at least 22.0.0 to use this. Update your Node.js version or use the shopware-cli docker image")
+	}
+
 	logging.FromContext(ctx).Debugf("Using tool directory: %s", toolsDir)
 	if err := os.MkdirAll(toolsDir, os.ModePerm); err != nil {
 		return fmt.Errorf("failed to create directory %s: %w", toolsDir, err)
