@@ -122,7 +122,7 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 				}
 			}
 
-			envList := []string{fmt.Sprintf("PROJECT_ROOT=%s", shopwareRoot)}
+			envList := []string{fmt.Sprintf("PROJECT_ROOT=%s", shopwareRoot), fmt.Sprintf("ADMIN_ROOT=%s", PlatformPath(shopwareRoot, "Administration", ""))}
 
 			if !assetConfig.ContributeProject {
 				envList = append(envList, "SHOPWARE_ADMIN_BUILD_ONLY_EXTENSIONS=1", "SHOPWARE_ADMIN_SKIP_SOURCEMAP_GENERATION=1")
