@@ -11,7 +11,7 @@ RUN <<EOF
         git \
         nodejs-22 \
         npm \
-        bun-bin \
+        bun \
         gettext \
         openssh-client \
         openssh-keyscan \
