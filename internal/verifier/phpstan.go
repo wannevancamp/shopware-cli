@@ -141,7 +141,8 @@ func (p PhpStan) isUselessDeprecation(message string) bool {
 	}
 
 	if strings.Contains(message, "reason:return-type-change") ||
-		strings.Contains(message, "reason:new-optional-parameter") {
+		strings.Contains(message, "reason:new-optional-parameter") ||
+		strings.Contains(message, "reason:exception-change") {
 		return true
 	}
 
