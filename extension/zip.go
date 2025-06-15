@@ -72,11 +72,12 @@ var (
 	}
 
 	defaultNotAllowedExtensions = []string{
-		".zip",
-		".tar",
 		".gz",
 		".phar",
 		".rar",
+		".tar",
+		".tar.gz",
+		".zip",
 	}
 )
 
