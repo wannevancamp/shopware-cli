@@ -359,4 +359,13 @@ npms:
     bugs: https://github.com/shopware/shopware-cli/issues
     access: public
 
-    
+notarize:
+  macos:
+    - enabled: '{{ isEnvSet "APPLE_CODE_SIGNING_KEY" }}'
+      sign:
+        certificate: "{{.Env.APPLE_CODE_SIGNING_KEY}}"
+        password: "{{.Env.APPLE_CODE_SIGNING_KEY_PASSWORD}}"
+      notarize:
+        issuer_id: "{{.Env.APPLE_APP_STORE_CONNECT_ISSUER}}"
+        key_id: "{{.Env.APPLE_APP_STORE_CONNECT_KEY_ID}}"
+        key: "{{.Env.APPLE_APP_STORE_CONNECT_KEY}}"
