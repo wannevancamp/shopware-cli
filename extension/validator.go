@@ -133,12 +133,6 @@ func runDefaultValidate(vc *ValidationContext) {
 			}
 		}
 
-		for _, file := range defaultNotAllowedFiles {
-			if file == base {
-				vc.AddError("zip.disallowed_file", fmt.Sprintf(notAllowedErrorFormat, p))
-			}
-		}
-
 		for _, ext := range defaultNotAllowedExtensions {
 			if strings.HasSuffix(base, ext) {
 				vc.AddError("zip.disallowed_file", fmt.Sprintf(notAllowedErrorFormat, p))
