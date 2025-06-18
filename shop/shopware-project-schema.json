@@ -188,6 +188,12 @@
             },
             "overrides": {
               "$ref": "#/$defs/ConfigDeploymentOverrides"
+            },
+            "force_updates": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
             }
           },
           "additionalProperties": false,

@@ -122,6 +122,9 @@ type ConfigDeployment struct {
 		Exclude []string `yaml:"exclude"`
 
 		Overrides ConfigDeploymentOverrides `yaml:"overrides"`
+
+		// On these extensions, it will be always called plugin:update
+		ForceUpdates []string `yaml:"force_updates,omitempty"`
 	} `yaml:"extension-management"`
 
 	OneTimeTasks []struct {
