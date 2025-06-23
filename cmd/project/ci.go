@@ -110,6 +110,7 @@ var projectCI = &cobra.Command{
 			SkipExtensionsWithBuildFiles: true,
 			DisableStorefrontBuild:       shopCfg.Build.DisableStorefrontBuild,
 			ForceExtensionBuild:          convertForceExtensionBuild(shopCfg.Build.ForceExtensionBuild),
+			ContributeProject:            shopCfg.Build.ForceAdminBuild,
 		}
 
 		if err := extension.BuildAssetsForExtensions(cmd.Context(), sources, assetCfg); err != nil {

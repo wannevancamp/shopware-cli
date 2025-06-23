@@ -50,6 +50,8 @@ type ConfigBuild struct {
 	DisableStorefrontBuild bool `yaml:"disable_storefront_build,omitempty"`
 	// Extensions to force build for, even if they have compiled files
 	ForceExtensionBuild []ConfigBuildExtension `yaml:"force_extension_build,omitempty"`
+	// When enabled, the shopware admin will be built
+	ForceAdminBuild bool `yaml:"force_admin_build,omitempty"`
 }
 
 // ConfigBuildExtension defines the configuration for forcing extension builds.
