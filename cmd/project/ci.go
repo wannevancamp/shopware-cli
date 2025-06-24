@@ -98,7 +98,7 @@ var projectCI = &cobra.Command{
 
 		composerInstallSection.End(cmd.Context())
 
-		logging.FromContext(cmd.Context()).Infof("Looking for extensions to build assets in project")
+		lookingForExtensionsSection := ci.Default.Section(cmd.Context(), "Looking for extensions")
 
 		sources := extension.FindAssetSourcesOfProject(cmd.Context(), args[0], shopCfg)
 
@@ -106,6 +106,8 @@ var projectCI = &cobra.Command{
 		if err != nil {
 			return err
 		}
+
+		lookingForExtensionsSection.End(cmd.Context())
 
 		assetCfg := extension.AssetBuildConfig{
 			CleanupNodeModules:           true,

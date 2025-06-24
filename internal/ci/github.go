@@ -27,6 +27,6 @@ func (g *GithubActions) Section(ctx context.Context, name string) Section {
 
 func (s GithubActionsSection) End(ctx context.Context) {
 	duration := time.Since(s.start)
-	fmt.Printf("::endgroup::\n")
 	logging.FromContext(ctx).Infof("%s took %s", s.name, duration)
+	fmt.Printf("::endgroup::\n")
 }
