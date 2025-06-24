@@ -177,9 +177,13 @@ var extensionZipCmd = &cobra.Command{
 			return fmt.Errorf("build modifier: %w", err)
 		}
 
-		fileName := fmt.Sprintf("%s-%s.zip", name, tag)
-		if len(tag) == 0 {
-			fileName = fmt.Sprintf("%s.zip", name)
+		fileName, _ := cmd.Flags().GetString("filename")
+
+		if len(fileName) == 0 {
+			fileName = fmt.Sprintf("%s-%s.zip", name, tag)
+			if len(tag) == 0 {
+				fileName = fmt.Sprintf("%s.zip", name)
+			}
 		}
 
 		outputDir, _ := cmd.Flags().GetString("output-directory")
@@ -222,6 +226,7 @@ func init() {
 	extensionZipCmd.Flags().String("overwrite-version", "", "Change the extension version to this value")
 	extensionZipCmd.Flags().String("output-directory", "", "Output directory for the zip file")
 	extensionZipCmd.Flags().String("git-commit", "", "Commit Hash / Tag to use")
+	extensionZipCmd.Flags().String("filename", "", "Name of the zip file, if not set it will be generated from the extension name and tag")
 }
 
 func getStringOnStringError(val string, _ error) string {
