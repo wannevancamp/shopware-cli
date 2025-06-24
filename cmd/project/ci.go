@@ -15,6 +15,7 @@ import (
 	"golang.org/x/text/language"
 
 	"github.com/shopware/shopware-cli/extension"
+	"github.com/shopware/shopware-cli/internal/ci"
 	"github.com/shopware/shopware-cli/internal/packagist"
 	"github.com/shopware/shopware-cli/internal/phpexec"
 	"github.com/shopware/shopware-cli/logging"
@@ -80,6 +81,8 @@ var projectCI = &cobra.Command{
 			return err
 		}
 
+		composerInstallSection := ci.Default.Section(cmd.Context(), "Composer Installation")
+
 		composer := phpexec.ComposerCommand(cmd.Context(), composerFlags...)
 		composer.Dir = args[0]
 		composer.Stdin = os.Stdin
@@ -92,6 +95,8 @@ var projectCI = &cobra.Command{
 		if err := composer.Run(); err != nil {
 			return err
 		}
+
+		composerInstallSection.End()
 
 		logging.FromContext(cmd.Context()).Infof("Looking for extensions to build assets in project")
 
@@ -117,7 +122,7 @@ var projectCI = &cobra.Command{
 			return err
 		}
 
-		logging.FromContext(cmd.Context()).Infof("Optimizing Administration sources")
+		optimizeSection := ci.Default.Section(cmd.Context(), "Optimizing Administration Assets")
 		if err := cleanupAdministrationFiles(cmd.Context(), path.Join(args[0], "vendor", "shopware", "administration")); err != nil {
 			return err
 		}
@@ -158,7 +163,9 @@ var projectCI = &cobra.Command{
 			return err
 		}
 
-		logging.FromContext(cmd.Context()).Infof("Warmup container cache")
+		optimizeSection.End()
+
+		warumupSection := ci.Default.Section(cmd.Context(), "Warming up container cache")
 
 		if err := runTransparentCommand(phpexec.PHPCommand(cmd.Context(), path.Join(args[0], "bin", "ci"), "--version")); err != nil { //nolint: gosec
 			return fmt.Errorf("failed to warmup container cache (php bin/ci --version): %w", err)
@@ -180,8 +187,10 @@ var projectCI = &cobra.Command{
 			}
 		}
 
+		warumupSection.End()
+
 		if shopCfg.Build.RemoveExtensionAssets {
-			logging.FromContext(cmd.Context()).Infof("Deleting assets of extensions")
+			deleteAssetsSection := ci.Default.Section(cmd.Context(), "Deleting assets of extensions")
 
 			for _, source := range sources {
 				if _, err := os.Stat(path.Join(source.Path, "Resources", "public", "administration", "css")); err == nil {
@@ -212,6 +221,8 @@ var projectCI = &cobra.Command{
 			if err := os.WriteFile(path.Join(args[0], "vendor", "shopware", "administration", "Resources", ".administration-css"), []byte{}, os.ModePerm); err != nil {
 				return err
 			}
+
+			deleteAssetsSection.End()
 		}
 
 		return nil

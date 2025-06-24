@@ -14,6 +14,7 @@ import (
 	"github.com/shyim/go-version"
 
 	"github.com/shopware/shopware-cli/internal/asset"
+	"github.com/shopware/shopware-cli/internal/ci"
 	"github.com/shopware/shopware-cli/internal/esbuild"
 	"github.com/shopware/shopware-cli/logging"
 )
@@ -72,14 +73,20 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 		defer deletePaths(ctx, shopwareRoot)
 	}
 
+	nodeInstallSection := ci.Default.Section(ctx, "Installing node_modules for extensions")
+
 	paths, err := InstallNodeModulesOfConfigs(ctx, cfgs, assetConfig.NPMForceInstall)
 	if err != nil {
 		return err
 	}
 
+	nodeInstallSection.End()
+
 	defer deletePaths(ctx, paths...)
 
 	if !assetConfig.DisableAdminBuild && cfgs.RequiresAdminBuild() {
+		administrationSection := ci.Default.Section(ctx, "Building administration assets")
+
 		// Build all extensions compatible with esbuild first
 		for name, entry := range cfgs.FilterByAdminAndEsBuild(true) {
 			options := esbuild.NewAssetCompileOptionsAdmin(name, entry.BasePath)
@@ -149,9 +156,12 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 				}
 			}
 		}
+
+		administrationSection.End()
 	}
 
 	if !assetConfig.DisableStorefrontBuild && cfgs.RequiresStorefrontBuild() {
+		storefrontSection := ci.Default.Section(ctx, "Building storefront assets")
 		// Build all extensions compatible with esbuild first
 		for name, entry := range cfgs.FilterByStorefrontAndEsBuild(true) {
 			isNewLayout := false
@@ -275,6 +285,8 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 				return err
 			}
 		}
+
+		storefrontSection.End()
 	}
 
 	return nil
@@ -369,17 +381,6 @@ func npmRunBuild(path string, buildCmd string, buildEnvVariables []string) error
 	return nil
 }
 
-func getInstallCommand(isProductionMode bool) *exec.Cmd {
-	// Bun can migrate on the fly the package-lock.json to a bun.lockdb and is much faster than NPM
-	if _, err := exec.LookPath("bun"); err == nil && !isProductionMode {
-		args := []string{"install", "--no-save"}
-
-		return exec.Command("bun", args...)
-	}
-
-	return exec.Command("npm", "install", "--no-audit", "--no-fund", "--prefer-offline", "--loglevel=error")
-}
-
 func InstallNPMDependencies(path string, packageJsonData NpmPackage, additionalParams ...string) error {
 	isProductionMode := false
 
@@ -393,7 +394,7 @@ func InstallNPMDependencies(path string, packageJsonData NpmPackage, additionalP
 		return nil
 	}
 
-	installCmd := getInstallCommand(isProductionMode)
+	installCmd := exec.Command("npm", "install", "--no-audit", "--no-fund", "--prefer-offline", "--loglevel=error")
 	installCmd.Args = append(installCmd.Args, additionalParams...)
 	installCmd.Dir = path
 	installCmd.Stdout = os.Stdout
@@ -482,12 +483,17 @@ func BuildAssetConfigFromExtensions(ctx context.Context, sources []asset.Source,
 
 		if assetCfg.SkipExtensionsWithBuildFiles {
 			expectedAdminCompiledFile := path.Join(source.Path, "Resources", "public", "administration", "js", esbuild.ToKebabCase(source.Name)+".js")
+			expectedAdminVitePath := path.Join(source.Path, "Resources", "public", "administration", ".vite", "manifest.json")
 			expectedStorefrontCompiledFile := path.Join(source.Path, "Resources", "app", "storefront", "dist", "storefront", "js", esbuild.ToKebabCase(source.Name), esbuild.ToKebabCase(source.Name)+".js")
 
 			// Check if extension is in the ForceExtensionBuild list
 			forceExtensionBuild := slices.Contains(assetCfg.ForceExtensionBuild, source.Name)
 
-			if _, err := os.Stat(expectedAdminCompiledFile); err == nil && !forceExtensionBuild {
+			_, foundAdminCompiled := os.Stat(expectedAdminCompiledFile)
+			_, foundAdminVite := os.Stat(expectedAdminVitePath)
+			_, foundStorefrontCompiled := os.Stat(expectedStorefrontCompiledFile)
+
+			if (foundAdminCompiled == nil || foundAdminVite == nil) && !forceExtensionBuild {
 				// clear out the entrypoint, so the admin does not build it
 				sourceConfig.Administration.EntryFilePath = nil
 				sourceConfig.Administration.Webpack = nil
@@ -495,7 +501,7 @@ func BuildAssetConfigFromExtensions(ctx context.Context, sources []asset.Source,
 				logging.FromContext(ctx).Infof("Skipping building administration assets for \"%s\" as compiled files are present", source.Name)
 			}
 
-			if _, err := os.Stat(expectedStorefrontCompiledFile); err == nil && !forceExtensionBuild {
+			if foundStorefrontCompiled == nil && !forceExtensionBuild {
 				// clear out the entrypoint, so the storefront does not build it
 				sourceConfig.Storefront.EntryFilePath = nil
 				sourceConfig.Storefront.Webpack = nil
