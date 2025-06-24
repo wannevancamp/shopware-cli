@@ -465,12 +465,12 @@ func InstallNPMDependencies(path string, packageJsonData NpmPackage, additionalP
 	installCmd := exec.Command("npm", "install", "--no-audit", "--no-fund", "--prefer-offline", "--loglevel=error")
 	installCmd.Args = append(installCmd.Args, additionalParams...)
 	installCmd.Dir = path
-	installCmd.Stdout = os.Stdout
-	installCmd.Stderr = os.Stderr
 	installCmd.Env = os.Environ()
 	installCmd.Env = append(installCmd.Env, "PUPPETEER_SKIP_DOWNLOAD=1", "NPM_CONFIG_ENGINE_STRICT=false", "NPM_CONFIG_FUND=false", "NPM_CONFIG_AUDIT=false", "NPM_CONFIG_UPDATE_NOTIFIER=false")
 
-	if err := installCmd.Run(); err != nil {
+	combinedOutput, err := installCmd.CombinedOutput()
+	if err != nil {
+		logging.FromContext(context.Background()).Errorf("npm install failed in %s: %s", path, string(combinedOutput))
 		return fmt.Errorf("installing dependencies for %s failed with error: %w", path, err)
 	}
 
