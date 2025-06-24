@@ -37,6 +37,6 @@ func (g *GitlabCi) Section(ctx context.Context, name string) Section {
 // SectionEnd ends the current log section.
 func (g GitlabCiSection) End(ctx context.Context) {
 	sectionId := gitlabSectionId(g.name)
+	logging.FromContext(ctx).Infof("%s took %s", g.name, time.Since(g.start))
 	fmt.Printf("section_end:%d:%s\r\x1b[0K\n", time.Now().Unix(), sectionId)
-	logging.FromContext(ctx).Infof("%s ended after %s", g.name, time.Since(g.start))
 }

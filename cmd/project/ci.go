@@ -68,8 +68,6 @@ var projectCI = &cobra.Command{
 
 		cleanupPaths = append(cleanupPaths, shopCfg.Build.CleanupPaths...)
 
-		logging.FromContext(cmd.Context()).Infof("Installing dependencies using Composer")
-
 		composerFlags := []string{"install", "--no-interaction", "--no-progress", "--optimize-autoloader", "--classmap-authoritative"}
 
 		if withDev, _ := cmd.Flags().GetBool("with-dev-dependencies"); !withDev {
