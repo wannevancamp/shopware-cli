@@ -8,8 +8,10 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/shyim/go-version"
 
@@ -300,8 +302,20 @@ func nodeModulesExists(root string) bool {
 	return false
 }
 
+type npmInstallJob struct {
+	npmPath             string
+	additionalNpmParams []string
+	additionalText      string
+}
+
+type npmInstallResult struct {
+	nodeModulesPath string
+	err             error
+}
+
 func InstallNodeModulesOfConfigs(ctx context.Context, cfgs ExtensionAssetConfig, force bool) ([]string, error) {
-	paths := make([]string, 0)
+	// Collect all npm install jobs
+	jobs := make([]npmInstallJob, 0)
 
 	// Install shared node_modules between admin and storefront
 	for _, entry := range cfgs {
@@ -333,29 +347,83 @@ func InstallNodeModulesOfConfigs(ctx context.Context, cfgs ExtensionAssetConfig,
 					continue
 				}
 
-				npmPackage, err := getNpmPackage(npmPath)
-				if err != nil {
-					return nil, err
-				}
-
 				additionalText := ""
-
 				if !entry.NpmStrict {
 					additionalText = " (consider enabling npm_strict mode, to install only production relevant dependencies)"
 				}
 
-				logging.FromContext(ctx).Infof("Installing npm dependencies in %s %s\n", npmPath, additionalText)
-
-				if err := InstallNPMDependencies(npmPath, npmPackage, additionalNpmParameters...); err != nil {
-					return nil, err
-				}
-
-				paths = append(paths, path.Join(npmPath, "node_modules"))
+				jobs = append(jobs, npmInstallJob{
+					npmPath:             npmPath,
+					additionalNpmParams: additionalNpmParameters,
+					additionalText:      additionalText,
+				})
 			}
 		}
 	}
 
+	if len(jobs) == 0 {
+		return []string{}, nil
+	}
+
+	// Set up worker pool with number of CPU cores
+	numWorkers := runtime.NumCPU()
+	jobChan := make(chan npmInstallJob, len(jobs))
+	resultChan := make(chan npmInstallResult, len(jobs))
+
+	// Start workers
+	var wg sync.WaitGroup
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for job := range jobChan {
+				result := processNpmInstallJob(ctx, job)
+				resultChan <- result
+			}
+		}()
+	}
+
+	// Send jobs to workers
+	for _, job := range jobs {
+		jobChan <- job
+	}
+	close(jobChan)
+
+	// Wait for all workers to finish
+	go func() {
+		wg.Wait()
+		close(resultChan)
+	}()
+
+	// Collect results
+	paths := make([]string, 0)
+	for result := range resultChan {
+		if result.err != nil {
+			return nil, result.err
+		}
+		if result.nodeModulesPath != "" {
+			paths = append(paths, result.nodeModulesPath)
+		}
+	}
+
 	return paths, nil
+}
+
+func processNpmInstallJob(ctx context.Context, job npmInstallJob) npmInstallResult {
+	npmPackage, err := getNpmPackage(job.npmPath)
+	if err != nil {
+		return npmInstallResult{err: err}
+	}
+
+	logging.FromContext(ctx).Infof("Installing npm dependencies in %s %s\n", job.npmPath, job.additionalText)
+
+	if err := InstallNPMDependencies(job.npmPath, npmPackage, job.additionalNpmParams...); err != nil {
+		return npmInstallResult{err: err}
+	}
+
+	return npmInstallResult{
+		nodeModulesPath: path.Join(job.npmPath, "node_modules"),
+	}
 }
 
 func deletePaths(ctx context.Context, nodeModulesPaths ...string) {
