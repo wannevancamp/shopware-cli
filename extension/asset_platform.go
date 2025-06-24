@@ -8,12 +8,15 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
+	"sync"
 
 	"github.com/shyim/go-version"
 
 	"github.com/shopware/shopware-cli/internal/asset"
+	"github.com/shopware/shopware-cli/internal/ci"
 	"github.com/shopware/shopware-cli/internal/esbuild"
 	"github.com/shopware/shopware-cli/logging"
 )
@@ -72,14 +75,20 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 		defer deletePaths(ctx, shopwareRoot)
 	}
 
+	nodeInstallSection := ci.Default.Section(ctx, "Installing node_modules for extensions")
+
 	paths, err := InstallNodeModulesOfConfigs(ctx, cfgs, assetConfig.NPMForceInstall)
 	if err != nil {
 		return err
 	}
 
+	nodeInstallSection.End(ctx)
+
 	defer deletePaths(ctx, paths...)
 
 	if !assetConfig.DisableAdminBuild && cfgs.RequiresAdminBuild() {
+		administrationSection := ci.Default.Section(ctx, "Building administration assets")
+
 		// Build all extensions compatible with esbuild first
 		for name, entry := range cfgs.FilterByAdminAndEsBuild(true) {
 			options := esbuild.NewAssetCompileOptionsAdmin(name, entry.BasePath)
@@ -149,9 +158,12 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 				}
 			}
 		}
+
+		administrationSection.End(ctx)
 	}
 
 	if !assetConfig.DisableStorefrontBuild && cfgs.RequiresStorefrontBuild() {
+		storefrontSection := ci.Default.Section(ctx, "Building storefront assets")
 		// Build all extensions compatible with esbuild first
 		for name, entry := range cfgs.FilterByStorefrontAndEsBuild(true) {
 			isNewLayout := false
@@ -275,6 +287,8 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 				return err
 			}
 		}
+
+		storefrontSection.End(ctx)
 	}
 
 	return nil
@@ -288,8 +302,20 @@ func nodeModulesExists(root string) bool {
 	return false
 }
 
+type npmInstallJob struct {
+	npmPath             string
+	additionalNpmParams []string
+	additionalText      string
+}
+
+type npmInstallResult struct {
+	nodeModulesPath string
+	err             error
+}
+
 func InstallNodeModulesOfConfigs(ctx context.Context, cfgs ExtensionAssetConfig, force bool) ([]string, error) {
-	paths := make([]string, 0)
+	// Collect all npm install jobs
+	jobs := make([]npmInstallJob, 0)
 
 	// Install shared node_modules between admin and storefront
 	for _, entry := range cfgs {
@@ -321,29 +347,83 @@ func InstallNodeModulesOfConfigs(ctx context.Context, cfgs ExtensionAssetConfig,
 					continue
 				}
 
-				npmPackage, err := getNpmPackage(npmPath)
-				if err != nil {
-					return nil, err
-				}
-
 				additionalText := ""
-
 				if !entry.NpmStrict {
 					additionalText = " (consider enabling npm_strict mode, to install only production relevant dependencies)"
 				}
 
-				logging.FromContext(ctx).Infof("Installing npm dependencies in %s %s\n", npmPath, additionalText)
-
-				if err := InstallNPMDependencies(npmPath, npmPackage, additionalNpmParameters...); err != nil {
-					return nil, err
-				}
-
-				paths = append(paths, path.Join(npmPath, "node_modules"))
+				jobs = append(jobs, npmInstallJob{
+					npmPath:             npmPath,
+					additionalNpmParams: additionalNpmParameters,
+					additionalText:      additionalText,
+				})
 			}
 		}
 	}
 
+	if len(jobs) == 0 {
+		return []string{}, nil
+	}
+
+	// Set up worker pool with number of CPU cores
+	numWorkers := runtime.NumCPU()
+	jobChan := make(chan npmInstallJob, len(jobs))
+	resultChan := make(chan npmInstallResult, len(jobs))
+
+	// Start workers
+	var wg sync.WaitGroup
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for job := range jobChan {
+				result := processNpmInstallJob(ctx, job)
+				resultChan <- result
+			}
+		}()
+	}
+
+	// Send jobs to workers
+	for _, job := range jobs {
+		jobChan <- job
+	}
+	close(jobChan)
+
+	// Wait for all workers to finish
+	go func() {
+		wg.Wait()
+		close(resultChan)
+	}()
+
+	// Collect results
+	paths := make([]string, 0)
+	for result := range resultChan {
+		if result.err != nil {
+			return nil, result.err
+		}
+		if result.nodeModulesPath != "" {
+			paths = append(paths, result.nodeModulesPath)
+		}
+	}
+
 	return paths, nil
+}
+
+func processNpmInstallJob(ctx context.Context, job npmInstallJob) npmInstallResult {
+	npmPackage, err := getNpmPackage(job.npmPath)
+	if err != nil {
+		return npmInstallResult{err: err}
+	}
+
+	logging.FromContext(ctx).Infof("Installing npm dependencies in %s %s\n", job.npmPath, job.additionalText)
+
+	if err := InstallNPMDependencies(job.npmPath, npmPackage, job.additionalNpmParams...); err != nil {
+		return npmInstallResult{err: err}
+	}
+
+	return npmInstallResult{
+		nodeModulesPath: path.Join(job.npmPath, "node_modules"),
+	}
 }
 
 func deletePaths(ctx context.Context, nodeModulesPaths ...string) {
@@ -369,17 +449,6 @@ func npmRunBuild(path string, buildCmd string, buildEnvVariables []string) error
 	return nil
 }
 
-func getInstallCommand(isProductionMode bool) *exec.Cmd {
-	// Bun can migrate on the fly the package-lock.json to a bun.lockdb and is much faster than NPM
-	if _, err := exec.LookPath("bun"); err == nil && !isProductionMode {
-		args := []string{"install", "--no-save"}
-
-		return exec.Command("bun", args...)
-	}
-
-	return exec.Command("npm", "install", "--no-audit", "--no-fund", "--prefer-offline", "--loglevel=error")
-}
-
 func InstallNPMDependencies(path string, packageJsonData NpmPackage, additionalParams ...string) error {
 	isProductionMode := false
 
@@ -393,7 +462,7 @@ func InstallNPMDependencies(path string, packageJsonData NpmPackage, additionalP
 		return nil
 	}
 
-	installCmd := getInstallCommand(isProductionMode)
+	installCmd := exec.Command("npm", "install", "--no-audit", "--no-fund", "--prefer-offline", "--loglevel=error")
 	installCmd.Args = append(installCmd.Args, additionalParams...)
 	installCmd.Dir = path
 	installCmd.Stdout = os.Stdout
@@ -482,12 +551,17 @@ func BuildAssetConfigFromExtensions(ctx context.Context, sources []asset.Source,
 
 		if assetCfg.SkipExtensionsWithBuildFiles {
 			expectedAdminCompiledFile := path.Join(source.Path, "Resources", "public", "administration", "js", esbuild.ToKebabCase(source.Name)+".js")
+			expectedAdminVitePath := path.Join(source.Path, "Resources", "public", "administration", ".vite", "manifest.json")
 			expectedStorefrontCompiledFile := path.Join(source.Path, "Resources", "app", "storefront", "dist", "storefront", "js", esbuild.ToKebabCase(source.Name), esbuild.ToKebabCase(source.Name)+".js")
 
 			// Check if extension is in the ForceExtensionBuild list
 			forceExtensionBuild := slices.Contains(assetCfg.ForceExtensionBuild, source.Name)
 
-			if _, err := os.Stat(expectedAdminCompiledFile); err == nil && !forceExtensionBuild {
+			_, foundAdminCompiled := os.Stat(expectedAdminCompiledFile)
+			_, foundAdminVite := os.Stat(expectedAdminVitePath)
+			_, foundStorefrontCompiled := os.Stat(expectedStorefrontCompiledFile)
+
+			if (foundAdminCompiled == nil || foundAdminVite == nil) && !forceExtensionBuild {
 				// clear out the entrypoint, so the admin does not build it
 				sourceConfig.Administration.EntryFilePath = nil
 				sourceConfig.Administration.Webpack = nil
@@ -495,7 +569,7 @@ func BuildAssetConfigFromExtensions(ctx context.Context, sources []asset.Source,
 				logging.FromContext(ctx).Infof("Skipping building administration assets for \"%s\" as compiled files are present", source.Name)
 			}
 
-			if _, err := os.Stat(expectedStorefrontCompiledFile); err == nil && !forceExtensionBuild {
+			if foundStorefrontCompiled == nil && !forceExtensionBuild {
 				// clear out the entrypoint, so the storefront does not build it
 				sourceConfig.Storefront.EntryFilePath = nil
 				sourceConfig.Storefront.Webpack = nil
