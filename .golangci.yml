@@ -46,6 +46,9 @@ linters:
       - path: cmd\/*
         linters:
           - forbidigo
+      - path: internal\/ci\/*
+        linters:
+          - forbidigo
 
 formatters:
   enable:

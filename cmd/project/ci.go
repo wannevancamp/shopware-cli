@@ -96,7 +96,7 @@ var projectCI = &cobra.Command{
 			return err
 		}
 
-		composerInstallSection.End()
+		composerInstallSection.End(cmd.Context())
 
 		logging.FromContext(cmd.Context()).Infof("Looking for extensions to build assets in project")
 
@@ -163,7 +163,7 @@ var projectCI = &cobra.Command{
 			return err
 		}
 
-		optimizeSection.End()
+		optimizeSection.End(cmd.Context())
 
 		warumupSection := ci.Default.Section(cmd.Context(), "Warming up container cache")
 
@@ -187,7 +187,7 @@ var projectCI = &cobra.Command{
 			}
 		}
 
-		warumupSection.End()
+		warumupSection.End(cmd.Context())
 
 		if shopCfg.Build.RemoveExtensionAssets {
 			deleteAssetsSection := ci.Default.Section(cmd.Context(), "Deleting assets of extensions")
@@ -222,7 +222,7 @@ var projectCI = &cobra.Command{
 				return err
 			}
 
-			deleteAssetsSection.End()
+			deleteAssetsSection.End(cmd.Context())
 		}
 
 		return nil

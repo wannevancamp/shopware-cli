@@ -80,7 +80,7 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 		return err
 	}
 
-	nodeInstallSection.End()
+	nodeInstallSection.End(ctx)
 
 	defer deletePaths(ctx, paths...)
 
@@ -157,7 +157,7 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 			}
 		}
 
-		administrationSection.End()
+		administrationSection.End(ctx)
 	}
 
 	if !assetConfig.DisableStorefrontBuild && cfgs.RequiresStorefrontBuild() {
@@ -286,7 +286,7 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 			}
 		}
 
-		storefrontSection.End()
+		storefrontSection.End(ctx)
 	}
 
 	return nil

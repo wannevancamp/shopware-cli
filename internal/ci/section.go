@@ -17,7 +17,7 @@ type CiHelper interface {
 }
 
 type Section interface {
-	End()
+	End(ctx context.Context)
 }
 
 // NewCiHelper returns a CiHelper for the current CI environment.

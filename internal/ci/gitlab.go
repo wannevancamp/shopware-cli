@@ -17,7 +17,6 @@ type GitlabCi struct{}
 
 type GitlabCiSection struct {
 	name  string
-	ctx   context.Context
 	start time.Time
 }
 
@@ -31,14 +30,13 @@ func (g *GitlabCi) Section(ctx context.Context, name string) Section {
 	fmt.Printf("section_start:%d:%s\r\x1b[0K%s\n", time.Now().Unix(), sectionId, name)
 	return GitlabCiSection{
 		name:  name,
-		ctx:   ctx,
 		start: time.Now(),
 	}
 }
 
 // SectionEnd ends the current log section.
-func (g GitlabCiSection) End() {
+func (g GitlabCiSection) End(ctx context.Context) {
 	sectionId := gitlabSectionId(g.name)
 	fmt.Printf("section_end:%d:%s\r\x1b[0K\n", time.Now().Unix(), sectionId)
-	logging.FromContext(g.ctx).Infof("Section '%s' ended after %s", g.name, time.Since(g.start))
+	logging.FromContext(ctx).Infof("%s ended after %s", g.name, time.Since(g.start))
 }
