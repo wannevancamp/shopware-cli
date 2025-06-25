@@ -83,10 +83,12 @@ func fillAuthStruct(auth *ComposerAuth) *ComposerAuth {
 func ReadComposerAuth(authFile string) (*ComposerAuth, error) {
 	content, err := os.ReadFile(authFile)
 	if err != nil {
-		auth := fillAuthStruct(&ComposerAuth{})
-		auth.path = authFile
-
-		return auth, nil
+		if os.IsNotExist(err) {
+			auth := fillAuthStruct(&ComposerAuth{})
+			auth.path = authFile
+			return auth, nil
+		}
+		return nil, err
 	}
 
 	var auth ComposerAuth
