@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -44,6 +45,7 @@ type AssetBuildConfig struct {
 	NPMForceInstall              bool
 	ContributeProject            bool
 	ForceExtensionBuild          []string
+	KeepNodeModules              []string
 }
 
 func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, assetConfig AssetBuildConfig) error { // nolint:gocyclo
@@ -83,6 +85,21 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 	}
 
 	nodeInstallSection.End(ctx)
+
+	log.Println(assetConfig.KeepNodeModules)
+
+	log.Println(paths)
+	if shopwareRoot != "" && len(assetConfig.KeepNodeModules) > 0 {
+		paths = slices.DeleteFunc(paths, func(path string) bool {
+			rel, err := filepath.Rel(shopwareRoot, path)
+			if err != nil {
+				return false
+			}
+
+			return slices.Contains(assetConfig.KeepNodeModules, rel)
+		})
+	}
+	log.Println(paths)
 
 	defer deletePaths(ctx, paths...)
 

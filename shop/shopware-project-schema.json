@@ -116,6 +116,13 @@
         "force_admin_build": {
           "type": "boolean",
           "description": "When enabled, the shopware admin will be built"
+        },
+        "keep_node_modules": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "description": "Keep following node_modules in the final build"
         }
       },
       "additionalProperties": false,

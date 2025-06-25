@@ -52,6 +52,8 @@ type ConfigBuild struct {
 	ForceExtensionBuild []ConfigBuildExtension `yaml:"force_extension_build,omitempty"`
 	// When enabled, the shopware admin will be built
 	ForceAdminBuild bool `yaml:"force_admin_build,omitempty"`
+	// Keep following node_modules in the final build
+	KeepNodeModules []string `yaml:"keep_node_modules,omitempty"`
 }
 
 // ConfigBuildExtension defines the configuration for forcing extension builds.
