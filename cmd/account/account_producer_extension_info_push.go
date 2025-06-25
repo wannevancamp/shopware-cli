@@ -20,9 +20,11 @@ import (
 
 var accountCompanyProducerExtensionInfoPushCmd = &cobra.Command{
 	Use:   "push [zip or path]",
-	Short: "Update store information of extension",
+	Short: "[Deprecate] Update store information of extension",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
+		logging.FromContext(cmd.Context()).Warnf("This command is deprecated and will be removed in the future. Please use Fixture Bundle instead https://developer.shopware.com/docs/resources/tooling/fixture-bundle/")
+
 		absolutePath, err := filepath.Abs(args[0])
 		if err != nil {
 			return fmt.Errorf("cannot open file: %w", err)
