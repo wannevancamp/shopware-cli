@@ -1,6 +1,7 @@
 package project
 
 import (
+	"context"
 	"fmt"
 	"path"
 	"strings"
@@ -8,6 +9,7 @@ import (
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
+	adminSdk "github.com/friendsofshopware/go-shopware-admin-api-sdk"
 	"github.com/shyim/go-version"
 	"github.com/spf13/cobra"
 
@@ -15,31 +17,49 @@ import (
 	account_api "github.com/shopware/shopware-cli/internal/account-api"
 	"github.com/shopware/shopware-cli/internal/packagist"
 	"github.com/shopware/shopware-cli/logging"
+	"github.com/shopware/shopware-cli/shop"
 )
 
 var projectUpgradeCheckCmd = &cobra.Command{
 	Use:   "upgrade-check",
 	Short: "Check that installed extensions are compatible with a future Shopware version",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		project, err := findClosestShopwareProject()
-		if err != nil {
+		var cfg *shop.Config
+		var err error
+		var shopwareVersion *version.Version
+		var extensions map[string]string
+
+		if cfg, err = shop.ReadConfig(projectConfigPath, true); err != nil {
 			return err
 		}
 
-		composerLock, err := packagist.ReadComposerLock(path.Join(project, "composer.lock"))
-		if err != nil {
-			return err
-		}
+		if cfg.IsAdminAPIConfigured() {
+			logging.FromContext(cmd.Context()).Debugf("Using Shopware Admin API to lookup for available extensions")
+			client, err := shop.NewShopClient(cmd.Context(), cfg)
+			if err != nil {
+				return err
+			}
 
-		corePackage := composerLock.GetPackage("shopware/core")
+			remoteExtensions, _, err := client.ExtensionManager.ListAvailableExtensions(adminSdk.NewApiContext(cmd.Context()))
 
-		if corePackage == nil {
-			return fmt.Errorf("shopware/core package not found in composer.lock")
-		}
+			if err != nil {
+				return fmt.Errorf("failed to list available extensions: %w", err)
+			}
 
-		currentVersion, err := version.NewVersion(strings.TrimPrefix(corePackage.Version, "v"))
-		if err != nil {
-			return err
+			extensions = make(map[string]string, 0)
+
+			for _, ext := range remoteExtensions {
+				extensions[ext.Name] = ext.Version
+			}
+
+			shopwareVersion = client.ShopwareVersion
+		} else {
+			logging.FromContext(cmd.Context()).Debugf("Using local composer.lock to lookup for available extensions")
+			shopwareVersion, extensions, err = getLocalExtensions()
+
+			if err != nil {
+				return fmt.Errorf("failed to get local extensions: %w", err)
+			}
 		}
 
 		versions, err := extension.GetShopwareVersions(cmd.Context())
@@ -59,7 +79,7 @@ var projectUpgradeCheckCmd = &cobra.Command{
 				continue
 			}
 
-			if ver.LessThan(currentVersion) {
+			if ver.LessThan(shopwareVersion) {
 				continue
 			}
 
@@ -89,23 +109,16 @@ var projectUpgradeCheckCmd = &cobra.Command{
 			return fmt.Errorf("no version selected")
 		}
 
-		extensions := extension.FindExtensionsFromProject(logging.DisableLogger(cmd.Context()), project)
+		extensionNames := make([]account_api.UpdateCheckExtension, 0)
+		for extName, extVersion := range extensions {
 
-		extensionNames := make([]account_api.UpdateCheckExtension, len(extensions))
-		for i, ext := range extensions {
-			extName, _ := ext.GetName()
-			extVersion, err := ext.GetVersion()
-			if err != nil {
-				extVersion = version.Must(version.NewVersion("1.0.0"))
-			}
-
-			extensionNames[i] = account_api.UpdateCheckExtension{
+			extensionNames = append(extensionNames, account_api.UpdateCheckExtension{
 				Name:    extName,
-				Version: extVersion.String(),
-			}
+				Version: extVersion,
+			})
 		}
 
-		updates, err := account_api.GetFutureExtensionUpdates(cmd.Context(), currentVersion.String(), selectedVersion, extensionNames)
+		updates, err := account_api.GetFutureExtensionUpdates(cmd.Context(), shopwareVersion.String(), selectedVersion, extensionNames)
 		if err != nil {
 			return err
 		}
@@ -123,4 +136,43 @@ var projectUpgradeCheckCmd = &cobra.Command{
 
 func init() {
 	projectRootCmd.AddCommand(projectUpgradeCheckCmd)
+}
+
+func getLocalExtensions() (*version.Version, map[string]string, error) {
+	project, err := findClosestShopwareProject()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	composerLock, err := packagist.ReadComposerLock(path.Join(project, "composer.lock"))
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to read composer.lock: %w", err)
+	}
+
+	corePackage := composerLock.GetPackage("shopware/core")
+
+	if corePackage == nil {
+		return nil, nil, fmt.Errorf("shopware/core package not found in composer.lock")
+	}
+
+	currentVersion, err := version.NewVersion(strings.TrimPrefix(corePackage.Version, "v"))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	extensions := extension.FindExtensionsFromProject(logging.DisableLogger(context.TODO()), project)
+
+	var extensionNames = make(map[string]string, 0)
+
+	for _, ext := range extensions {
+		extName, _ := ext.GetName()
+		extVersion, err := ext.GetVersion()
+		if err != nil {
+			extVersion = version.Must(version.NewVersion("1.0.0"))
+		}
+
+		extensionNames[extName] = extVersion.String()
+	}
+
+	return currentVersion, extensionNames, nil
 }

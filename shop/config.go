@@ -31,6 +31,14 @@ type Config struct {
 	foundConfig      bool
 }
 
+func (c *Config) IsAdminAPIConfigured() bool {
+	if c.AdminApi == nil {
+		return false
+	}
+
+	return (c.AdminApi.ClientId != "" && c.AdminApi.ClientSecret != "") || (c.AdminApi.Username != "" && c.AdminApi.Password != "")
+}
+
 type ConfigBuild struct {
 	// When enabled, the assets will not be copied to the public folder
 	DisableAssetCopy bool `yaml:"disable_asset_copy,omitempty"`
