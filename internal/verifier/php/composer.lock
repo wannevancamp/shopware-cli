@@ -1589,16 +1589,16 @@
         },
         {
             "name": "shopwarelabs/phpstan-shopware",
-            "version": "0.1.10",
+            "version": "0.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/shopwareLabs/phpstan-shopware.git",
-                "reference": "13639b71e75f3cd6272340891c390c3a4d6627d4"
+                "reference": "7f18f3b865ce4b9a585594f26cfc24c2182134c8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/shopwareLabs/phpstan-shopware/zipball/13639b71e75f3cd6272340891c390c3a4d6627d4",
-                "reference": "13639b71e75f3cd6272340891c390c3a4d6627d4",
+                "url": "https://api.github.com/repos/shopwareLabs/phpstan-shopware/zipball/7f18f3b865ce4b9a585594f26cfc24c2182134c8",
+                "reference": "7f18f3b865ce4b9a585594f26cfc24c2182134c8",
                 "shasum": ""
             },
             "require": {
@@ -1632,9 +1632,9 @@
             "description": "PhpStan Rules for Shopware",
             "support": {
                 "issues": "https://github.com/shopwareLabs/phpstan-shopware/issues",
-                "source": "https://github.com/shopwareLabs/phpstan-shopware/tree/0.1.10"
+                "source": "https://github.com/shopwareLabs/phpstan-shopware/tree/0.1.11"
             },
-            "time": "2025-06-05T08:08:51+00:00"
+            "time": "2025-06-30T08:42:23+00:00"
         },
         {
             "name": "spaze/phpstan-disallowed-calls",
