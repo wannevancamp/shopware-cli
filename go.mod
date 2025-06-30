@@ -14,7 +14,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/doutorfinancas/go-mad v0.0.0-20240205120830-463c1e9760f0
 	github.com/evanw/esbuild v0.25.5
-	github.com/friendsofshopware/go-shopware-admin-api-sdk v0.0.0-20250606073843-190bee9dc92b
+	github.com/friendsofshopware/go-shopware-admin-api-sdk v0.0.0-20250625202956-e984fc9cf9e8
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/google/generative-ai-go v0.20.1
 	github.com/google/uuid v1.6.0
