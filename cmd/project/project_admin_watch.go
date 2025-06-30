@@ -54,6 +54,10 @@ var projectAdminWatchCmd = &cobra.Command{
 
 		adminRoot := extension.PlatformPath(projectRoot, "Administration", "Resources/app/administration")
 
+		if err := os.Setenv("ADMIN_ROOT", extension.PlatformPath(projectRoot, "Administration", "")); err != nil {
+			return err
+		}
+
 		if _, err := os.Stat(extension.PlatformPath(projectRoot, "Administration", "Resources/app/administration/scripts/entitySchemaConverter/entity-schema-converter.ts")); err == nil {
 			mockDirectory := extension.PlatformPath(projectRoot, "Administration", "Resources/app/administration/test/_mocks_")
 			if _, err := os.Stat(mockDirectory); os.IsNotExist(err) {
