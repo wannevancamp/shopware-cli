@@ -86,6 +86,8 @@ github.com/frankban/quicktest v1.14.2 h1:SPb1KFFmM+ybpEjPUhCCkZOM5xlovT5UbrMvWnX
 github.com/frankban/quicktest v1.14.2/go.mod h1:mgiwOwqx65TmIk1wJ6Q7wvnVMocbUorkibMOrVTHZps=
 github.com/friendsofshopware/go-shopware-admin-api-sdk v0.0.0-20250606073843-190bee9dc92b h1:g7224zuHFL5lohnMQHjwJQtOdl7Co0hg6Eji0uFkJDA=
 github.com/friendsofshopware/go-shopware-admin-api-sdk v0.0.0-20250606073843-190bee9dc92b/go.mod h1:1Ou4HCVCMqON0XEz/uLlhPlY3sp3JVs3sKymxcYUx5k=
+github.com/friendsofshopware/go-shopware-admin-api-sdk v0.0.0-20250625202956-e984fc9cf9e8 h1:n86bR07963m8JYzLSiu/A6hKBRBxRcxRaX1m0RPWBDI=
+github.com/friendsofshopware/go-shopware-admin-api-sdk v0.0.0-20250625202956-e984fc9cf9e8/go.mod h1:n4hTpOQ+6frNIsqxbuCbCqWruorxI5MfaGLfNcl4Jy0=
 github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 github.com/go-logr/logr v1.4.3 h1:CjnDlHq8ikf6E492q6eKboGOC0T8CDaOvkHCIg8idEI=
 github.com/go-logr/logr v1.4.3/go.mod h1:9T104GzyrTigFIr8wt5mBrctHMim0Nb2HLGrmQ40KvY=
