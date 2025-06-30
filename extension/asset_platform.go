@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -86,9 +85,6 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 
 	nodeInstallSection.End(ctx)
 
-	log.Println(assetConfig.KeepNodeModules)
-
-	log.Println(paths)
 	if shopwareRoot != "" && len(assetConfig.KeepNodeModules) > 0 {
 		paths = slices.DeleteFunc(paths, func(path string) bool {
 			rel, err := filepath.Rel(shopwareRoot, path)
@@ -99,7 +95,6 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 			return slices.Contains(assetConfig.KeepNodeModules, rel)
 		})
 	}
-	log.Println(paths)
 
 	defer deletePaths(ctx, paths...)
 
