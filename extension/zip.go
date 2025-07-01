@@ -27,6 +27,7 @@ import (
 )
 
 var (
+	// These paths will only be removed relative to the top level of the plugin
 	defaultNotAllowedPaths = []string{
 		".editorconfig",
 		".git",
@@ -50,9 +51,12 @@ var (
 		"phpstan.neon",
 		"phpstan.neon.dist",
 		"phpstan-baseline.neon",
+		"phpunit.sh",
 		"phpunit.xml.dist",
+		"phpunitx.xml",
 		"psalm.xml",
 		"rector.php",
+		"shell.nix",
 		"src/Resources/app/administration/.tmp",
 		"src/Resources/app/administration/node_modules",
 		"src/Resources/app/node_modules",
@@ -62,16 +66,20 @@ var (
 		"var",
 	}
 
+	// These files will be removed in all subdirectories
 	defaultNotAllowedFiles = []string{
 		".DS_Store",
 		"Thumbs.db",
 		"__MACOSX",
 		".gitignore",
+		".gitkeep",
+		".prettierrc",
 		"stylelint.config.js",
 		".stylelintrc.js",
 		".stylelintrc",
 		"eslint.config.js",
 		".eslintrc.js",
+		".zipignore",
 	}
 
 	defaultNotAllowedExtensions = []string{
