@@ -27,42 +27,30 @@ import (
 )
 
 var (
+	// These paths will only be removed relative to the top level of the plugin
 	defaultNotAllowedPaths = []string{
-		".DS_Store",
 		".editorconfig",
-		".eslintrc.js",
 		".git",
 		".github",
-		".gitignore",
-		".gitkeep",
 		".gitlab-ci.yml",
 		".gitpod.Dockerfile",
 		".gitpod.yml",
-		".phar",
 		".php-cs-fixer.cache",
 		".php-cs-fixer.dist.php",
 		".php_cs.cache",
 		".php_cs.dist",
-		".prettierrc",
-		".stylelintrc",
-		".stylelintrc.js",
 		".sw-zip-blacklist",
 		".travis.yml",
-		".zipignore",
 		"ISSUE_TEMPLATE.md",
 		"Makefile",
 		"Resources/store",
-		"Thumbs.db",
-		"__MACOSX",
 		"auth.json",
 		"bitbucket-pipelines.yml",
 		"build.sh",
-		"eslint.config.js",
 		"grumphp.yml",
-		"phpdoc.dist.xml",
-		"phpstan-baseline.neon",
 		"phpstan.neon",
 		"phpstan.neon.dist",
+		"phpstan-baseline.neon",
 		"phpunit.sh",
 		"phpunit.xml.dist",
 		"phpunitx.xml",
@@ -74,9 +62,24 @@ var (
 		"src/Resources/app/node_modules",
 		"src/Resources/app/storefront/node_modules",
 		"src/Resources/store",
-		"stylelint.config.js",
 		"tests",
 		"var",
+	}
+
+	// These files will be removed in all subdirectories
+	defaultNotAllowedFiles = []string{
+		".DS_Store",
+		"Thumbs.db",
+		"__MACOSX",
+		".gitignore",
+		".gitkeep",
+		".prettierrc",
+		"stylelint.config.js",
+		".stylelintrc.js",
+		".stylelintrc",
+		"eslint.config.js",
+		".eslintrc.js",
+		".zipignore",
 	}
 
 	defaultNotAllowedExtensions = []string{
@@ -332,6 +335,12 @@ func CleanupExtensionFolder(path string, additionalPaths []string) error {
 		}
 
 		base := filepath.Base(path)
+
+		for _, file := range defaultNotAllowedFiles {
+			if file == base {
+				return os.RemoveAll(path)
+			}
+		}
 
 		for _, ext := range defaultNotAllowedExtensions {
 			if strings.HasSuffix(base, ext) {
