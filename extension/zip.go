@@ -28,47 +28,50 @@ import (
 
 var (
 	defaultNotAllowedPaths = []string{
-        ".DS_Store",
-        ".editorconfig",
-        ".eslintrc.js",
-        ".git",
-        ".gitignore",
-        ".gitlab-ci.yml",
-        ".phar",
-        ".gitpod.Dockerfile",
-        ".gitpod.yml",
-        ".php-cs-fixer.cache",
-        ".php-cs-fixer.dist.php",
-        ".php_cs.cache",
-        ".php_cs.dist",
-        ".stylelintrc",
-        ".stylelintrc.js",
-        ".sw-zip-blacklist",
-        ".travis.yml",
-        "ISSUE_TEMPLATE.md",
-        "Makefile",
-        "Resources/store",
-        "Thumbs.db",
-        "__MACOSX",
-        "auth.json",
-        "bitbucket-pipelines.yml",
-        "build.sh",
-        "eslint.config.js",
-        "grumphp.yml",
-        "phpstan-baseline.neon",
-        "phpstan.neon",
-        "phpstan.neon.dist",
-        "phpunit.xml.dist",
-        "psalm.xml",
-        "rector.php",
-        "src/Resources/app/administration/.tmp",
-        "src/Resources/app/administration/node_modules",
-        "src/Resources/app/node_modules",
-        "src/Resources/app/storefront/node_modules",
-        "src/Resources/store",
-        "stylelint.config.js",
-        "tests",
-        "var",
+		".editorconfig",
+		".git",
+		".github",
+		".gitlab-ci.yml",
+		".gitpod.Dockerfile",
+		".gitpod.yml",
+		".php-cs-fixer.cache",
+		".php-cs-fixer.dist.php",
+		".php_cs.cache",
+		".php_cs.dist",
+		".sw-zip-blacklist",
+		".travis.yml",
+		"ISSUE_TEMPLATE.md",
+		"Makefile",
+		"Resources/store",
+		"auth.json",
+		"bitbucket-pipelines.yml",
+		"build.sh",
+		"grumphp.yml",
+		"phpstan.neon",
+		"phpstan.neon.dist",
+		"phpstan-baseline.neon",
+		"phpunit.xml.dist",
+		"psalm.xml",
+		"rector.php",
+		"src/Resources/app/administration/.tmp",
+		"src/Resources/app/administration/node_modules",
+		"src/Resources/app/node_modules",
+		"src/Resources/app/storefront/node_modules",
+		"src/Resources/store",
+		"tests",
+		"var",
+	}
+
+	defaultNotAllowedFiles = []string{
+		".DS_Store",
+		"Thumbs.db",
+		"__MACOSX",
+		".gitignore",
+		"stylelint.config.js",
+		".stylelintrc.js",
+		".stylelintrc",
+		"eslint.config.js",
+		".eslintrc.js",
 	}
 
 	defaultNotAllowedExtensions = []string{
@@ -324,6 +327,12 @@ func CleanupExtensionFolder(path string, additionalPaths []string) error {
 		}
 
 		base := filepath.Base(path)
+
+		for _, file := range defaultNotAllowedFiles {
+			if file == base {
+				return os.RemoveAll(path)
+			}
+		}
 
 		for _, ext := range defaultNotAllowedExtensions {
 			if strings.HasSuffix(base, ext) {
