@@ -123,6 +123,25 @@ var projectUpgradeCheckCmd = &cobra.Command{
 			return err
 		}
 
+		for _, name := range extensionNames {
+			found := false
+			for _, update := range updates {
+				if update.Name == name.Name {
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				updates = append(updates, account_api.UpdateCheckExtensionCompatibility{
+					Name: name.Name,
+					Status: account_api.UpdateCheckExtensionCompatibilityStatus{
+						Label: "Not available in Store",
+					},
+				})
+			}
+		}
+
 		t := table.New().Border(lipgloss.NormalBorder()).Headers("Extension Name", "Compatible")
 		for _, update := range updates {
 			t.Row(update.Name, update.Status.Label)

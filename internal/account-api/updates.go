@@ -17,14 +17,16 @@ type UpdateCheckExtension struct {
 }
 
 type UpdateCheckExtensionCompatibility struct {
-	Name     string `json:"name"`
-	Label    string `json:"label"`
-	IconPath string `json:"iconPath"`
-	Status   struct {
-		Name  string `json:"name"`
-		Label string `json:"label"`
-		Type  string `json:"type"`
-	} `json:"status"`
+	Name     string                                  `json:"name"`
+	Label    string                                  `json:"label"`
+	IconPath string                                  `json:"iconPath"`
+	Status   UpdateCheckExtensionCompatibilityStatus `json:"status"`
+}
+
+type UpdateCheckExtensionCompatibilityStatus struct {
+	Name  string `json:"name"`
+	Label string `json:"label"`
+	Type  string `json:"type"`
 }
 
 func GetFutureExtensionUpdates(ctx context.Context, currentVersion string, futureVersion string, extensions []UpdateCheckExtension) ([]UpdateCheckExtensionCompatibility, error) {
