@@ -239,46 +239,19 @@ func (e *ElementNode) Dump(indent int) string {
 
 	// Handle children
 	if len(e.Children) > 0 {
-		// Special case: if all children are text/comments/template expressions, keep them on same line
-		allSimpleNodes := true
-		hasLongTemplateExpression := false
-		multipleTemplateExpressions := 0
-		multipleShortTemplateExpressions := false
-
-		// Count template expressions and check for long ones
-		for _, child := range e.Children {
-			if tplExpr, ok := child.(*TemplateExpressionNode); ok {
-				multipleTemplateExpressions++
-				if len(tplExpr.Dump(0)) > 30 {
-					hasLongTemplateExpression = true
-				}
-			} else if _, ok := child.(*RawNode); !ok {
-				if _, ok := child.(*CommentNode); !ok {
-					allSimpleNodes = false
-					break
-				}
-			}
-		}
-
-		// Check if we have multiple short template expressions
-		if multipleTemplateExpressions > 1 && !hasLongTemplateExpression {
-			// Check if they're short enough to stay on one line
-			totalLength := 0
+		// Preserve on p tag the formatting
+		if e.Tag == "p" {
+			hasLongTemplateExpression := false
 			for _, child := range e.Children {
 				if tplExpr, ok := child.(*TemplateExpressionNode); ok {
-					totalLength += len(tplExpr.Dump(indent + 1))
+					if len(tplExpr.Dump(0)) > 30 {
+						hasLongTemplateExpression = true
+						break
+					}
 				}
 			}
-			// If the combined length is short, keep them on the same line
-			if totalLength <= 100 {
-				multipleShortTemplateExpressions = true
-			}
-		}
 
-		if allSimpleNodes {
-			// Format based on content
-			if hasLongTemplateExpression || (multipleTemplateExpressions > 1 && !multipleShortTemplateExpressions) {
-				// For template expressions that are long or multiple long ones, add nice formatting
+			if hasLongTemplateExpression {
 				builder.WriteString("\n")
 				for _, child := range e.Children {
 					if _, ok := child.(*TemplateExpressionNode); ok {
@@ -302,45 +275,114 @@ func (e *ElementNode) Dump(indent int) string {
 					builder.WriteString(indentStr)
 				}
 			} else {
-				// For simple content, keep on the same line
 				for _, child := range e.Children {
 					builder.WriteString(child.Dump(indent))
 				}
 			}
 		} else {
-			// For complex nodes, format with proper indentation
-			var nonEmptyChildren NodeList
+			// Special case: if all children are text/comments/template expressions, keep them on same line
+			allSimpleNodes := true
+			hasLongTemplateExpression := false
+			multipleTemplateExpressions := 0
+			multipleShortTemplateExpressions := false
+
+			// Count template expressions and check for long ones
 			for _, child := range e.Children {
-				if raw, ok := child.(*RawNode); ok {
-					if strings.TrimSpace(raw.Text) != "" {
-						nonEmptyChildren = append(nonEmptyChildren, raw)
+				if tplExpr, ok := child.(*TemplateExpressionNode); ok {
+					multipleTemplateExpressions++
+					if len(tplExpr.Dump(0)) > 30 {
+						hasLongTemplateExpression = true
 					}
-				} else {
-					nonEmptyChildren = append(nonEmptyChildren, child)
+				} else if _, ok := child.(*RawNode); !ok {
+					if _, ok := child.(*CommentNode); !ok {
+						allSimpleNodes = false
+						break
+					}
 				}
 			}
 
-			// Check for template elements and add extra newlines between them
-			for i, child := range nonEmptyChildren {
-				builder.WriteString("\n")
-
-				// Add an extra newline between template elements
-				if i > 0 && isTemplateElement(child) && isTemplateElement(nonEmptyChildren[i-1]) {
-					builder.WriteString("\n")
+			// Check if we have multiple short template expressions
+			if multipleTemplateExpressions > 1 && !hasLongTemplateExpression {
+				// Check if they're short enough to stay on one line
+				totalLength := 0
+				for _, child := range e.Children {
+					if tplExpr, ok := child.(*TemplateExpressionNode); ok {
+						totalLength += len(tplExpr.Dump(indent + 1))
+					}
 				}
+				// If the combined length is short, keep them on the same line
+				if totalLength <= 100 {
+					multipleShortTemplateExpressions = true
+				}
+			}
 
-				if elementChild, ok := child.(*ElementNode); ok {
-					builder.WriteString(elementChild.Dump(indent + 1))
-				} else {
-					for j := 0; j < indent+1; j++ {
+			if allSimpleNodes {
+				// Format based on content
+				if hasLongTemplateExpression || (multipleTemplateExpressions > 1 && !multipleShortTemplateExpressions) {
+					// For template expressions that are long or multiple long ones, add nice formatting
+					builder.WriteString("\n")
+					for _, child := range e.Children {
+						if _, ok := child.(*TemplateExpressionNode); ok {
+							for j := 0; j < indent+1; j++ {
+								builder.WriteString(indentStr)
+							}
+							builder.WriteString(child.Dump(indent+1) + "\n")
+						} else if raw, ok := child.(*RawNode); ok {
+							trimmed := strings.TrimSpace(raw.Text)
+							if trimmed != "" {
+								for j := 0; j < indent+1; j++ {
+									builder.WriteString(indentStr)
+								}
+								builder.WriteString(trimmed + "\n")
+							}
+						} else {
+							builder.WriteString(child.Dump(indent + 1))
+						}
+					}
+					for i := 0; i < indent; i++ {
 						builder.WriteString(indentStr)
 					}
-					builder.WriteString(strings.TrimSpace(child.Dump(indent + 1)))
+				} else {
+					// For simple content, keep on the same line
+					for _, child := range e.Children {
+						builder.WriteString(child.Dump(indent))
+					}
 				}
-			}
-			builder.WriteString("\n")
-			for i := 0; i < indent; i++ {
-				builder.WriteString(indentStr)
+			} else {
+				// For complex nodes, format with proper indentation
+				var nonEmptyChildren NodeList
+				for _, child := range e.Children {
+					if raw, ok := child.(*RawNode); ok {
+						if strings.TrimSpace(raw.Text) != "" {
+							nonEmptyChildren = append(nonEmptyChildren, raw)
+						}
+					} else {
+						nonEmptyChildren = append(nonEmptyChildren, child)
+					}
+				}
+
+				// Check for template elements and add extra newlines between them
+				for i, child := range nonEmptyChildren {
+					builder.WriteString("\n")
+
+					// Add an extra newline between template elements
+					if i > 0 && isTemplateElement(child) && isTemplateElement(nonEmptyChildren[i-1]) {
+						builder.WriteString("\n")
+					}
+
+					if elementChild, ok := child.(*ElementNode); ok {
+						builder.WriteString(elementChild.Dump(indent + 1))
+					} else {
+						for j := 0; j < indent+1; j++ {
+							builder.WriteString(indentStr)
+						}
+						builder.WriteString(strings.TrimSpace(child.Dump(indent + 1)))
+					}
+				}
+				builder.WriteString("\n")
+				for i := 0; i < indent; i++ {
+					builder.WriteString(indentStr)
+				}
 			}
 		}
 	}
