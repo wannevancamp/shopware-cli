@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/shyim/go-version"
@@ -266,10 +265,7 @@ func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
 		pluginIcon = "src/Resources/config/plugin.png"
 	}
 
-	// check if the plugin icon exists
-	if _, err := os.Stat(filepath.Join(p.GetPath(), pluginIcon)); os.IsNotExist(err) {
-		ctx.AddError("metadata.icon", fmt.Sprintf("The plugin icon %s does not exist", pluginIcon))
-	}
+	validateExtensionIcon(ctx, pluginIcon, "plugin")
 
 	validateTheme(ctx)
 	validatePHPFiles(c, ctx)

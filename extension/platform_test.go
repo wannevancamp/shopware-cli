@@ -90,3 +90,21 @@ func TestPluginIconDifferntPathExists(t *testing.T) {
 
 	assert.Equal(t, 0, len(ctx.errors))
 }
+
+func TestPluginIconIsTooBig(t *testing.T) {
+	dir := t.TempDir()
+
+	plugin := getTestPlugin(dir)
+
+	assert.NoError(t, os.MkdirAll(dir+"/src/Resources/config/", os.ModePerm))
+	// Create a file larger than 10KB
+	bigFile := make([]byte, 11*1024)
+	assert.NoError(t, os.WriteFile(dir+"/src/Resources/config/plugin.png", bigFile, os.ModePerm))
+
+	ctx := newValidationContext(&plugin)
+
+	plugin.Validate(getTestContext(), ctx)
+
+	assert.Len(t, ctx.errors, 1)
+	assert.Equal(t, "The plugin icon src/Resources/config/plugin.png is bigger than 10kb", ctx.errors[0].Message)
+}
