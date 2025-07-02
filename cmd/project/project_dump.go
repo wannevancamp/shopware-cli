@@ -334,7 +334,7 @@ func init() {
 	projectDatabaseDumpCmd.Flags().String("port", "", "mysql port")
 
 	projectDatabaseDumpCmd.Flags().String("output", "dump.sql", "file or - (for stdout)")
-	projectDatabaseDumpCmd.Flags().Bool("clean", false, "Ignores cart, enqueue, message_queue_stats")
+	projectDatabaseDumpCmd.Flags().Bool("clean", false, "Ignores cart, messenger_messages, message_queue_stats,...")
 	projectDatabaseDumpCmd.Flags().Bool("skip-lock-tables", false, "Skips locking the tables")
 	projectDatabaseDumpCmd.Flags().Bool("anonymize", false, "Anonymize customer data")
 	projectDatabaseDumpCmd.Flags().String("compression", "", "Compress the dump (gzip, zstd)")
