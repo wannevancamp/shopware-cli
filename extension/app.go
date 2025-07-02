@@ -150,9 +150,7 @@ func (a App) Validate(_ context.Context, ctx *ValidationContext) {
 		appIcon = "Resources/config/plugin.png"
 	}
 
-	if _, err := os.Stat(filepath.Join(a.GetPath(), appIcon)); os.IsNotExist(err) {
-		ctx.AddError("metadata.icon", fmt.Sprintf("Cannot find app icon at %s", appIcon))
-	}
+	validateExtensionIcon(ctx, appIcon, "app")
 
 	allowedTwigLocations := []string{path.Join(a.GetRootDir(), "Resources", "views"), path.Join(a.GetRootDir(), "Resources", "scripts")}
 

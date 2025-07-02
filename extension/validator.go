@@ -3,6 +3,7 @@ package extension
 import (
 	"fmt"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -81,6 +82,19 @@ func (c *ValidationContext) ApplyIgnores(ignores []ConfigValidationIgnoreItem) {
 				i--
 				continue
 			}
+		}
+	}
+}
+
+func validateExtensionIcon(ctx *ValidationContext, iconPath, extensionType string) {
+	fullIconPath := filepath.Join(ctx.Extension.GetPath(), iconPath)
+	info, err := os.Stat(fullIconPath)
+
+	if os.IsNotExist(err) {
+		ctx.AddError("metadata.icon", fmt.Sprintf("The %s icon %s does not exist", extensionType, iconPath))
+	} else if err == nil {
+		if info.Size() > 10*1024 {
+			ctx.AddError("metadata.icon.size", fmt.Sprintf("The %s icon %s is bigger than 10kb", extensionType, iconPath))
 		}
 	}
 }

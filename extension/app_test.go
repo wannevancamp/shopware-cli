@@ -133,7 +133,7 @@ func TestIconNotExists(t *testing.T) {
 	app.Validate(getTestContext(), ctx)
 
 	assert.Equal(t, 1, len(ctx.errors))
-	assert.Equal(t, "Cannot find app icon at Resources/config/plugin.png", ctx.errors[0].Message)
+	assert.Equal(t, "The app icon Resources/config/plugin.png does not exist", ctx.errors[0].Message)
 }
 
 func TestAppNoLicense(t *testing.T) {
@@ -322,4 +322,26 @@ func TestAppWithTwigFiles(t *testing.T) {
 
 	assert.Equal(t, 1, len(ctx.errors))
 	assert.Contains(t, ctx.errors[0].Message, "Twig files should be at")
+}
+
+func TestAppIconIsTooBig(t *testing.T) {
+	appPath := t.TempDir()
+
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "manifest.xml"), []byte(testAppManifestIcon), os.ModePerm))
+	// Create a file larger than 10KB
+	bigFile := make([]byte, 11*1024)
+	assert.NoError(t, os.WriteFile(path.Join(appPath, "app.png"), bigFile, os.ModePerm))
+
+	app, err := newApp(appPath)
+
+	assert.NoError(t, err)
+
+	assert.Equal(t, "MyExampleApp", app.manifest.Meta.Name)
+	assert.Equal(t, "app.png", app.manifest.Meta.Icon)
+
+	ctx := newValidationContext(app)
+	app.Validate(getTestContext(), ctx)
+
+	assert.Len(t, ctx.errors, 1)
+	assert.Equal(t, "The app icon app.png is bigger than 10kb", ctx.errors[0].Message)
 }
