@@ -10,6 +10,11 @@ import (
 func getTestPlugin(tempDir string) PlatformPlugin {
 	return PlatformPlugin{
 		path: tempDir,
+		config: &Config{
+			Store: ConfigStore{
+				Availabilities: &[]string{"German"},
+			},
+		},
 		Composer: PlatformComposerJson{
 			Name:        "frosh/frosh-tools",
 			Description: "Frosh Tools",
@@ -107,4 +112,40 @@ func TestPluginIconIsTooBig(t *testing.T) {
 
 	assert.Len(t, ctx.errors, 1)
 	assert.Equal(t, "The extension icon Resources/config/plugin.png is bigger than 10kb", ctx.errors[0].Message)
+}
+
+func TestPluginGermanDescriptionMissing(t *testing.T) {
+	dir := t.TempDir()
+
+	plugin := getTestPlugin(dir)
+	plugin.Composer.Extra.Description = map[string]string{
+		"en-GB": "Frosh Tools",
+	}
+
+	ctx := newValidationContext(&plugin)
+	assert.NoError(t, os.MkdirAll(dir+"/src/Resources/config/", os.ModePerm))
+	assert.NoError(t, os.WriteFile(dir+"/src/Resources/config/plugin.png", []byte("test"), os.ModePerm))
+
+	plugin.Validate(getTestContext(), ctx)
+
+	assert.Len(t, ctx.errors, 1)
+	assert.Equal(t, "extra.description for language de-DE is required", ctx.errors[0].Message)
+}
+
+func TestPluginGermanDescriptionMissingOnlyEnglishMarket(t *testing.T) {
+	dir := t.TempDir()
+
+	plugin := getTestPlugin(dir)
+	plugin.Composer.Extra.Description = map[string]string{
+		"en-GB": "Frosh Tools",
+	}
+	plugin.config.Store.Availabilities = &[]string{"International"}
+	assert.NoError(t, os.MkdirAll(dir+"/src/Resources/config/", os.ModePerm))
+	assert.NoError(t, os.WriteFile(dir+"/src/Resources/config/plugin.png", []byte("test"), os.ModePerm))
+
+	ctx := newValidationContext(&plugin)
+
+	plugin.Validate(getTestContext(), ctx)
+
+	assert.Len(t, ctx.errors, 0)
 }
