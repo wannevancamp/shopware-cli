@@ -3,7 +3,7 @@ package esbuild
 import (
 	"encoding/json"
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -27,7 +27,7 @@ func TestDumpViteManifest(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verify that manifest.json is created
-	manifestPath := path.Join(tempDir, "manifest.json")
+	manifestPath := filepath.Join(tempDir, "manifest.json")
 	_, err = os.Stat(manifestPath)
 	assert.NoError(t, err)
 
@@ -70,7 +70,7 @@ func TestDumpViteEntrypoint(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verify that entrypoints.json is created
-	entrypointsPath := path.Join(tempDir, "entrypoints.json")
+	entrypointsPath := filepath.Join(tempDir, "entrypoints.json")
 	_, err = os.Stat(entrypointsPath)
 	assert.NoError(t, err)
 
@@ -126,16 +126,16 @@ func TestDumpViteConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Verify that .vite directory is created
-	viteDir := path.Join(tempDir, "dist", ".vite")
+	viteDir := filepath.Join(tempDir, "dist", ".vite")
 	stat, err := os.Stat(viteDir)
 	assert.NoError(t, err)
 	assert.True(t, stat.IsDir())
 
 	// Verify that both manifest.json and entrypoints.json exist
-	_, err = os.Stat(path.Join(viteDir, "manifest.json"))
+	_, err = os.Stat(filepath.Join(viteDir, "manifest.json"))
 	assert.NoError(t, err)
 
-	_, err = os.Stat(path.Join(viteDir, "entrypoints.json"))
+	_, err = os.Stat(filepath.Join(viteDir, "entrypoints.json"))
 	assert.NoError(t, err)
 }
 
@@ -157,8 +157,8 @@ func TestDumpViteConfigCannotOverwrite(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Read file content after first call
-	viteDir := path.Join(tempDir, "dist", ".vite")
-	manifestPath := path.Join(viteDir, "manifest.json")
+	viteDir := filepath.Join(tempDir, "dist", ".vite")
+	manifestPath := filepath.Join(viteDir, "manifest.json")
 	initialContent, err := os.ReadFile(manifestPath)
 	assert.NoError(t, err)
 

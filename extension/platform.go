@@ -242,6 +242,10 @@ func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
 
 	requiredKeys := []string{"de-DE", "en-GB"}
 
+	if !p.GetExtensionConfig().Store.IsInGermanStore() {
+		requiredKeys = []string{"en-GB"}
+	}
+
 	for _, key := range requiredKeys {
 		_, hasLabel := p.Composer.Extra.Label[key]
 		_, hasDescription := p.Composer.Extra.Description[key]

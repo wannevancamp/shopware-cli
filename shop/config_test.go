@@ -2,7 +2,7 @@ package shop
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -34,8 +34,8 @@ sync:
         core.store.licenseHost: xyz.nuonic.dev
 `)
 
-	baseFilePath := path.Join(tmpDir, "base.yml")
-	stagingFilePath := path.Join(tmpDir, "staging.yml")
+	baseFilePath := filepath.Join(tmpDir, "base.yml")
+	stagingFilePath := filepath.Join(tmpDir, "staging.yml")
 
 	assert.NoError(t, os.WriteFile(baseFilePath, baseConfig, 0644))
 	assert.NoError(t, os.WriteFile(stagingFilePath, stagingConfig, 0644))

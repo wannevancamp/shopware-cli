@@ -1,7 +1,7 @@
 package extension
 
 import (
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,7 +24,7 @@ func TestConvertPlugin(t *testing.T) {
 	froshTools := assetSource[0]
 
 	assert.Equal(t, "FroshTools", froshTools.Name)
-	assert.Equal(t, path.Join(plugin.path, "src"), froshTools.Path)
+	assert.Equal(t, filepath.Join(plugin.path, "src"), froshTools.Path)
 }
 
 func TestConvertApp(t *testing.T) {

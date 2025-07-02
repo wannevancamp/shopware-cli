@@ -67,17 +67,15 @@ func TestMigrateComposerJson(t *testing.T) {
 		assert.False(t, migratedComposer.HasConfig("platform"))
 
 		// Verify plugin configuration
-		allowPlugins, ok := migratedComposer.Config["allow-plugins"]
+		allowPlugins, ok := migratedComposer.Config["allow-plugins"].(map[string]interface{})
 		require.True(t, ok)
-		allowPluginsMap, ok := allowPlugins.(map[string]interface{})
-		require.True(t, ok)
-		flexEnabled, ok := allowPluginsMap["symfony/flex"]
+		flexEnabled, ok := allowPlugins["symfony/flex"]
 		require.True(t, ok)
 		assert.Equal(t, true, flexEnabled)
-		runtimeEnabled, ok := allowPluginsMap["symfony/runtime"]
+		runtimeEnabled, ok := allowPlugins["symfony/runtime"]
 		require.True(t, ok)
 		assert.Equal(t, true, runtimeEnabled)
-		_, hasDeprecatedPlugin := allowPluginsMap["composer/package-versions-deprecated"]
+		_, hasDeprecatedPlugin := allowPlugins["composer/package-versions-deprecated"]
 		assert.False(t, hasDeprecatedPlugin)
 
 		// Verify symfony configuration

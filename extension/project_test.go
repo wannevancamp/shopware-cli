@@ -127,7 +127,7 @@ final public const SHOPWARE_FALLBACK_VERSION = '6.6.9999999.9999999-dev';
 			tmpDir := t.TempDir()
 
 			for file, content := range tc.Files {
-				tmpFile := tmpDir + "/" + file
+				tmpFile := filepath.Join(tmpDir, file)
 				parentDir := filepath.Dir(tmpFile)
 
 				if _, err := os.Stat(parentDir); os.IsNotExist(err) {

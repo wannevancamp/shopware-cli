@@ -326,3 +326,17 @@ func (c *Config) Dump(dir string) error {
 
 	return encoder.Encode(c)
 }
+
+func (c *ConfigStore) IsInGermanStore() bool {
+	if c.Availabilities == nil {
+		return true
+	}
+
+	for _, availability := range *c.Availabilities {
+		if availability == "German" {
+			return true
+		}
+	}
+
+	return false
+}
