@@ -33,6 +33,7 @@ require (
 	github.com/yuin/goldmark v1.7.12
 	github.com/zeebo/xxh3 v1.0.2
 	go.uber.org/zap v1.27.0
+	golang.org/x/image v0.28.0
 	golang.org/x/text v0.26.0
 	google.golang.org/api v0.239.0
 	gopkg.in/yaml.v3 v3.0.1

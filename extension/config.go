@@ -98,7 +98,7 @@ type ConfigStore struct {
 	Categories *[]string `yaml:"categories" jsonschema:"enum=Administration,enum=SEOOptimierung,enum=Bonitaetsprüfung,enum=Rechtssicherheit,enum=Auswertung,enum=KommentarFeedback,enum=Tracking,enum=Integration,enum=PreissuchmaschinenPortale,enum=Warenwirtschaft,enum=Versand,enum=Bezahlung,enum=StorefrontDetailanpassungen,enum=Sprache,enum=Suche,enum=HeaderFooter,enum=Detailseite,enum=MenueKategorien,enum=Bestellprozess,enum=KundenkontoPersonalisierung,enum=Sonderfunktionen,enum=Themes,enum=Branche,enum=Home+Furnishings,enum=FashionBekleidung,enum=GartenNatur,enum=KosmetikGesundheit,enum=EssenTrinken,enum=KinderPartyGeschenke,enum=SportLifestyleReisen,enum=Bauhaus,enum=Elektronik,enum=Geraete,enum=Heimkueche,enum=Hobby,enum=Kueche,enum=Lebensmittel,enum=Medizin,enum=Mode,enum=Musik,enum=Spiel,enum=Technik,enum=Umweltschutz,enum=Wohnen,enum=Zubehoer"`
 	// Specifies the type of the extension.
 	Type *string `yaml:"type" jsonschema:"enum=extension,enum=theme"`
-	// Specifies the Path to the icon (128x128 px) for store.
+	// Specifies the Path to the icon (256x256 px) for store.
 	Icon *string `yaml:"icon"`
 	// Specifies whether the extension should automatically be set compatible with Shopware bugfix versions.
 	AutomaticBugfixVersionCompatibility *bool `yaml:"automatic_bugfix_version_compatibility"`
