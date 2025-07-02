@@ -154,7 +154,7 @@ func (a App) GetMetaData() *extensionMetadata {
 func (a App) Validate(_ context.Context, ctx *ValidationContext) {
 	validateTheme(ctx)
 
-	validateExtensionIcon(ctx, "app")
+	validateExtensionIcon(ctx)
 
 	allowedTwigLocations := []string{path.Join(a.GetRootDir(), "Resources", "views"), path.Join(a.GetRootDir(), "Resources", "scripts")}
 

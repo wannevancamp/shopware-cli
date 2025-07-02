@@ -264,7 +264,7 @@ func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
 		ctx.AddError("metadata.autoload", "At least one of the properties psr-0 or psr-4 are required in the composer.json")
 	}
 
-	validateExtensionIcon(ctx, "plugin")
+	validateExtensionIcon(ctx)
 
 	validateTheme(ctx)
 	validatePHPFiles(c, ctx)
