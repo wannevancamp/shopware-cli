@@ -184,7 +184,6 @@ func (e ProducerEndpoint) UpdateExtensionIcon(ctx context.Context, extensionId i
 	if err != nil {
 		return fmt.Errorf(errorFormat, err)
 	}
-	defer iconFile.Close()
 
 	img, _, err := image.Decode(iconFile)
 	if err != nil {
@@ -209,6 +208,10 @@ func (e ProducerEndpoint) UpdateExtensionIcon(ctx context.Context, extensionId i
 		if _, err = io.Copy(fileWriter, iconFile); err != nil {
 			return fmt.Errorf(errorFormat, err)
 		}
+	}
+
+	if err := iconFile.Close(); err != nil {
+		return fmt.Errorf(errorFormat, err)
 	}
 
 	err = w.Close()

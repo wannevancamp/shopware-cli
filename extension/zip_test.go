@@ -1,7 +1,6 @@
 package extension
 
 import (
-	"context"
 	"encoding/json"
 	"os"
 	"path/filepath"
@@ -102,9 +101,9 @@ func TestGenerateChecksumJSON(t *testing.T) {
 
 	// Create a mock extension
 	mockExt := &mockExtension{
-		name:    "TestExt",
-		version: version.Must(version.NewVersion("1.0.0")),
-		config:  &Config{},
+		name:       "TestExt",
+		extVersion: version.Must(version.NewVersion("1.0.0")),
+		config:     &Config{},
 	}
 
 	// Generate checksum.json
@@ -156,9 +155,9 @@ func TestGenerateChecksumJSONIgnores(t *testing.T) {
 	}
 
 	mockExt := &mockExtension{
-		name:    "TestExt",
-		version: version.Must(version.NewVersion("1.0.0")),
-		config:  &Config{},
+		name:       "TestExt",
+		extVersion: version.Must(version.NewVersion("1.0.0")),
+		config:     &Config{},
 	}
 
 	mockExt.config.Build.Zip.Checksum.Ignore = []string{
@@ -183,89 +182,4 @@ func TestGenerateChecksumJSONIgnores(t *testing.T) {
 	// Verify that the checksum.json contains the expected files
 	assert.Contains(t, checksum.Hashes, "composer.json", "composer.json should be in the checksum list")
 	assert.NotContains(t, checksum.Hashes, "src/Resources/test.txt", "src/Resources/test.txt should be in the checksum list")
-}
-
-// Mock implementation of Extension interface for testing
-type mockExtension struct {
-	name    string
-	version *version.Version
-	config  *Config
-}
-
-func (m *mockExtension) GetName() (string, error) {
-	return m.name, nil
-}
-
-func (m *mockExtension) GetComposerName() (string, error) {
-	return "test/test-ext", nil
-}
-
-func (m *mockExtension) GetResourcesDir() string {
-	return "src/Resources"
-}
-
-func (m *mockExtension) GetResourcesDirs() []string {
-	return []string{"src/Resources"}
-}
-
-func (m *mockExtension) GetRootDir() string {
-	return "src"
-}
-
-func (m *mockExtension) GetSourceDirs() []string {
-	return []string{"src"}
-}
-
-func (m *mockExtension) GetVersion() (*version.Version, error) {
-	return m.version, nil
-}
-
-func (m *mockExtension) GetLicense() (string, error) {
-	return "MIT", nil
-}
-
-func (m *mockExtension) GetShopwareVersionConstraint() (*version.Constraints, error) {
-	constraint, _ := version.NewConstraint(">=6.4.0")
-	return &constraint, nil
-}
-
-func (m *mockExtension) GetType() string {
-	return TypePlatformPlugin
-}
-
-func (m *mockExtension) GetPath() string {
-	return ""
-}
-
-func (m *mockExtension) GetChangelog() (*ExtensionChangelog, error) {
-	return &ExtensionChangelog{
-		German:  "Änderungen",
-		English: "Changes",
-		Changelogs: map[string]string{
-			"en-GB": "English changelog",
-			"de-DE": "German changelog",
-		},
-	}, nil
-}
-
-func (m *mockExtension) GetMetaData() *extensionMetadata {
-	return &extensionMetadata{
-		Name: m.name,
-		Label: extensionTranslated{
-			German:  "Test Extension DE",
-			English: "Test Extension EN",
-		},
-		Description: extensionTranslated{
-			German:  "Test Beschreibung",
-			English: "Test Description",
-		},
-	}
-}
-
-func (m *mockExtension) GetExtensionConfig() *Config {
-	return m.config
-}
-
-func (m *mockExtension) Validate(ctx context.Context, validationContext *ValidationContext) {
-	// No validation needed for tests
 }

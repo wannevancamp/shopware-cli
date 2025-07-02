@@ -125,6 +125,16 @@ func (a App) GetChangelog() (*ExtensionChangelog, error) {
 	return parseExtensionMarkdownChangelog(a)
 }
 
+func (a App) GetIconPath() string {
+	iconPath := a.manifest.Meta.Icon
+
+	if iconPath == "" {
+		iconPath = "Resources/config/plugin.png"
+	}
+
+	return path.Join(a.GetRootDir(), iconPath)
+}
+
 func (a App) GetMetaData() *extensionMetadata {
 	german := []string{"de-DE", "de"}
 	english := []string{"en-GB", "en-US", "en", ""}
@@ -144,13 +154,7 @@ func (a App) GetMetaData() *extensionMetadata {
 func (a App) Validate(_ context.Context, ctx *ValidationContext) {
 	validateTheme(ctx)
 
-	appIcon := a.manifest.Meta.Icon
-
-	if appIcon == "" {
-		appIcon = "Resources/config/plugin.png"
-	}
-
-	validateExtensionIcon(ctx, appIcon, "app")
+	validateExtensionIcon(ctx)
 
 	allowedTwigLocations := []string{path.Join(a.GetRootDir(), "Resources", "views"), path.Join(a.GetRootDir(), "Resources", "scripts")}
 

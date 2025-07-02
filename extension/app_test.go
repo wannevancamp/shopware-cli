@@ -133,7 +133,7 @@ func TestIconNotExists(t *testing.T) {
 	app.Validate(getTestContext(), ctx)
 
 	assert.Equal(t, 1, len(ctx.errors))
-	assert.Equal(t, "The app icon Resources/config/plugin.png does not exist", ctx.errors[0].Message)
+	assert.Equal(t, "The extension icon Resources/config/plugin.png does not exist", ctx.errors[0].Message)
 }
 
 func TestAppNoLicense(t *testing.T) {
@@ -343,5 +343,5 @@ func TestAppIconIsTooBig(t *testing.T) {
 	app.Validate(getTestContext(), ctx)
 
 	assert.Len(t, ctx.errors, 1)
-	assert.Equal(t, "The app icon app.png is bigger than 10kb", ctx.errors[0].Message)
+	assert.Equal(t, "The extension icon app.png is bigger than 10kb", ctx.errors[0].Message)
 }
