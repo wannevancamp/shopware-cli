@@ -2,7 +2,7 @@ package extension
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -47,7 +47,7 @@ func TestCanIUseUpdate(t *testing.T) {
   }
 }`
 
-	packageLockJson := path.Join(tmpDir, "package-lock.json")
+	packageLockJson := filepath.Join(tmpDir, "package-lock.json")
 
 	if err := os.WriteFile(packageLockJson, []byte(packageLock), 0644); err != nil {
 		t.Fatal(err)

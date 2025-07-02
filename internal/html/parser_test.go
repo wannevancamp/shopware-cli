@@ -2,7 +2,7 @@ package html
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -57,7 +57,7 @@ func TestFormatting(t *testing.T) {
 		t.Run(f.Name(), func(t *testing.T) {
 			name := f.Name()
 
-			data, err := os.ReadFile(path.Join("testdata", name))
+			data, err := os.ReadFile(filepath.Join("testdata", name))
 			if err != nil {
 				t.Fatal(err)
 			}
