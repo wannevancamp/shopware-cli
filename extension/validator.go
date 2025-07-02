@@ -94,7 +94,7 @@ func validateExtensionIcon(ctx *ValidationContext, iconPath, extensionType strin
 		ctx.AddError("metadata.icon", fmt.Sprintf("The %s icon %s does not exist", extensionType, iconPath))
 	} else if err == nil {
 		if info.Size() > 10*1024 {
-			ctx.AddError("metadata.icon", fmt.Sprintf("The %s icon %s is bigger than 10kb", extensionType, iconPath))
+			ctx.AddError("metadata.icon.size", fmt.Sprintf("The %s icon %s is bigger than 10kb", extensionType, iconPath))
 		}
 	}
 }
