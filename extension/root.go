@@ -104,6 +104,8 @@ type Extension interface {
 	GetResourcesDir() string
 	GetResourcesDirs() []string
 
+	GetIconPath() string
+
 	// GetRootDir Returns the root folder where the code is located plugin -> src, app ->
 	GetRootDir() string
 	GetSourceDirs() []string

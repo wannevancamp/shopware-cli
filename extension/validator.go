@@ -86,15 +86,20 @@ func (c *ValidationContext) ApplyIgnores(ignores []ConfigValidationIgnoreItem) {
 	}
 }
 
-func validateExtensionIcon(ctx *ValidationContext, iconPath, extensionType string) {
-	fullIconPath := filepath.Join(ctx.Extension.GetPath(), iconPath)
+func validateExtensionIcon(ctx *ValidationContext, extensionType string) {
+	fullIconPath := ctx.Extension.GetIconPath()
+	relPath, err := filepath.Rel(ctx.Extension.GetRootDir(), fullIconPath)
+	if err != nil {
+		relPath = fullIconPath
+	}
+
 	info, err := os.Stat(fullIconPath)
 
 	if os.IsNotExist(err) {
-		ctx.AddError("metadata.icon", fmt.Sprintf("The %s icon %s does not exist", extensionType, iconPath))
+		ctx.AddError("metadata.icon", fmt.Sprintf("The %s icon %s does not exist", extensionType, relPath))
 	} else if err == nil {
 		if info.Size() > 10*1024 {
-			ctx.AddError("metadata.icon.size", fmt.Sprintf("The %s icon %s is bigger than 10kb", extensionType, iconPath))
+			ctx.AddError("metadata.icon.size", fmt.Sprintf("The %s icon %s is bigger than 10kb", extensionType, relPath))
 		}
 	}
 }

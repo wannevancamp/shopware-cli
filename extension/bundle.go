@@ -160,6 +160,10 @@ func (p ShopwareBundle) GetPath() string {
 	return p.path
 }
 
+func (p ShopwareBundle) GetIconPath() string {
+	return ""
+}
+
 func (p ShopwareBundle) GetMetaData() *extensionMetadata {
 	return &extensionMetadata{
 		Label: extensionTranslated{

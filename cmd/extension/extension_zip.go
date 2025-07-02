@@ -120,15 +120,14 @@ var extensionZipCmd = &cobra.Command{
 				return fmt.Errorf("after hooks composer: %w", err)
 			}
 		}
+		var tempExt extension.Extension
+		if tempExt, err = extension.GetExtensionByFolder(extDir); err != nil {
+			return err
+		}
 
 		if extCfg.Build.Zip.Assets.Enabled {
 			if err := executeHooks(ext, extCfg.Build.Zip.Assets.BeforeHooks, extDir); err != nil {
 				return fmt.Errorf("before hooks assets: %w", err)
-			}
-
-			var tempExt extension.Extension
-			if tempExt, err = extension.GetExtensionByFolder(extDir); err != nil {
-				return err
 			}
 
 			shopwareConstraint, err := tempExt.GetShopwareVersionConstraint()
@@ -167,6 +166,10 @@ var extensionZipCmd = &cobra.Command{
 			if err := extension.PrepareExtensionForRelease(cmd.Context(), extPath, extDir, ext); err != nil {
 				return fmt.Errorf("prepare for release: %w", err)
 			}
+		}
+
+		if err := extension.ResizeExtensionIcon(cmd.Context(), tempExt); err != nil {
+			return fmt.Errorf("resize extension icon: %w", err)
 		}
 
 		if err := extension.BuildModifier(ext, extDir, extension.BuildModifierConfig{

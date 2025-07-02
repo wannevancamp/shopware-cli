@@ -193,6 +193,16 @@ func (p PlatformPlugin) GetMetaData() *extensionMetadata {
 	}
 }
 
+func (p PlatformPlugin) GetIconPath() string {
+	pluginIcon := p.Composer.Extra.PluginIcon
+
+	if pluginIcon == "" {
+		pluginIcon = "src/Resources/config/plugin.png"
+	}
+
+	return path.Join(p.path, pluginIcon)
+}
+
 func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
 	if p.Composer.Name == "" {
 		ctx.AddError("metadata.name", "Key `name` is required")
@@ -259,13 +269,7 @@ func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
 		ctx.AddError("metadata.autoload", "At least one of the properties psr-0 or psr-4 are required in the composer.json")
 	}
 
-	pluginIcon := p.Composer.Extra.PluginIcon
-
-	if pluginIcon == "" {
-		pluginIcon = "src/Resources/config/plugin.png"
-	}
-
-	validateExtensionIcon(ctx, pluginIcon, "plugin")
+	validateExtensionIcon(ctx, "plugin")
 
 	validateTheme(ctx)
 	validatePHPFiles(c, ctx)
