@@ -245,6 +245,7 @@ func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
 	for _, key := range requiredKeys {
 		_, hasLabel := p.Composer.Extra.Label[key]
 		_, hasDescription := p.Composer.Extra.Description[key]
+		_, hasManufacturer := p.Composer.Extra.ManufacturerLink[key]
 		_, hasSupportLink := p.Composer.Extra.SupportLink[key]
 
 		if !hasLabel {
@@ -253,6 +254,10 @@ func (p PlatformPlugin) Validate(c context.Context, ctx *ValidationContext) {
 
 		if !hasDescription {
 			ctx.AddError("metadata.description", fmt.Sprintf("extra.description for language %s is required", key))
+		}
+
+		if !hasManufacturer {
+			ctx.AddError("metadata.manufacturer", fmt.Sprintf("extra.manufacturerLink for language %s is required", key))
 		}
 
 		if !hasSupportLink {
