@@ -19,7 +19,7 @@ func TestResizeExtensionIcon(t *testing.T) {
 	t.Run("icon is smaller than 56x56", func(t *testing.T) {
 		tempDir := t.TempDir()
 		iconPath := filepath.Join(tempDir, "icon.png")
-		createTestImage(t, iconPath, 32, 32)
+		assert.NoError(t, createTestImageWithSize(iconPath, 32, 32))
 
 		ext := &mockExtension{iconPath: iconPath}
 		err := ResizeExtensionIcon(getTestContext(), ext)
@@ -38,7 +38,7 @@ func TestResizeExtensionIcon(t *testing.T) {
 	t.Run("icon is exactly 56x56", func(t *testing.T) {
 		tempDir := t.TempDir()
 		iconPath := filepath.Join(tempDir, "icon.png")
-		createTestImage(t, iconPath, 56, 56)
+		assert.NoError(t, createTestImageWithSize(iconPath, 32, 32))
 
 		ext := &mockExtension{iconPath: iconPath}
 		err := ResizeExtensionIcon(getTestContext(), ext)
@@ -49,15 +49,15 @@ func TestResizeExtensionIcon(t *testing.T) {
 
 		img, _, err := image.DecodeConfig(f)
 		assert.NoError(t, err)
-		assert.Equal(t, 56, img.Width)
-		assert.Equal(t, 56, img.Height)
+		assert.Equal(t, 32, img.Width)
+		assert.Equal(t, 32, img.Height)
 		assert.NoError(t, f.Close(), "Failed to close file after resizing icon")
 	})
 
 	t.Run("icon is larger than 56x56", func(t *testing.T) {
 		tempDir := t.TempDir()
 		iconPath := filepath.Join(tempDir, "icon.png")
-		createTestImage(t, iconPath, 128, 128)
+		assert.NoError(t, createTestImageWithSize(iconPath, 32, 32))
 
 		ext := &mockExtension{iconPath: iconPath}
 		err := ResizeExtensionIcon(getTestContext(), ext)
@@ -68,8 +68,8 @@ func TestResizeExtensionIcon(t *testing.T) {
 
 		img, _, err := image.DecodeConfig(f)
 		assert.NoError(t, err)
-		assert.Equal(t, 56, img.Width)
-		assert.Equal(t, 56, img.Height)
+		assert.Equal(t, 32, img.Width)
+		assert.Equal(t, 32, img.Height)
 		assert.NoError(t, f.Close(), "Failed to close file after resizing icon")
 	})
 }

@@ -13,7 +13,7 @@ import (
 )
 
 func ResizeExtensionIcon(ctx context.Context, ext Extension) error {
-	// Resize the icon to 56x56
+	// Resize the icon to 256x256 if it's larger than that.
 	iconPath := ext.GetIconPath()
 	if iconPath == "" {
 		return nil // No icon to resize
@@ -33,13 +33,13 @@ func ResizeExtensionIcon(ctx context.Context, ext Extension) error {
 		return fmt.Errorf("cannot decode icon: %w", err)
 	}
 
-	if src.Bounds().Dx() <= 56 && src.Bounds().Dy() <= 56 {
+	if src.Bounds().Dx() <= 256 && src.Bounds().Dy() <= 256 {
 		return nil
 	}
 
-	logging.FromContext(ctx).Infof("Resizing extension icon from %dx%d to 56x56", src.Bounds().Dx(), src.Bounds().Dy())
+	logging.FromContext(ctx).Infof("Resizing extension icon from %dx%d to 256x256", src.Bounds().Dx(), src.Bounds().Dy())
 
-	dst := image.NewRGBA(image.Rect(0, 0, 56, 56))
+	dst := image.NewRGBA(image.Rect(0, 0, 256, 256))
 
 	draw.BiLinear.Scale(dst, dst.Rect, src, src.Bounds(), draw.Over, nil)
 

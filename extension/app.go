@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -27,11 +26,11 @@ func (a App) GetSourceDirs() []string {
 }
 
 func (a App) GetResourcesDir() string {
-	return path.Join(a.path, "Resources")
+	return filepath.Join(a.path, "Resources")
 }
 
 func (a App) GetResourcesDirs() []string {
-	return []string{path.Join(a.path, "Resources")}
+	return []string{filepath.Join(a.path, "Resources")}
 }
 
 func (a App) GetComposerName() (string, error) {
@@ -132,7 +131,7 @@ func (a App) GetIconPath() string {
 		iconPath = "Resources/config/plugin.png"
 	}
 
-	return path.Join(a.GetRootDir(), iconPath)
+	return filepath.Join(a.GetRootDir(), iconPath)
 }
 
 func (a App) GetMetaData() *extensionMetadata {
@@ -156,7 +155,7 @@ func (a App) Validate(_ context.Context, ctx *ValidationContext) {
 
 	validateExtensionIcon(ctx)
 
-	allowedTwigLocations := []string{path.Join(a.GetRootDir(), "Resources", "views"), path.Join(a.GetRootDir(), "Resources", "scripts")}
+	allowedTwigLocations := []string{filepath.Join(a.GetRootDir(), "Resources", "views"), filepath.Join(a.GetRootDir(), "Resources", "scripts")}
 
 	_ = filepath.Walk(a.GetRootDir(), func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == ".php" {

@@ -141,7 +141,7 @@ func TestAppNoLicense(t *testing.T) {
 
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifestMissingLicense), os.ModePerm))
 	assert.NoError(t, os.MkdirAll(filepath.Join(appPath, "Resources/config"), os.ModePerm))
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(appPath, "Resources/config/plugin.png")))
 
 	app, err := newApp(appPath)
 
@@ -159,7 +159,7 @@ func TestAppNoCopyright(t *testing.T) {
 
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifestMissingCopyright), os.ModePerm))
 	assert.NoError(t, os.MkdirAll(filepath.Join(appPath, "Resources/config"), os.ModePerm))
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(appPath, "Resources/config/plugin.png")))
 
 	app, err := newApp(appPath)
 
@@ -177,7 +177,7 @@ func TestAppNoAuthor(t *testing.T) {
 
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifestMissingAuthor), os.ModePerm))
 	assert.NoError(t, os.MkdirAll(filepath.Join(appPath, "Resources/config"), os.ModePerm))
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(appPath, "Resources/config/plugin.png")))
 
 	app, err := newApp(appPath)
 
@@ -195,7 +195,7 @@ func TestAppHasSecret(t *testing.T) {
 
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifestSetup), os.ModePerm))
 	assert.NoError(t, os.MkdirAll(filepath.Join(appPath, "Resources/config"), os.ModePerm))
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(appPath, "Resources/config/plugin.png")))
 
 	app, err := newApp(appPath)
 
@@ -212,7 +212,7 @@ func TestIconExistsDefaultsPath(t *testing.T) {
 	appPath := t.TempDir()
 
 	assert.NoError(t, os.MkdirAll(filepath.Join(appPath, "Resources/config"), os.ModePerm))
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(appPath, "Resources/config/plugin.png")))
 
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifest), os.ModePerm))
 
@@ -233,7 +233,7 @@ func TestIconExistsDifferentPath(t *testing.T) {
 	appPath := t.TempDir()
 
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifestIcon), os.ModePerm))
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "app.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, createTestImageWithSize(filepath.Join(appPath, "app.png"), 120, 120))
 
 	app, err := newApp(appPath)
 
@@ -284,7 +284,7 @@ func TestAppWithPHPFiles(t *testing.T) {
 	assert.NoError(t, os.MkdirAll(filepath.Join(appPath, "Resources/config"), os.ModePerm))
 
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifest), os.ModePerm))
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(appPath, "Resources/config/plugin.png")))
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "test.php"), []byte("<?php echo 'Hello World';"), os.ModePerm))
 
 	app, err := newApp(appPath)
@@ -309,7 +309,7 @@ func TestAppWithTwigFiles(t *testing.T) {
 	assert.NoError(t, os.MkdirAll(filepath.Join(appPath, "Resources/views/"), os.ModePerm))
 
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifest), os.ModePerm))
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "Resources/config/plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(appPath, "Resources/config/plugin.png")))
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "test.twig"), []byte("<?php echo 'Hello World';"), os.ModePerm))
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "Resources/views/test.twig"), []byte("<?php echo 'Hello World';"), os.ModePerm))
 
@@ -328,9 +328,7 @@ func TestAppIconIsTooBig(t *testing.T) {
 	appPath := t.TempDir()
 
 	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifestIcon), os.ModePerm))
-	// Create a file larger than 10KB
-	bigFile := make([]byte, 11*1024)
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "app.png"), bigFile, os.ModePerm))
+	assert.NoError(t, createTestImageWithSize(filepath.Join(appPath, "app.png"), 1000, 1000))
 
 	app, err := newApp(appPath)
 
@@ -343,5 +341,5 @@ func TestAppIconIsTooBig(t *testing.T) {
 	app.Validate(getTestContext(), ctx)
 
 	assert.Len(t, ctx.errors, 1)
-	assert.Equal(t, "The extension icon app.png is bigger than 10kb", ctx.errors[0].Message)
+	assert.Equal(t, "The extension icon app.png is bigger than 50kb", ctx.errors[0].Message)
 }

@@ -2,7 +2,7 @@ package extension
 
 import (
 	"os"
-	"path"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -72,8 +72,8 @@ func TestPluginIconExists(t *testing.T) {
 
 	plugin := getTestPlugin(dir)
 
-	assert.NoError(t, os.MkdirAll(path.Join(dir, "src", "Resources", "config"), os.ModePerm))
-	assert.NoError(t, os.WriteFile(path.Join(dir, "src", "Resources", "config", "plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, os.MkdirAll(filepath.Join(dir, "src", "Resources", "config"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(dir, "src", "Resources", "config", "plugin.png")))
 
 	ctx := newValidationContext(&plugin)
 
@@ -88,7 +88,7 @@ func TestPluginIconDifferntPathExists(t *testing.T) {
 	plugin := getTestPlugin(dir)
 	plugin.Composer.Extra.PluginIcon = "plugin.png"
 
-	assert.NoError(t, os.WriteFile(path.Join(dir, "plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(dir, "plugin.png")))
 
 	ctx := newValidationContext(&plugin)
 
@@ -102,17 +102,15 @@ func TestPluginIconIsTooBig(t *testing.T) {
 
 	plugin := getTestPlugin(dir)
 
-	assert.NoError(t, os.MkdirAll(path.Join(dir, "src", "Resources", "config"), os.ModePerm))
-	// Create a file larger than 10KB
-	bigFile := make([]byte, 11*1024)
-	assert.NoError(t, os.WriteFile(path.Join(dir, "src", "Resources", "config", "plugin.png"), bigFile, os.ModePerm))
+	assert.NoError(t, os.MkdirAll(filepath.Join(dir, "src", "Resources", "config"), os.ModePerm))
+	assert.NoError(t, createTestImageWithSize(filepath.Join(dir, "src", "Resources", "config", "plugin.png"), 1000, 1000))
 
 	ctx := newValidationContext(&plugin)
 
 	plugin.Validate(getTestContext(), ctx)
 
 	assert.Len(t, ctx.errors, 1)
-	assert.Equal(t, "The extension icon Resources/config/plugin.png is bigger than 10kb", ctx.errors[0].Message)
+	assert.Equal(t, "The extension icon Resources/config/plugin.png is bigger than 50kb", ctx.errors[0].Message)
 }
 
 func TestPluginGermanDescriptionMissing(t *testing.T) {
@@ -124,8 +122,8 @@ func TestPluginGermanDescriptionMissing(t *testing.T) {
 	}
 
 	ctx := newValidationContext(&plugin)
-	assert.NoError(t, os.MkdirAll(path.Join(dir, "src", "Resources", "config"), os.ModePerm))
-	assert.NoError(t, os.WriteFile(path.Join(dir, "src", "Resources", "config", "plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, os.MkdirAll(filepath.Join(dir, "src", "Resources", "config"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(dir, "src", "Resources", "config", "plugin.png")))
 
 	plugin.Validate(getTestContext(), ctx)
 
@@ -141,8 +139,8 @@ func TestPluginGermanDescriptionMissingOnlyEnglishMarket(t *testing.T) {
 		"en-GB": "Frosh Tools",
 	}
 	plugin.config.Store.Availabilities = &[]string{"International"}
-	assert.NoError(t, os.MkdirAll(path.Join(dir, "src", "Resources", "config"), os.ModePerm))
-	assert.NoError(t, os.WriteFile(path.Join(dir, "src", "Resources", "config", "plugin.png"), []byte("test"), os.ModePerm))
+	assert.NoError(t, os.MkdirAll(filepath.Join(dir, "src", "Resources", "config"), os.ModePerm))
+	assert.NoError(t, createTestImage(filepath.Join(dir, "src", "Resources", "config", "plugin.png")))
 
 	ctx := newValidationContext(&plugin)
 

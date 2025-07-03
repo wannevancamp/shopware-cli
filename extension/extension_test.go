@@ -2,9 +2,6 @@ package extension
 
 import (
 	"context"
-	"image"
-	"image/png"
-	"os"
 	"testing"
 
 	"github.com/shyim/go-version"
@@ -90,16 +87,6 @@ func (m *mockExtension) GetExtensionConfig() *Config {
 }
 
 func (m *mockExtension) Validate(ctx context.Context, validationContext *ValidationContext) {
-}
-
-func createTestImage(t *testing.T, path string, width, height int) {
-	t.Helper()
-	img := image.NewRGBA(image.Rect(0, 0, width, height))
-	f, err := os.Create(path)
-	assert.NoError(t, err)
-	err = png.Encode(f, img)
-	assert.NoError(t, err)
-	assert.NoError(t, f.Close(), "Failed to close file after creating test image")
 }
 
 func TestMockExtension(t *testing.T) {

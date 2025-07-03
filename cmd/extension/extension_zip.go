@@ -168,6 +168,10 @@ var extensionZipCmd = &cobra.Command{
 			}
 		}
 
+		if err := extension.ResizeExtensionIcon(cmd.Context(), tempExt); err != nil {
+			return fmt.Errorf("resize extension icon: %w", err)
+		}
+
 		if err := extension.BuildModifier(ext, extDir, extension.BuildModifierConfig{
 			AppBackendUrl:    getStringOnStringError(cmd.Flags().GetString("overwrite-app-backend-url")),
 			AppBackendSecret: getStringOnStringError(cmd.Flags().GetString("overwrite-app-backend-secret")),

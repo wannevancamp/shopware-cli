@@ -2,6 +2,7 @@ package extension
 
 import (
 	"fmt"
+	"image"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -98,8 +99,24 @@ func validateExtensionIcon(ctx *ValidationContext) {
 	if os.IsNotExist(err) {
 		ctx.AddError("metadata.icon", fmt.Sprintf("The extension icon %s does not exist", relPath))
 	} else if err == nil {
-		if info.Size() > 10*1024 {
-			ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s is bigger than 10kb", relPath))
+		if info.Size() > 50*1024 {
+			ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s is bigger than 50kb", relPath))
+		}
+
+		file, err := os.Open(fullIconPath)
+		if err != nil {
+			ctx.AddError("metadata.icon", fmt.Sprintf("Could not open icon file %s: %s", relPath, err.Error()))
+		} else {
+			config, _, err := image.DecodeConfig(file)
+			if err != nil {
+				ctx.AddError("metadata.icon", fmt.Sprintf("Could not decode icon image %s: %s", relPath, err.Error()))
+			} else if config.Width < 112 || config.Height < 112 {
+				ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are smaller than required 112x112 pixels", relPath, config.Width, config.Height))
+			}
+
+			if err := file.Close(); err != nil {
+				ctx.AddError("metadata.icon", fmt.Sprintf("Failed to close icon file %s: %s", relPath, err.Error()))
+			}
 		}
 	}
 }
