@@ -149,10 +149,25 @@ func init() {
 }
 
 func hasSCSSFiles(dir string) (bool, error) {
-	matches, err := filepath.Glob(filepath.Join(dir, "**", "*.scss"))
+	var found bool
+	err := filepath.WalkDir(dir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if d.IsDir() && (d.Name() == "node_modules" || d.Name() == "vendor" || d.Name() == "dist") {
+			return filepath.SkipDir
+		}
+
+		if !d.IsDir() && strings.HasSuffix(path, ".scss") {
+			found = true
+			return filepath.SkipAll
+		}
+		return nil
+	})
 	if err != nil {
 		return false, err
 	}
 
-	return len(matches) > 0, nil
+	return found, nil
 }

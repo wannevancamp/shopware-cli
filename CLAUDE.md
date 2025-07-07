@@ -57,6 +57,7 @@ Commands follow Cobra CLI patterns with:
 
 ### Testing Strategy
 - Unit tests alongside source files (`*_test.go`)
+- Use testify assert for test assertions (`github.com/stretchr/testify/assert`)
 - Test data in `testdata/` directories
 - Integration tests use real extension samples in `testdata/`
 

@@ -18,7 +18,16 @@ export default {
             "severity": "warning"
         }],
         "selector-max-type": [0, {
+            "severity": "warning",
             "message": "Selectors containing elements like \"%s\" should be avoided because the element type might change. Prefer to use .classes, #ids and [data-attributes] instead."
+        }],
+        "declaration-no-important": [true, {
+            "severity": "warning",
+            "message": "Avoid using !important in declarations. It makes the CSS harder to maintain and let others override your styles."
+        }],
+        "scss/load-partial-extension": null,
+        "scss/at-extend-no-missing-placeholder": [true, {
+            "severity": "warning",
         }],
     }
 };
