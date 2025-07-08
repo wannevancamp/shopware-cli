@@ -9,9 +9,9 @@
 	"description": "",
 	"devDependencies": {
 		"@eslint/js": "^9.21.0",
-		"@shopware-ag/admin-eslint-rules": "file:packages/@shopware-ag/admin-eslint-rules",
-		"@shopware-ag/admin-stylelint-rules": "file:packages/@shopware-ag/admin-stylelint-rules",
-		"@shopware-ag/storefront-eslint-rules": "file:packages/@shopware-ag/storefront-eslint-rules",
+		"@shopwarelabs/admin-eslint-rules": "^1.0.2",
+		"@shopwarelabs/admin-stylelint-rules": "^1.0.2",
+		"@shopwarelabs/storefront-eslint-rules": "^1.0.2",
 		"eslint": "^9.30.1",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-inclusive-language": "^2.2.1",

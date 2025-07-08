@@ -13,7 +13,7 @@ import (
 	"github.com/shopware/shopware-cli/logging"
 )
 
-//go:embed php/composer.json php/composer.lock php/configs js/configs js/packages js/package*.json
+//go:embed php/composer.json php/composer.lock php/configs js/configs js/package*.json
 var toolsFS embed.FS
 
 func SetupTools(ctx context.Context, currentVersion string) error {

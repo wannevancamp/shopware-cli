@@ -3,7 +3,7 @@ import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
 import eslintConfigPrettier from "eslint-config-prettier";
 
-import storefrontRules from "@shopware-ag/storefront-eslint-rules";
+import storefrontRules from "@shopwarelabs/storefront-eslint-rules";
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
