@@ -2,7 +2,7 @@
 export default {
 	extends: ["stylelint-config-recommended-scss"],
 	customSyntax: "postcss-scss",
-	plugins: ["stylelint-scss", "@shopwarelabs/admin-stylelint-rules"],
+	plugins: ["stylelint-scss", "@shopware-ag/admin-stylelint-rules"],
 	rules: {
 		"selector-class-pattern": null,
 		"import-notation": null,
