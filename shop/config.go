@@ -135,8 +135,10 @@ type ConfigDeployment struct {
 
 		Overrides ConfigDeploymentOverrides `yaml:"overrides"`
 
+		// DEPRECATED, On these extensions, it will be always called plugin:update
+		ForceUpdatesDeprecated []string `yaml:"force_updates,omitempty" jsonschema:"deprecated=true"`
 		// On these extensions, it will be always called plugin:update
-		ForceUpdates []string `yaml:"force_updates,omitempty"`
+		ForceUpdate []string `yaml:"force-update,omitempty"`
 	} `yaml:"extension-management"`
 
 	OneTimeTasks []struct {

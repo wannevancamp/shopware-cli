@@ -205,6 +205,12 @@
                 "type": "string"
               },
               "type": "array"
+            },
+            "force-update": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
             }
           },
           "additionalProperties": false,

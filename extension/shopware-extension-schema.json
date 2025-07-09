@@ -353,7 +353,7 @@
         },
         "icon": {
           "type": "string",
-          "description": "Specifies the Path to the icon (128x128 px) for store."
+          "description": "Specifies the Path to the icon (256x256 px) for store."
         },
         "automatic_bugfix_version_compatibility": {
           "type": "boolean",
