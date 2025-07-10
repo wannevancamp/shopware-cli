@@ -20,6 +20,7 @@ var extensionValidateCmd = &cobra.Command{
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		isFull, _ := cmd.Flags().GetBool("full")
+		storeCompliance, _ := cmd.Flags().GetBool("store-compliance")
 		reportingFormat, _ := cmd.Flags().GetString("reporter")
 		checkAgainst, _ := cmd.Flags().GetString("check-against")
 		tmpDir, err := os.MkdirTemp(os.TempDir(), "analyse-extension-*")
@@ -87,6 +88,12 @@ var extensionValidateCmd = &cobra.Command{
 			}
 		}
 
+		if storeCompliance || os.Getenv("SHOPWARE_CLI_STORE_COMPLIANCE") == "1" {
+			toolCfg.Extension.GetExtensionConfig().Validation.StoreCompliance = true
+			// The user is not allowed to provide a custom ignore list when store compliance is enabled
+			toolCfg.Extension.GetExtensionConfig().Validation.Ignore = extension.ConfigValidationList{}
+		}
+
 		toolCfg.CheckAgainst = checkAgainst
 		result := verifier.NewCheck()
 
@@ -117,6 +124,7 @@ var extensionValidateCmd = &cobra.Command{
 func init() {
 	extensionRootCmd.AddCommand(extensionValidateCmd)
 	extensionValidateCmd.PersistentFlags().Bool("full", false, "Run full validation including PHPStan, ESLint and Stylelint")
+	extensionValidateCmd.PersistentFlags().Bool("store-compliance", false, "Runs specific store compliance checks")
 	extensionValidateCmd.PersistentFlags().String("reporter", "", "Reporting format (summary, json, github, junit, markdown)")
 	extensionValidateCmd.PersistentFlags().String("check-against", "highest", "Check against Shopware Version (highest, lowest)")
 	extensionValidateCmd.PersistentFlags().String("only", "", "Run only specific tools by name (comma-separated, e.g. phpstan,eslint)")

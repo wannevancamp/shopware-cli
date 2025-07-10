@@ -164,7 +164,8 @@ type ConfigStoreImagePreview struct {
 // ConfigValidation is used to configure the extension validation.
 type ConfigValidation struct {
 	// Ignore items from the validation.
-	Ignore ConfigValidationList `yaml:"ignore,omitempty"`
+	Ignore          ConfigValidationList `yaml:"ignore,omitempty"`
+	StoreCompliance bool                 `yaml:"store_compliance,omitempty"`
 }
 
 type ConfigValidationList []ConfigValidationIgnoreItem
