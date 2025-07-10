@@ -12,6 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Verbose test output**: `go test -v ./...`
 
 ### Code Quality
+- **Prefer Go 1.24 packages** like slices package
 - **Check Go modules**: `go mod tidy`
 - **Format code**: `go fmt ./...`
 - **Run static analysis**: `go vet ./...`
@@ -60,6 +61,9 @@ Commands follow Cobra CLI patterns with:
 - Use testify assert for test assertions (`github.com/stretchr/testify/assert`)
 - Test data in `testdata/` directories
 - Integration tests use real extension samples in `testdata/`
+- Prefer assert.ElementsMatch on lists to ignore ordering issues
+- Use t.Setenv for environment variables
+- Use t.Context() for Context creation in tests
 
 ### Error Handling
 - Use structured logging via `go.uber.org/zap`
