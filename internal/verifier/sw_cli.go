@@ -23,7 +23,6 @@ func (s SWCLI) Check(ctx context.Context, check *Check, config ToolConfig) error
 		validationContext.ApplyIgnores([]extension.ConfigValidationIgnoreItem{
 			{
 				Identifier: "zip.disallowed_file",
-				Message:    ".gitignore is not allowed in the zip file",
 			},
 		})
 	}
