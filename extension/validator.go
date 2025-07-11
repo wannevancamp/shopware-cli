@@ -128,6 +128,7 @@ func RunValidation(ctx context.Context, ext Extension) *ValidationContext {
 	ext.Validate(ctx, vc)
 	validateAdministrationSnippets(vc)
 	validateStorefrontSnippets(vc)
+	validateAssets(vc)
 	vc.ApplyIgnores(ext.GetExtensionConfig().Validation.Ignore)
 
 	return vc
