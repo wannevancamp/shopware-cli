@@ -521,6 +521,9 @@
         "ignore": {
           "$ref": "#/$defs/ConfigValidationList",
           "description": "Ignore items from the validation."
+        },
+        "store_compliance": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
