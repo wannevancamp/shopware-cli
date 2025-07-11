@@ -12,9 +12,7 @@ func validateAssets(ctx *ValidationContext) {
 	}
 
 	for _, resourceDir := range ctx.Extension.GetResourcesDirs() {
-		if err := validateAssetByResourceDir(ctx, resourceDir); err != nil {
-			ctx.AddError("assets", fmt.Sprintf("Assets validation failed for %s: %s", resourceDir, err.Error()))
-		}
+		validateAssetByResourceDir(ctx, resourceDir)
 	}
 
 	for _, extraBundle := range ctx.Extension.GetExtensionConfig().Build.ExtraBundles {
@@ -26,13 +24,11 @@ func validateAssets(ctx *ValidationContext) {
 			bundlePath = fmt.Sprintf("%s/%s", bundlePath, extraBundle.Name)
 		}
 
-		if err := validateAssetByResourceDir(ctx, filepath.Join(bundlePath, "Resources")); err != nil {
-			ctx.AddError("assets", fmt.Sprintf("Assets validation failed for extra bundle %s: %s", extraBundle.Name, err.Error()))
-		}
+		validateAssetByResourceDir(ctx, filepath.Join(bundlePath, "Resources"))
 	}
 }
 
-func validateAssetByResourceDir(ctx *ValidationContext, resourceDir string) error {
+func validateAssetByResourceDir(ctx *ValidationContext, resourceDir string) {
 	_, foundAdminBuildFiles := os.Stat(filepath.Join(resourceDir, "public", "administration"))
 	foundAdminEntrypoint := hasJavascriptEntrypoint(filepath.Join(resourceDir, "app", "administration", "src"))
 	foundStorefrontEntrypoint := hasJavascriptEntrypoint(filepath.Join(resourceDir, "app", "storefront", "src"))
@@ -53,8 +49,6 @@ func validateAssetByResourceDir(ctx *ValidationContext, resourceDir string) erro
 	if foundStorefrontDistFiles == nil && !foundStorefrontEntrypoint {
 		ctx.AddError("assets.storefront.build_missing", fmt.Sprintf("Found storefront source files in %s but no build files. Please run the build command to generate the assets.", resourceDir))
 	}
-
-	return nil
 }
 
 func hasJavascriptEntrypoint(jsRoot string) bool {
