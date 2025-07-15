@@ -18,6 +18,8 @@ import (
 	"github.com/shopware/shopware-cli/shop"
 )
 
+const storefrontBundleName = "Storefront"
+
 func findClosestShopwareProject() (string, error) {
 	projectRoot := os.Getenv("PROJECT_ROOT")
 
@@ -63,30 +65,12 @@ func findClosestShopwareProject() (string, error) {
 }
 
 func filterAndWritePluginJson(cmd *cobra.Command, projectRoot string, shopCfg *shop.Config) error {
-	sources, err := extension.DumpAndLoadAssetSourcesOfProject(cmd.Context(), projectRoot, shopCfg)
+	sources, err := filterAndGetSources(cmd, projectRoot, shopCfg)
 	if err != nil {
 		return err
 	}
 
 	cfgs := extension.BuildAssetConfigFromExtensions(cmd.Context(), sources, extension.AssetBuildConfig{})
-
-	onlyExtensions, _ := cmd.PersistentFlags().GetString("only-extensions")
-	skipExtensions, _ := cmd.PersistentFlags().GetString("skip-extensions")
-
-	if onlyExtensions != "" && skipExtensions != "" {
-		return fmt.Errorf("only-extensions and skip-extensions cannot be used together")
-	}
-
-	if onlyExtensions != "" {
-		cfgs = cfgs.Only(strings.Split(onlyExtensions, ","))
-	}
-
-	if skipExtensions != "" {
-		cfgs = cfgs.Not(strings.Split(skipExtensions, ","))
-	} else {
-		logging.FromContext(cmd.Context()).Infof("Excluding extensions based on project config: %s", strings.Join(shopCfg.Build.ExcludeExtensions, ", "))
-		cfgs = cfgs.Not(shopCfg.Build.ExcludeExtensions)
-	}
 
 	if _, err := extension.InstallNodeModulesOfConfigs(cmd.Context(), cfgs, false); err != nil {
 		return err
@@ -126,6 +110,11 @@ func filterAndGetSources(cmd *cobra.Command, projectRoot string, shopCfg *shop.C
 		}
 
 		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			// We want to always include the Storefront extension, otherwise the watchers have problems
+			if s.Name == storefrontBundleName {
+				return false
+			}
+
 			// First try to resolve any symlinks
 			resolvedPath, err := filepath.EvalSymlinks(s.Path)
 			if err != nil {
@@ -165,6 +154,11 @@ func filterAndGetSources(cmd *cobra.Command, projectRoot string, shopCfg *shop.C
 	if onlyExtensions == "" && skipExtensions == "" && !onlyCustomStatic {
 		logging.FromContext(cmd.Context()).Infof("Excluding extensions based on project config: %s", strings.Join(shopCfg.Build.ExcludeExtensions, ", "))
 		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			// We want to always include the Storefront extension, otherwise the watchers have problems
+			if s.Name == storefrontBundleName {
+				return false
+			}
+
 			return slices.Contains(shopCfg.Build.ExcludeExtensions, s.Name)
 		})
 	}
@@ -172,11 +166,21 @@ func filterAndGetSources(cmd *cobra.Command, projectRoot string, shopCfg *shop.C
 	if onlyExtensions != "" {
 		logging.FromContext(cmd.Context()).Infof("Only including extensions: %s", onlyExtensions)
 		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			// We want to always include the Storefront extension, otherwise the watchers have problems
+			if s.Name == storefrontBundleName {
+				return false
+			}
+
 			return !slices.Contains(strings.Split(onlyExtensions, ","), s.Name)
 		})
 	} else if skipExtensions != "" {
 		logging.FromContext(cmd.Context()).Infof("Excluding extensions: %s", skipExtensions)
 		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			// We want to always include the Storefront extension, otherwise the watchers have problems
+			if s.Name == storefrontBundleName {
+				return false
+			}
+
 			return slices.Contains(strings.Split(skipExtensions, ","), s.Name)
 		})
 	}
