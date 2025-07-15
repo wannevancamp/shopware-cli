@@ -63,30 +63,12 @@ func findClosestShopwareProject() (string, error) {
 }
 
 func filterAndWritePluginJson(cmd *cobra.Command, projectRoot string, shopCfg *shop.Config) error {
-	sources, err := extension.DumpAndLoadAssetSourcesOfProject(cmd.Context(), projectRoot, shopCfg)
+	sources, err := filterAndGetSources(cmd, projectRoot, shopCfg)
 	if err != nil {
 		return err
 	}
 
 	cfgs := extension.BuildAssetConfigFromExtensions(cmd.Context(), sources, extension.AssetBuildConfig{})
-
-	onlyExtensions, _ := cmd.PersistentFlags().GetString("only-extensions")
-	skipExtensions, _ := cmd.PersistentFlags().GetString("skip-extensions")
-
-	if onlyExtensions != "" && skipExtensions != "" {
-		return fmt.Errorf("only-extensions and skip-extensions cannot be used together")
-	}
-
-	if onlyExtensions != "" {
-		cfgs = cfgs.Only(strings.Split(onlyExtensions, ","))
-	}
-
-	if skipExtensions != "" {
-		cfgs = cfgs.Not(strings.Split(skipExtensions, ","))
-	} else {
-		logging.FromContext(cmd.Context()).Infof("Excluding extensions based on project config: %s", strings.Join(shopCfg.Build.ExcludeExtensions, ", "))
-		cfgs = cfgs.Not(shopCfg.Build.ExcludeExtensions)
-	}
 
 	if _, err := extension.InstallNodeModulesOfConfigs(cmd.Context(), cfgs, false); err != nil {
 		return err
