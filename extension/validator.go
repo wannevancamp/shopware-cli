@@ -111,7 +111,9 @@ func validateExtensionIcon(ctx *ValidationContext) {
 			if err != nil {
 				ctx.AddError("metadata.icon", fmt.Sprintf("Could not decode icon image %s: %s", relPath, err.Error()))
 			} else if config.Width < 112 || config.Height < 112 {
-				ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are smaller than required 112x112 pixels", relPath, config.Width, config.Height))
+				ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are smaller than required 112x112 and maximum 256x256 pixels with max file size 50kb and 72dpi", relPath, config.Width, config.Height))
+			} else if config.Width > 256 || config.Height > 256 {
+				ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are larger than maximum 256x256 pixels with max file size 50kb and 72dpi", relPath, config.Width, config.Height))
 			}
 
 			if err := file.Close(); err != nil {

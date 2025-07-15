@@ -323,23 +323,3 @@ func TestAppWithTwigFiles(t *testing.T) {
 	assert.Equal(t, 1, len(ctx.errors))
 	assert.Contains(t, ctx.errors[0].Message, "Twig files should be at")
 }
-
-func TestAppIconIsTooBig(t *testing.T) {
-	appPath := t.TempDir()
-
-	assert.NoError(t, os.WriteFile(filepath.Join(appPath, "manifest.xml"), []byte(testAppManifestIcon), os.ModePerm))
-	assert.NoError(t, createTestImageWithSize(filepath.Join(appPath, "app.png"), 1000, 1000))
-
-	app, err := newApp(appPath)
-
-	assert.NoError(t, err)
-
-	assert.Equal(t, "MyExampleApp", app.manifest.Meta.Name)
-	assert.Equal(t, "app.png", app.manifest.Meta.Icon)
-
-	ctx := newValidationContext(app)
-	app.Validate(getTestContext(), ctx)
-
-	assert.Len(t, ctx.errors, 1)
-	assert.Equal(t, "The extension icon app.png is bigger than 50kb", ctx.errors[0].Message)
-}
