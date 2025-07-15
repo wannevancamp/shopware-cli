@@ -108,6 +108,11 @@ func filterAndGetSources(cmd *cobra.Command, projectRoot string, shopCfg *shop.C
 		}
 
 		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			// We want to always include the Storefront extension, otherwise the watchers have problems
+			if s.Name == "Storefront" {
+				return false
+			}
+
 			// First try to resolve any symlinks
 			resolvedPath, err := filepath.EvalSymlinks(s.Path)
 			if err != nil {
@@ -147,6 +152,11 @@ func filterAndGetSources(cmd *cobra.Command, projectRoot string, shopCfg *shop.C
 	if onlyExtensions == "" && skipExtensions == "" && !onlyCustomStatic {
 		logging.FromContext(cmd.Context()).Infof("Excluding extensions based on project config: %s", strings.Join(shopCfg.Build.ExcludeExtensions, ", "))
 		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			// We want to always include the Storefront extension, otherwise the watchers have problems
+			if s.Name == "Storefront" {
+				return false
+			}
+
 			return slices.Contains(shopCfg.Build.ExcludeExtensions, s.Name)
 		})
 	}
@@ -154,11 +164,21 @@ func filterAndGetSources(cmd *cobra.Command, projectRoot string, shopCfg *shop.C
 	if onlyExtensions != "" {
 		logging.FromContext(cmd.Context()).Infof("Only including extensions: %s", onlyExtensions)
 		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			// We want to always include the Storefront extension, otherwise the watchers have problems
+			if s.Name == "Storefront" {
+				return false
+			}
+
 			return !slices.Contains(strings.Split(onlyExtensions, ","), s.Name)
 		})
 	} else if skipExtensions != "" {
 		logging.FromContext(cmd.Context()).Infof("Excluding extensions: %s", skipExtensions)
 		sources = slices.DeleteFunc(sources, func(s asset.Source) bool {
+			// We want to always include the Storefront extension, otherwise the watchers have problems
+			if s.Name == "Storefront" {
+				return false
+			}
+
 			return slices.Contains(strings.Split(skipExtensions, ","), s.Name)
 		})
 	}
