@@ -83,11 +83,15 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 		var phpstanResult PhpStanOutput
 
 		if err := json.Unmarshal(log, &phpstanResult); err != nil {
-			//nolint: forbidigo
-			fmt.Print(stderr.String())
-			//nolint: forbidigo
-			fmt.Print(string(log))
-			return fmt.Errorf("failed to unmarshal phpstan output: %w", err)
+			check.AddResult(CheckResult{
+				Path:       "phpstan.neon",
+				Message:    "failed to unmarshal phpstan output: " + stderr.String(),
+				Severity:   "error",
+				Line:       0,
+				Identifier: "phpstan/error",
+			})
+			//nolint: nilerr
+			return nil
 		}
 
 		for _, error := range phpstanResult.Errors {

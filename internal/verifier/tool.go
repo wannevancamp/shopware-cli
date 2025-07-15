@@ -8,6 +8,9 @@ import (
 	"github.com/shopware/shopware-cli/extension"
 )
 
+const SeverityError = "error"
+const SeverityWarning = "warning"
+
 type ToolList []Tool
 
 var availableTools = ToolList{}
