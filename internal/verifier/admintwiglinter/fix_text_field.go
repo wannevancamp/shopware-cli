@@ -20,7 +20,7 @@ func (t TextFieldFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-text-field" {
 			errs = append(errs, CheckError{
 				Message:    "sw-text-field is removed, use mt-text-field instead. Review conversion for props, events and label slot.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-text-field",
 				Line:       node.Line,
 			})

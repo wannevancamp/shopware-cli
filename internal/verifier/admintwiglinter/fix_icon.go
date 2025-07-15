@@ -20,7 +20,7 @@ func (i IconFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-icon" {
 			errors = append(errors, CheckError{
 				Message:    "sw-icon is removed, use mt-icon instead with proper size prop.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-icon",
 				Line:       node.Line,
 			})

@@ -77,6 +77,7 @@ export default [
 			"no-undef": "off",
 			"no-alert": "error",
 			"no-console": ["error", { allow: ["warn", "error"] }],
+			"@typescript-eslint/no-unused-vars": "warn"
 		},
 	},
 	{

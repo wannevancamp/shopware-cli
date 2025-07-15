@@ -22,7 +22,7 @@ func (b ButtonFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-button" {
 			errors = append(errors, CheckError{
 				Message:    "sw-button is removed, use mt-button instead. Please review conversion for variant and router-link.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-button",
 				Line:       node.Line,
 			})

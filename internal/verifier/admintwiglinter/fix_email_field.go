@@ -20,7 +20,7 @@ func (e EmailFieldFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-email-field" {
 			errors = append(errors, CheckError{
 				Message:    "sw-email-field is removed, use mt-email-field instead. Review conversion for props, events and label slot.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-email-field",
 				Line:       node.Line,
 			})

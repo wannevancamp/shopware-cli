@@ -18,7 +18,7 @@ func (l LoaderFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-loader" {
 			errs = append(errs, CheckError{
 				Message:    "sw-loader is removed, use mt-loader instead.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-loader",
 				Line:       node.Line,
 			})

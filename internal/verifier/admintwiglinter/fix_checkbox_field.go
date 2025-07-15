@@ -21,7 +21,7 @@ func (c CheckboxFieldFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-checkbox-field" {
 			errs = append(errs, CheckError{
 				Message:    "sw-checkbox-field is removed, use mt-checkbox instead. Review conversion for props, events and slots.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-checkbox-field",
 				Line:       node.Line,
 			})

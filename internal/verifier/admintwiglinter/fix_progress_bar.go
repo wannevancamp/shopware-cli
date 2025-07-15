@@ -18,7 +18,7 @@ func (p ProgressBarFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-progress-bar" {
 			errors = append(errors, CheckError{
 				Message:    "sw-progress-bar is removed, use mt-progress-bar instead.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-progress-bar",
 				Line:       node.Line,
 			})

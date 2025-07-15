@@ -19,7 +19,7 @@ func (p PopoverFixer) Check(node []html.Node) []CheckError {
 		if node.Tag == "sw-popover" {
 			checkErrors = append(checkErrors, CheckError{
 				Message:    "sw-popover is deprecated, use mt-floating-ui instead",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-popover",
 				Line:       node.Line,
 			})

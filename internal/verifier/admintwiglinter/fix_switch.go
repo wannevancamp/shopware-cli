@@ -20,7 +20,7 @@ func (s SwitchFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-switch-field" {
 			errs = append(errs, CheckError{
 				Message:    "sw-switch-field is removed, use mt-switch instead. Review conversion for props, events and slots.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-switch-field",
 				Line:       node.Line,
 			})

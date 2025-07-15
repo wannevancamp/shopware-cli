@@ -18,7 +18,7 @@ func (a AlertFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-alert" {
 			errors = append(errors, CheckError{
 				Message:    "sw-alert is removed, use mt-banner instead. Please review conversion for variant changes.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-alert",
 				Line:       node.Line,
 			})

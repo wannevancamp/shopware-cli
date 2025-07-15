@@ -19,7 +19,7 @@ func (c CardFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-card" {
 			errors = append(errors, CheckError{
 				Message:    "sw-card is removed, use mt-card instead. Review conversion for aiBadge and contentPadding.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-card",
 				Line:       node.Line,
 			})

@@ -20,7 +20,7 @@ func (p PasswordFieldFixer) Check(nodes []html.Node) []CheckError {
 		if node.Tag == "sw-password-field" {
 			checkErrors = append(checkErrors, CheckError{
 				Message:    "sw-password-field is removed, use mt-password-field instead. Please review conversion for label/hint properties.",
-				Severity:   "error",
+				Severity:   "warn",
 				Identifier: "sw-password-field",
 				Line:       node.Line,
 			})
