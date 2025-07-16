@@ -109,9 +109,8 @@ func TestPluginIconIsTooBig(t *testing.T) {
 
 	plugin.Validate(getTestContext(), ctx)
 
-	assert.Len(t, ctx.errors, 2)
-	assert.Equal(t, "The extension icon Resources/config/plugin.png is bigger than 50kb", ctx.errors[0].Message)
-	assert.Equal(t, "The extension icon Resources/config/plugin.png dimensions (1000x1000) are larger than maximum 256x256 pixels with max file size 50kb and 72dpi", ctx.errors[1].Message)
+	assert.Len(t, ctx.errors, 1)
+	assert.Equal(t, "The extension icon Resources/config/plugin.png dimensions (1000x1000) are larger than maximum 256x256 pixels with max file size 30kb and 72dpi", ctx.errors[0].Message)
 }
 
 func TestPluginGermanDescriptionMissing(t *testing.T) {

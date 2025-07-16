@@ -49,7 +49,11 @@ func ResizeExtensionIcon(ctx context.Context, ext Extension) error {
 		return fmt.Errorf("cannot create icon file: %w", err)
 	}
 
-	if err := png.Encode(writeFile, dst); err != nil {
+	encoder := png.Encoder{
+		CompressionLevel: png.BestCompression,
+	}
+
+	if err := encoder.Encode(writeFile, dst); err != nil {
 		return fmt.Errorf("cannot encode icon: %w", err)
 	}
 

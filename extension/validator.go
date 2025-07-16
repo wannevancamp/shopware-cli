@@ -99,8 +99,8 @@ func validateExtensionIcon(ctx *ValidationContext) {
 	if os.IsNotExist(err) {
 		ctx.AddError("metadata.icon", fmt.Sprintf("The extension icon %s does not exist", relPath))
 	} else if err == nil {
-		if info.Size() > 50*1024 {
-			ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s is bigger than 50kb", relPath))
+		if info.Size() > 30*1024 {
+			ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s is bigger than 30kb", relPath))
 		}
 
 		file, err := os.Open(fullIconPath)
@@ -112,9 +112,9 @@ func validateExtensionIcon(ctx *ValidationContext) {
 				ctx.AddError("metadata.icon", fmt.Sprintf("Could not decode icon image %s: %s", relPath, err.Error()))
 			} else {
 				if config.Width < 112 || config.Height < 112 {
-					ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are smaller than required 112x112 and maximum 256x256 pixels with max file size 50kb and 72dpi", relPath, config.Width, config.Height))
+					ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are smaller than required 112x112 and maximum 256x256 pixels with max file size 30kb and 72dpi", relPath, config.Width, config.Height))
 				} else if config.Width > 256 || config.Height > 256 {
-					ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are larger than maximum 256x256 pixels with max file size 50kb and 72dpi", relPath, config.Width, config.Height))
+					ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are larger than maximum 256x256 pixels with max file size 30kb and 72dpi", relPath, config.Width, config.Height))
 				}
 			}
 

@@ -4,7 +4,6 @@ import (
 	"image"
 	"image/color"
 	"image/png"
-	"math/rand"
 	"os"
 )
 
@@ -14,9 +13,16 @@ func createTestImage(path string) error {
 
 func createTestImageWithSize(path string, width, height int) error {
 	img := image.NewRGBA(image.Rect(0, 0, width, height))
+
+	// Create a simple pattern with fewer colors for better compression
 	for x := 0; x < width; x++ {
 		for y := 0; y < height; y++ {
-			img.Set(x, y, color.RGBA{uint8(rand.Intn(255)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), 255})
+			// Simple checkerboard pattern with just 2 colors
+			if (x/4+y/4)%2 == 0 {
+				img.Set(x, y, color.RGBA{220, 220, 220, 255}) // Light gray
+			} else {
+				img.Set(x, y, color.RGBA{180, 180, 180, 255}) // Slightly darker gray
+			}
 		}
 	}
 
@@ -29,5 +35,9 @@ func createTestImageWithSize(path string, width, height int) error {
 		_ = f.Close()
 	}()
 
-	return png.Encode(f, img)
+	encoder := png.Encoder{
+		CompressionLevel: png.BestCompression,
+	}
+
+	return encoder.Encode(f, img)
 }
