@@ -209,29 +209,29 @@ func runDefaultValidate(vc *ValidationContext) {
 
 	metaData := vc.Extension.GetMetaData()
 	if len([]rune(metaData.Label.German)) == 0 {
-		vc.AddError("metadata.label", "label is not translated in german")
+		vc.AddError("metadata.label", "in composer.json, label is not translated in german")
 	}
 
 	if len(metaData.Label.English) == 0 {
-		vc.AddError("metadata.label", "label is not translated in english")
+		vc.AddError("metadata.label", "in composer.json, label is not translated in english")
 	}
 
 	// Skip description validation for ShopwareBundle
 	if vc.Extension.GetType() != TypeShopwareBundle {
 		if len([]rune(metaData.Description.German)) == 0 {
-			vc.AddError("metadata.description", "description is not translated in german")
+			vc.AddError("metadata.description", "in composer.json, description is not translated in german")
 		}
 
 		if len(metaData.Description.English) == 0 {
-			vc.AddError("metadata.description", "description is not translated in english")
+			vc.AddError("metadata.description", "in composer.json, description is not translated in english")
 		}
 
 		if len([]rune(metaData.Description.German)) < 150 || len([]rune(metaData.Description.German)) > 185 {
-			vc.AddError("metadata.description", fmt.Sprintf("the german description with length of %d should have a length from 150 up to 185 characters.", len([]rune(metaData.Description.German))))
+			vc.AddError("metadata.description", fmt.Sprintf("in composer.json, the german description with length of %d should have a length from 150 up to 185 characters.", len([]rune(metaData.Description.German))))
 		}
 
 		if len(metaData.Description.English) < 150 || len(metaData.Description.English) > 185 {
-			vc.AddError("metadata.description", fmt.Sprintf("the english description with length of %d should have a length from 150 up to 185 characters.", len(metaData.Description.English)))
+			vc.AddError("metadata.description", fmt.Sprintf("in composer.json, the english description with length of %d should have a length from 150 up to 185 characters.", len(metaData.Description.English)))
 		}
 	}
 }
