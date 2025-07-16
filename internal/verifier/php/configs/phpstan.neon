@@ -10,6 +10,7 @@ parameters:
     paths:
         - %currentWorkingDirectory%
     excludePaths:
+        - src/Resources/config (?)
         - vendor (?)
         - vendor-bin (?)
         - tests/ (?)
