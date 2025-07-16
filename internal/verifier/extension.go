@@ -9,13 +9,14 @@ import (
 	"github.com/shyim/go-version"
 
 	"github.com/shopware/shopware-cli/extension"
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 func ConvertExtensionToToolConfig(ext extension.Extension) (*ToolConfig, error) {
-	var ignores []ToolConfigIgnore
+	var ignores []validation.ToolConfigIgnore
 
 	for _, ignore := range ext.GetExtensionConfig().Validation.Ignore {
-		ignores = append(ignores, ToolConfigIgnore{
+		ignores = append(ignores, validation.ToolConfigIgnore{
 			Identifier: ignore.Identifier,
 			Path:       ignore.Path,
 			Message:    ignore.Message,

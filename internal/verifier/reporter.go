@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 func DetectDefaultReporter() string {
@@ -35,7 +37,7 @@ func DoCheckReport(result *Check, reportingFormat string) error {
 
 func doSummaryReport(result *Check) error {
 	// Group results by file
-	fileGroups := make(map[string][]CheckResult)
+	fileGroups := make(map[string][]validation.CheckResult)
 	for _, r := range result.Results {
 		if r.Path == "" {
 			r.Path = "general"
@@ -55,9 +57,9 @@ func doSummaryReport(result *Check) error {
 		for _, r := range results {
 			totalProblems++
 			switch r.Severity {
-			case CheckSeverityError:
+			case "error":
 				errorCount++
-			case CheckSeverityWarn:
+			case "warn":
 				warningCount++
 			}
 			//nolint:forbidigo
@@ -223,7 +225,7 @@ func doMarkdownReport(result *Check) error {
 	return nil
 }
 
-func convertResultsToMarkdown(check []CheckResult) string {
+func convertResultsToMarkdown(check []validation.CheckResult) string {
 	var builder strings.Builder
 
 	builder.WriteString("# Results\n\n")

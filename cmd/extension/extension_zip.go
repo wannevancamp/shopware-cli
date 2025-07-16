@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/shopware/shopware-cli/extension"
+	"github.com/shopware/shopware-cli/internal/validation"
 	"github.com/shopware/shopware-cli/logging"
 )
 
@@ -151,7 +152,7 @@ var extensionZipCmd = &cobra.Command{
 		}
 
 		if cmd.Flags().Changed("overwrite-app-backend-secret") {
-			extCfg.Validation.Ignore = append(extCfg.Validation.Ignore, extension.ConfigValidationIgnoreItem{Identifier: "metadata.setup"})
+			extCfg.Validation.Ignore = append(extCfg.Validation.Ignore, validation.ToolConfigIgnore{Identifier: "metadata.setup"})
 			if err := extCfg.Dump(extDir); err != nil {
 				return fmt.Errorf("dump extension config: %w", err)
 			}

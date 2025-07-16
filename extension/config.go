@@ -6,11 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/invopop/jsonschema"
-	orderedmap "github.com/wk8/go-ordered-map/v2"
 	"gopkg.in/yaml.v3"
 
 	"github.com/shopware/shopware-cli/internal/changelog"
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 type ConfigBuild struct {
@@ -168,7 +167,7 @@ type ConfigValidation struct {
 	StoreCompliance bool                 `yaml:"store_compliance,omitempty"`
 }
 
-type ConfigValidationList []ConfigValidationIgnoreItem
+type ConfigValidationList []validation.ToolConfigIgnore
 
 func (c *ConfigValidationList) Identifiers() []string {
 	identifiers := []string{}
@@ -178,63 +177,6 @@ func (c *ConfigValidationList) Identifiers() []string {
 	return identifiers
 }
 
-type ConfigValidationIgnoreItem struct {
-	// The identifier of the item to ignore.
-	Identifier string `yaml:"identifier"`
-	// Optional to ignore only a specific path.
-	Path string `yaml:"path,omitempty"`
-	// Optional to ignore only a specific message.
-	Message string `yaml:"message,omitempty"`
-}
-
-func (c *ConfigValidationIgnoreItem) UnmarshalYAML(value *yaml.Node) error {
-	if value.Kind == yaml.ScalarNode {
-		c.Identifier = value.Value
-		return nil
-	}
-
-	type objectFormat struct {
-		Identifier string `yaml:"identifier"`
-		Path       string `yaml:"path,omitempty"`
-		Message    string `yaml:"message,omitempty"`
-	}
-	var obj objectFormat
-	if err := value.Decode(&obj); err != nil {
-		return fmt.Errorf("failed to decode ConfigItem: %w", err)
-	}
-
-	c.Identifier = obj.Identifier
-	c.Path = obj.Path
-	c.Message = obj.Message
-
-	return nil
-}
-
-func (c ConfigValidationIgnoreItem) JSONSchema() *jsonschema.Schema {
-	ordMap := orderedmap.New[string, *jsonschema.Schema]()
-
-	ordMap.Set("identifier", &jsonschema.Schema{
-		Type:        "string",
-		Description: "The identifier of the item to ignore.",
-	})
-
-	ordMap.Set("path", &jsonschema.Schema{
-		Type:        "string",
-		Description: "The path of the item to ignore.",
-	})
-
-	return &jsonschema.Schema{
-		OneOf: []*jsonschema.Schema{
-			{
-				Type:       "object",
-				Properties: ordMap,
-			},
-			{
-				Type: "string",
-			},
-		},
-	}
-}
 
 type Config struct {
 	FileName string `yaml:"-" jsonschema:"-"`

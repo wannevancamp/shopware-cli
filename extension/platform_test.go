@@ -59,12 +59,12 @@ func TestPluginIconNotExists(t *testing.T) {
 
 	plugin := getTestPlugin(dir)
 
-	ctx := newValidationContext(&plugin)
+	check := &testCheck{}
 
-	plugin.Validate(getTestContext(), ctx)
+	plugin.Validate(getTestContext(), check)
 
-	assert.Equal(t, 1, len(ctx.errors))
-	assert.Equal(t, "The extension icon Resources/config/plugin.png does not exist", ctx.errors[0].Message)
+	assert.Equal(t, 1, len(check.Results))
+	assert.Equal(t, "The extension icon Resources/config/plugin.png does not exist", check.Results[0].Message)
 }
 
 func TestPluginIconExists(t *testing.T) {
@@ -75,11 +75,11 @@ func TestPluginIconExists(t *testing.T) {
 	assert.NoError(t, os.MkdirAll(filepath.Join(dir, "src", "Resources", "config"), os.ModePerm))
 	assert.NoError(t, createTestImage(filepath.Join(dir, "src", "Resources", "config", "plugin.png")))
 
-	ctx := newValidationContext(&plugin)
+	check := &testCheck{}
 
-	plugin.Validate(getTestContext(), ctx)
+	plugin.Validate(getTestContext(), check)
 
-	assert.Equal(t, 0, len(ctx.errors))
+	assert.Equal(t, 0, len(check.Results))
 }
 
 func TestPluginIconDifferntPathExists(t *testing.T) {
@@ -90,11 +90,11 @@ func TestPluginIconDifferntPathExists(t *testing.T) {
 
 	assert.NoError(t, createTestImage(filepath.Join(dir, "plugin.png")))
 
-	ctx := newValidationContext(&plugin)
+	check := &testCheck{}
 
-	plugin.Validate(getTestContext(), ctx)
+	plugin.Validate(getTestContext(), check)
 
-	assert.Equal(t, 0, len(ctx.errors))
+	assert.Equal(t, 0, len(check.Results))
 }
 
 func TestPluginIconIsTooBig(t *testing.T) {
@@ -105,12 +105,12 @@ func TestPluginIconIsTooBig(t *testing.T) {
 	assert.NoError(t, os.MkdirAll(filepath.Join(dir, "src", "Resources", "config"), os.ModePerm))
 	assert.NoError(t, createTestImageWithSize(filepath.Join(dir, "src", "Resources", "config", "plugin.png"), 1000, 1000))
 
-	ctx := newValidationContext(&plugin)
+	check := &testCheck{}
 
-	plugin.Validate(getTestContext(), ctx)
+	plugin.Validate(getTestContext(), check)
 
-	assert.Len(t, ctx.errors, 1)
-	assert.Equal(t, "The extension icon Resources/config/plugin.png dimensions (1000x1000) are larger than maximum 256x256 pixels with max file size 30kb and 72dpi", ctx.errors[0].Message)
+	assert.Len(t, check.Results, 1)
+	assert.Equal(t, "The extension icon Resources/config/plugin.png dimensions (1000x1000) are larger than maximum 256x256 pixels with max file size 30kb and 72dpi", check.Results[0].Message)
 }
 
 func TestPluginGermanDescriptionMissing(t *testing.T) {
@@ -121,14 +121,14 @@ func TestPluginGermanDescriptionMissing(t *testing.T) {
 		"en-GB": "Frosh Tools",
 	}
 
-	ctx := newValidationContext(&plugin)
+	check := &testCheck{}
 	assert.NoError(t, os.MkdirAll(filepath.Join(dir, "src", "Resources", "config"), os.ModePerm))
 	assert.NoError(t, createTestImage(filepath.Join(dir, "src", "Resources", "config", "plugin.png")))
 
-	plugin.Validate(getTestContext(), ctx)
+	plugin.Validate(getTestContext(), check)
 
-	assert.Len(t, ctx.errors, 1)
-	assert.Equal(t, "extra.description for language de-DE is required", ctx.errors[0].Message)
+	assert.Len(t, check.Results, 1)
+	assert.Equal(t, "extra.description for language de-DE is required", check.Results[0].Message)
 }
 
 func TestPluginGermanDescriptionMissingOnlyEnglishMarket(t *testing.T) {
@@ -142,9 +142,9 @@ func TestPluginGermanDescriptionMissingOnlyEnglishMarket(t *testing.T) {
 	assert.NoError(t, os.MkdirAll(filepath.Join(dir, "src", "Resources", "config"), os.ModePerm))
 	assert.NoError(t, createTestImage(filepath.Join(dir, "src", "Resources", "config", "plugin.png")))
 
-	ctx := newValidationContext(&plugin)
+	check := &testCheck{}
 
-	plugin.Validate(getTestContext(), ctx)
+	plugin.Validate(getTestContext(), check)
 
-	assert.Len(t, ctx.errors, 0)
+	assert.Len(t, check.Results, 0)
 }

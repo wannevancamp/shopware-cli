@@ -11,85 +11,13 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/shopware/shopware-cli/internal/spdx"
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
-type ValidationMessage struct {
-	Identifier string
-	Message    string
-}
 
-type ValidationContext struct {
-	Extension Extension
-	errors    []ValidationMessage
-	warnings  []ValidationMessage
-}
-
-func newValidationContext(ext Extension) *ValidationContext {
-	return &ValidationContext{Extension: ext}
-}
-
-func (c *ValidationContext) AddError(id, message string) {
-	c.errors = append(c.errors, ValidationMessage{Identifier: id, Message: message})
-}
-
-func (c *ValidationContext) HasErrors() bool {
-	return len(c.errors) > 0
-}
-
-func (c *ValidationContext) Errors() []ValidationMessage {
-	return c.errors
-}
-
-func (c *ValidationContext) AddWarning(id, message string) {
-	c.warnings = append(c.warnings, ValidationMessage{Identifier: id, Message: message})
-}
-
-func (c *ValidationContext) HasWarnings() bool {
-	return len(c.warnings) > 0
-}
-
-func (c *ValidationContext) Warnings() []ValidationMessage {
-	return c.warnings
-}
-
-func (c *ValidationContext) ApplyIgnores(ignores []ConfigValidationIgnoreItem) {
-	for _, ignore := range ignores {
-		for i := 0; i < len(c.errors); i++ {
-			if c.errors[i].Identifier == ignore.Identifier && ignore.Message == "" {
-				c.errors = append(c.errors[:i], c.errors[i+1:]...)
-				i--
-				continue
-			}
-
-			if c.errors[i].Identifier == ignore.Identifier && ignore.Message != "" && strings.Contains(c.errors[i].Message, ignore.Message) {
-				c.errors = append(c.errors[:i], c.errors[i+1:]...)
-				i--
-				continue
-			}
-		}
-	}
-
-	// Apply the same logic to warnings
-	for _, ignore := range ignores {
-		for i := 0; i < len(c.warnings); i++ {
-			if c.warnings[i].Identifier == ignore.Identifier && ignore.Message == "" {
-				c.warnings = append(c.warnings[:i], c.warnings[i+1:]...)
-				i--
-				continue
-			}
-
-			if c.warnings[i].Identifier == ignore.Identifier && ignore.Message != "" && strings.Contains(c.warnings[i].Message, ignore.Message) {
-				c.warnings = append(c.warnings[:i], c.warnings[i+1:]...)
-				i--
-				continue
-			}
-		}
-	}
-}
-
-func validateExtensionIcon(ctx *ValidationContext) {
-	fullIconPath := ctx.Extension.GetIconPath()
-	relPath, err := filepath.Rel(ctx.Extension.GetRootDir(), fullIconPath)
+func validateExtensionIcon(ext Extension, check validation.Check) {
+	fullIconPath := ext.GetIconPath()
+	relPath, err := filepath.Rel(ext.GetRootDir(), fullIconPath)
 	if err != nil {
 		relPath = fullIconPath
 	}
@@ -97,109 +25,182 @@ func validateExtensionIcon(ctx *ValidationContext) {
 	info, err := os.Stat(fullIconPath)
 
 	if os.IsNotExist(err) {
-		ctx.AddError("metadata.icon", fmt.Sprintf("The extension icon %s does not exist", relPath))
+		check.AddResult(validation.CheckResult{
+			Identifier: "metadata.icon",
+			Message:    fmt.Sprintf("The extension icon %s does not exist", relPath),
+			Severity:   validation.SeverityError,
+		})
 	} else if err == nil {
 		if info.Size() > 30*1024 {
-			ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s is bigger than 30kb", relPath))
+			check.AddResult(validation.CheckResult{
+				Identifier: "metadata.icon.size",
+				Message:    fmt.Sprintf("The extension icon %s is bigger than 30kb", relPath),
+				Severity:   validation.SeverityError,
+			})
 		}
 
 		file, err := os.Open(fullIconPath)
 		if err != nil {
-			ctx.AddError("metadata.icon", fmt.Sprintf("Could not open icon file %s: %s", relPath, err.Error()))
+			check.AddResult(validation.CheckResult{
+				Identifier: "metadata.icon",
+				Message:    fmt.Sprintf("Could not open icon file %s: %s", relPath, err.Error()),
+				Severity:   validation.SeverityError,
+			})
 		} else {
 			config, _, err := image.DecodeConfig(file)
 			if err != nil {
-				ctx.AddError("metadata.icon", fmt.Sprintf("Could not decode icon image %s: %s", relPath, err.Error()))
+				check.AddResult(validation.CheckResult{
+					Identifier: "metadata.icon",
+					Message:    fmt.Sprintf("Could not decode icon image %s: %s", relPath, err.Error()),
+					Severity:   validation.SeverityError,
+				})
 			} else {
 				if config.Width < 112 || config.Height < 112 {
-					ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are smaller than required 112x112 and maximum 256x256 pixels with max file size 30kb and 72dpi", relPath, config.Width, config.Height))
+					check.AddResult(validation.CheckResult{
+						Identifier: "metadata.icon.size",
+						Message:    fmt.Sprintf("The extension icon %s dimensions (%dx%d) are smaller than required 112x112 and maximum 256x256 pixels with max file size 30kb and 72dpi", relPath, config.Width, config.Height),
+						Severity:   validation.SeverityError,
+					})
 				} else if config.Width > 256 || config.Height > 256 {
-					ctx.AddError("metadata.icon.size", fmt.Sprintf("The extension icon %s dimensions (%dx%d) are larger than maximum 256x256 pixels with max file size 30kb and 72dpi", relPath, config.Width, config.Height))
+					check.AddResult(validation.CheckResult{
+						Identifier: "metadata.icon.size",
+						Message:    fmt.Sprintf("The extension icon %s dimensions (%dx%d) are larger than maximum 256x256 pixels with max file size 30kb and 72dpi", relPath, config.Width, config.Height),
+						Severity:   validation.SeverityError,
+					})
 				}
 			}
 
 			if err := file.Close(); err != nil {
-				ctx.AddError("metadata.icon", fmt.Sprintf("Failed to close icon file %s: %s", relPath, err.Error()))
+				check.AddResult(validation.CheckResult{
+					Identifier: "metadata.icon",
+					Message:    fmt.Sprintf("Failed to close icon file %s: %s", relPath, err.Error()),
+					Severity:   validation.SeverityError,
+				})
 			}
 		}
 	}
 }
 
-func RunValidation(ctx context.Context, ext Extension) *ValidationContext {
-	vc := newValidationContext(ext)
-
-	runDefaultValidate(vc)
-	ext.Validate(ctx, vc)
-	validateAdministrationSnippets(vc)
-	validateStorefrontSnippets(vc)
-	validateAssets(vc)
-	vc.ApplyIgnores(ext.GetExtensionConfig().Validation.Ignore)
-
-	return vc
+func RunValidation(ctx context.Context, ext Extension, check validation.Check) {
+	runDefaultValidate(ext, check)
+	ext.Validate(ctx, check)
+	validateAdministrationSnippets(ext, check)
+	validateStorefrontSnippets(ext, check)
+	validateAssets(ext, check)
+	validateExtensionIcon(ext, check)
+	// Note: ignores are now applied in the verifier layer
 }
 
-func runDefaultValidate(vc *ValidationContext) {
-	_, versionErr := vc.Extension.GetVersion()
-	name, nameErr := vc.Extension.GetName()
-	_, shopwareVersionErr := vc.Extension.GetShopwareVersionConstraint()
+func runDefaultValidate(ext Extension, check validation.Check) {
+	_, versionErr := ext.GetVersion()
+	name, nameErr := ext.GetName()
+	_, shopwareVersionErr := ext.GetShopwareVersionConstraint()
 
 	// Skip version validation for ShopwareBundle
-	if versionErr != nil && vc.Extension.GetType() != TypeShopwareBundle {
-		vc.AddError("metadata.version", versionErr.Error())
+	if versionErr != nil && ext.GetType() != TypeShopwareBundle {
+		check.AddResult(validation.CheckResult{
+			Identifier: "metadata.version",
+			Message:    versionErr.Error(),
+			Severity:   validation.SeverityError,
+		})
 	}
 
 	if nameErr != nil {
-		vc.AddError("metadata.name", nameErr.Error())
+		check.AddResult(validation.CheckResult{
+			Identifier: "metadata.name",
+			Message:    nameErr.Error(),
+			Severity:   validation.SeverityError,
+		})
 	}
 
 	if shopwareVersionErr != nil {
-		vc.AddError("metadata.shopware_version", shopwareVersionErr.Error())
+		check.AddResult(validation.CheckResult{
+			Identifier: "metadata.shopware_version",
+			Message:    shopwareVersionErr.Error(),
+			Severity:   validation.SeverityError,
+		})
 	}
 
 	if len(name) == 0 {
-		vc.AddError("metadata.name", "Extension name cannot be empty")
+		check.AddResult(validation.CheckResult{
+			Identifier: "metadata.name",
+			Message:    "Extension name cannot be empty",
+			Severity:   validation.SeverityError,
+		})
 	}
 
 	notAllowedErrorFormat := "file %s is not allowed in the zip file"
-	_ = filepath.Walk(vc.Extension.GetPath(), func(p string, info fs.FileInfo, _ error) error {
+	_ = filepath.Walk(ext.GetPath(), func(p string, info fs.FileInfo, _ error) error {
 		base := filepath.Base(p)
 
 		if base == ".." {
-			vc.AddError("zip.path_travel", "Path travel detected in zip file")
+			check.AddResult(validation.CheckResult{
+				Identifier: "zip.path_travel",
+				Message:    "Path travel detected in zip file",
+				Severity:   validation.SeverityError,
+			})
 		}
 
 		for _, file := range defaultNotAllowedPaths {
 			if strings.HasPrefix(p, file) {
-				vc.AddError("zip.disallowed_file", fmt.Sprintf(notAllowedErrorFormat, p))
+				check.AddResult(validation.CheckResult{
+					Identifier: "zip.disallowed_file",
+					Message:    fmt.Sprintf(notAllowedErrorFormat, p),
+					Severity:   validation.SeverityError,
+				})
 			}
 		}
 
 		for _, file := range defaultNotAllowedFiles {
 			if file == base {
-				vc.AddError("zip.disallowed_file", fmt.Sprintf(notAllowedErrorFormat, p))
+				check.AddResult(validation.CheckResult{
+					Identifier: "zip.disallowed_file",
+					Message:    fmt.Sprintf(notAllowedErrorFormat, p),
+					Severity:   validation.SeverityError,
+				})
 			}
 		}
 
-		for _, ext := range defaultNotAllowedExtensions {
-			if strings.HasSuffix(base, ext) {
-				vc.AddError("zip.disallowed_file", fmt.Sprintf(notAllowedErrorFormat, p))
+		for _, extFile := range defaultNotAllowedExtensions {
+			if strings.HasSuffix(base, extFile) {
+				check.AddResult(validation.CheckResult{
+					Identifier: "zip.disallowed_file",
+					Message:    fmt.Sprintf(notAllowedErrorFormat, p),
+					Severity:   validation.SeverityError,
+				})
 			}
 		}
 
-		license, err := vc.Extension.GetLicense()
+		license, err := ext.GetLicense()
 
 		if err != nil {
-			vc.AddError("metadata.license", fmt.Sprintf("Could not read the license of the extension: %s", err.Error()))
+			check.AddResult(validation.CheckResult{
+				Identifier: "metadata.license",
+				Message:    fmt.Sprintf("Could not read the license of the extension: %s", err.Error()),
+				Severity:   validation.SeverityError,
+			})
 		} else if strings.TrimSpace(strings.ToLower(license)) != "proprietary" {
 			spdxList, err := spdx.NewSpdxLicenses()
 			if err != nil {
-				vc.AddWarning("metadata.license", fmt.Sprintf("Could not load the SPDX license list: %s", err.Error()))
+				check.AddResult(validation.CheckResult{
+					Identifier: "metadata.license",
+					Message:    fmt.Sprintf("Could not load the SPDX license list: %s", err.Error()),
+					Severity:   validation.SeverityWarning,
+				})
 			} else {
 				valid, err := spdxList.Validate(license)
 				if err != nil {
-					vc.AddError("metadata.license", fmt.Sprintf("Could not validate the license: %s", err.Error()))
+					check.AddResult(validation.CheckResult{
+						Identifier: "metadata.license",
+						Message:    fmt.Sprintf("Could not validate the license: %s", err.Error()),
+						Severity:   validation.SeverityError,
+					})
 				} else if !valid {
-					vc.AddError("metadata.license", fmt.Sprintf("The license %s is not a valid SPDX license", license))
+					check.AddResult(validation.CheckResult{
+						Identifier: "metadata.license",
+						Message:    fmt.Sprintf("The license %s is not a valid SPDX license", license),
+						Severity:   validation.SeverityError,
+					})
 				}
 			}
 		}
@@ -207,31 +208,55 @@ func runDefaultValidate(vc *ValidationContext) {
 		return nil
 	})
 
-	metaData := vc.Extension.GetMetaData()
+	metaData := ext.GetMetaData()
 	if len([]rune(metaData.Label.German)) == 0 {
-		vc.AddError("metadata.label", "in composer.json, label is not translated in german")
+		check.AddResult(validation.CheckResult{
+			Identifier: "metadata.label",
+			Message:    "in composer.json, label is not translated in german",
+			Severity:   validation.SeverityError,
+		})
 	}
 
 	if len(metaData.Label.English) == 0 {
-		vc.AddError("metadata.label", "in composer.json, label is not translated in english")
+		check.AddResult(validation.CheckResult{
+			Identifier: "metadata.label",
+			Message:    "in composer.json, label is not translated in english",
+			Severity:   validation.SeverityError,
+		})
 	}
 
 	// Skip description validation for ShopwareBundle
-	if vc.Extension.GetType() != TypeShopwareBundle {
+	if ext.GetType() != TypeShopwareBundle {
 		if len([]rune(metaData.Description.German)) == 0 {
-			vc.AddError("metadata.description", "in composer.json, description is not translated in german")
+			check.AddResult(validation.CheckResult{
+				Identifier: "metadata.description",
+				Message:    "in composer.json, description is not translated in german",
+				Severity:   validation.SeverityError,
+			})
 		}
 
 		if len(metaData.Description.English) == 0 {
-			vc.AddError("metadata.description", "in composer.json, description is not translated in english")
+			check.AddResult(validation.CheckResult{
+				Identifier: "metadata.description",
+				Message:    "in composer.json, description is not translated in english",
+				Severity:   validation.SeverityError,
+			})
 		}
 
 		if len([]rune(metaData.Description.German)) < 150 || len([]rune(metaData.Description.German)) > 185 {
-			vc.AddError("metadata.description", fmt.Sprintf("in composer.json, the german description with length of %d should have a length from 150 up to 185 characters.", len([]rune(metaData.Description.German))))
+			check.AddResult(validation.CheckResult{
+				Identifier: "metadata.description",
+				Message:    fmt.Sprintf("in composer.json, the german description with length of %d should have a length from 150 up to 185 characters.", len([]rune(metaData.Description.German))),
+				Severity:   validation.SeverityError,
+			})
 		}
 
 		if len(metaData.Description.English) < 150 || len(metaData.Description.English) > 185 {
-			vc.AddError("metadata.description", fmt.Sprintf("in composer.json, the english description with length of %d should have a length from 150 up to 185 characters.", len(metaData.Description.English)))
+			check.AddResult(validation.CheckResult{
+				Identifier: "metadata.description",
+				Message:    fmt.Sprintf("in composer.json, the english description with length of %d should have a length from 150 up to 185 characters.", len(metaData.Description.English)),
+				Severity:   validation.SeverityError,
+			})
 		}
 	}
 }

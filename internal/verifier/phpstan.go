@@ -11,6 +11,8 @@ import (
 	"path"
 	"regexp"
 	"strings"
+
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 var possiblePHPStanConfigs = []string{
@@ -83,7 +85,7 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 		var phpstanResult PhpStanOutput
 
 		if err := json.Unmarshal(log, &phpstanResult); err != nil {
-			check.AddResult(CheckResult{
+			check.AddResult(validation.CheckResult{
 				Path:       "phpstan.neon",
 				Message:    "failed to unmarshal phpstan output: " + stderr.String(),
 				Severity:   "error",
@@ -95,7 +97,7 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 		}
 
 		for _, error := range phpstanResult.Errors {
-			check.AddResult(CheckResult{
+			check.AddResult(validation.CheckResult{
 				Path:       "phpstan.neon",
 				Message:    error,
 				Severity:   "error",
@@ -110,7 +112,7 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 					continue
 				}
 
-				check.AddResult(CheckResult{
+				check.AddResult(validation.CheckResult{
 					Path:       strings.TrimPrefix(strings.TrimPrefix(fileName, "/private"), config.RootDir+"/"),
 					Line:       message.Line,
 					Message:    message.Message,

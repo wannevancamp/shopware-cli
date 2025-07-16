@@ -5,6 +5,9 @@ import (
 	"image/color"
 	"image/png"
 	"os"
+	"strings"
+	
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 func createTestImage(path string) error {
@@ -40,4 +43,54 @@ func createTestImageWithSize(path string, width, height int) error {
 	}
 
 	return encoder.Encode(f, img)
+}
+
+// testCheck is a test helper that implements validation.Check
+type testCheck struct {
+	Results []validation.CheckResult
+}
+
+func (c *testCheck) AddResult(result validation.CheckResult) {
+	c.Results = append(c.Results, result)
+}
+
+func (c *testCheck) RemoveByIdentifier(ignores []validation.ToolConfigIgnore) validation.Check {
+	filtered := make([]validation.CheckResult, 0)
+	for _, r := range c.Results {
+		shouldKeep := true
+		for _, ignore := range ignores {
+			// Only ignore all matches when identifier is the only field specified
+			if ignore.Identifier != "" && ignore.Path == "" && ignore.Message == "" {
+				if r.Identifier == ignore.Identifier {
+					shouldKeep = false
+					break
+				}
+			}
+
+			// If path is specified with identifier (but no message), match both
+			if ignore.Identifier != "" && ignore.Path != "" && ignore.Message == "" {
+				if r.Identifier == ignore.Identifier && r.Path == ignore.Path {
+					shouldKeep = false
+					break
+				}
+			}
+
+			// If both identifier and message are specified, match both
+			if ignore.Identifier != "" && ignore.Message != "" && r.Identifier == ignore.Identifier && strings.Contains(r.Message, ignore.Message) {
+				shouldKeep = false
+				break
+			}
+
+			// Handle message-based ignores (when no identifier is specified)
+			if ignore.Identifier == "" && ignore.Message != "" && strings.Contains(r.Message, ignore.Message) && (r.Path == ignore.Path || ignore.Path == "") {
+				shouldKeep = false
+				break
+			}
+		}
+		if shouldKeep {
+			filtered = append(filtered, r)
+		}
+	}
+	c.Results = filtered
+	return c
 }

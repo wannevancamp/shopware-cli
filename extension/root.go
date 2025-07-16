@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/shyim/go-version"
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 const (
@@ -117,5 +118,5 @@ type Extension interface {
 	GetChangelog() (*ExtensionChangelog, error)
 	GetMetaData() *extensionMetadata
 	GetExtensionConfig() *Config
-	Validate(context.Context, *ValidationContext)
+	Validate(context.Context, validation.Check)
 }

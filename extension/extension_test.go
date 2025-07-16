@@ -6,6 +6,7 @@ import (
 
 	"github.com/shyim/go-version"
 	"github.com/stretchr/testify/assert"
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 type mockExtension struct {
@@ -86,7 +87,7 @@ func (m *mockExtension) GetExtensionConfig() *Config {
 	return m.config
 }
 
-func (m *mockExtension) Validate(ctx context.Context, validationContext *ValidationContext) {
+func (m *mockExtension) Validate(ctx context.Context, check validation.Check) {
 }
 
 func TestMockExtension(t *testing.T) {

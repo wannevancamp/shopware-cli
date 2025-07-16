@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 func TestNewCheck(t *testing.T) {
@@ -14,7 +16,7 @@ func TestNewCheck(t *testing.T) {
 
 func TestAddResult(t *testing.T) {
 	check := NewCheck()
-	result := CheckResult{
+	result := validation.CheckResult{
 		Path:       "test.go",
 		Line:       1,
 		Message:    "test message",
@@ -30,17 +32,17 @@ func TestAddResult(t *testing.T) {
 func TestHasErrors(t *testing.T) {
 	tests := []struct {
 		name     string
-		results  []CheckResult
+		results  []validation.CheckResult
 		expected bool
 	}{
 		{
 			name:     "no results",
-			results:  []CheckResult{},
+			results:  []validation.CheckResult{},
 			expected: false,
 		},
 		{
 			name: "no errors",
-			results: []CheckResult{
+			results: []validation.CheckResult{
 				{Severity: "warning"},
 				{Severity: "info"},
 			},
@@ -48,7 +50,7 @@ func TestHasErrors(t *testing.T) {
 		},
 		{
 			name: "has errors",
-			results: []CheckResult{
+			results: []validation.CheckResult{
 				{Severity: "warning"},
 				{Severity: "error"},
 				{Severity: "info"},
@@ -71,90 +73,90 @@ func TestHasErrors(t *testing.T) {
 func TestRemoveByIdentifier(t *testing.T) {
 	tests := []struct {
 		name            string
-		initialResults  []CheckResult
-		ignores         []ToolConfigIgnore
-		expectedResults []CheckResult
+		initialResults  []validation.CheckResult
+		ignores         []validation.ToolConfigIgnore
+		expectedResults []validation.CheckResult
 	}{
 		{
 			name: "remove single result",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Identifier: "TEST001"},
 				{Path: "file2.go", Identifier: "TEST002"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Path: "file1.go", Identifier: "TEST001"},
 			},
-			expectedResults: []CheckResult{
+			expectedResults: []validation.CheckResult{
 				{Path: "file2.go", Identifier: "TEST002"},
 			},
 		},
 		{
 			name: "remove by identifier only",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Identifier: "TEST001"},
 				{Path: "file2.go", Identifier: "TEST001"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Identifier: "TEST001"},
 			},
-			expectedResults: []CheckResult{},
+			expectedResults: []validation.CheckResult{},
 		},
 		{
 			name: "no matches",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Identifier: "TEST001"},
 				{Path: "file2.go", Identifier: "TEST002"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Path: "file3.go", Identifier: "TEST003"},
 			},
-			expectedResults: []CheckResult{
+			expectedResults: []validation.CheckResult{
 				{Path: "file1.go", Identifier: "TEST001"},
 				{Path: "file2.go", Identifier: "TEST002"},
 			},
 		},
 		{
 			name: "identifier with message should not ignore all",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Identifier: "TEST001", Message: "error 1"},
 				{Path: "file2.go", Identifier: "TEST001", Message: "error 2"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Identifier: "TEST001", Message: "error 1"},
 			},
-			expectedResults: []CheckResult{
+			expectedResults: []validation.CheckResult{
 				{Path: "file1.go", Identifier: "TEST001", Message: "error 1"},
 				{Path: "file2.go", Identifier: "TEST001", Message: "error 2"},
 			},
 		},
 		{
 			name: "identifier only should ignore all matching errors",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Identifier: "TEST001", Message: "error 1"},
 				{Path: "file2.go", Identifier: "TEST001", Message: "error 2"},
 				{Path: "file3.go", Identifier: "TEST002", Message: "error 3"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Identifier: "TEST001"},
 			},
-			expectedResults: []CheckResult{
+			expectedResults: []validation.CheckResult{
 				{Path: "file3.go", Identifier: "TEST002", Message: "error 3"},
 			},
 		},
 		{
 			name: "multiple ignores with different conditions",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Identifier: "TEST001", Message: "error 1"},
 				{Path: "file2.go", Identifier: "TEST001", Message: "error 2"},
 				{Path: "file3.go", Identifier: "TEST002", Message: "error 3"},
 				{Path: "file4.go", Identifier: "TEST003", Message: "error 4"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Identifier: "TEST001"},                   // Should remove all TEST001
 				{Path: "file3.go", Identifier: "TEST002"}, // Should remove only TEST002 in file3.go
 				{Message: "error 4"},                      // Should remove anything with this message
 			},
-			expectedResults: []CheckResult{},
+			expectedResults: []validation.CheckResult{},
 		},
 	}
 
@@ -174,71 +176,71 @@ func TestRemoveByIdentifier(t *testing.T) {
 func TestRemoveByMessage(t *testing.T) {
 	tests := []struct {
 		name            string
-		initialResults  []CheckResult
-		ignores         []ToolConfigIgnore
-		expectedResults []CheckResult
+		initialResults  []validation.CheckResult
+		ignores         []validation.ToolConfigIgnore
+		expectedResults []validation.CheckResult
 	}{
 		{
 			name: "remove_single_result_by_exact_message",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
 				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Path: "file1.go", Message: "test error message"},
 			},
-			expectedResults: []CheckResult{
+			expectedResults: []validation.CheckResult{
 				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
 			},
 		},
 		{
 			name: "remove_by_message_only",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
 				{Path: "file2.go", Line: 2, Message: "test error message", Severity: "error"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Message: "test error message"},
 			},
-			expectedResults: []CheckResult{},
+			expectedResults: []validation.CheckResult{},
 		},
 		{
 			name: "remove_by_partial_message_match",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
 				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Message: "test error"},
 			},
-			expectedResults: []CheckResult{
+			expectedResults: []validation.CheckResult{
 				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
 			},
 		},
 		{
 			name: "no_matches",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
 				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Message: "non-existent message"},
 			},
-			expectedResults: []CheckResult{
+			expectedResults: []validation.CheckResult{
 				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
 				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
 			},
 		},
 		{
 			name: "remove_by_path_and_partial_message",
-			initialResults: []CheckResult{
+			initialResults: []validation.CheckResult{
 				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
 				{Path: "file2.go", Line: 2, Message: "test error message", Severity: "error"},
 			},
-			ignores: []ToolConfigIgnore{
+			ignores: []validation.ToolConfigIgnore{
 				{Path: "file1.go", Message: "test"},
 			},
-			expectedResults: []CheckResult{
+			expectedResults: []validation.CheckResult{
 				{Path: "file2.go", Line: 2, Message: "test error message", Severity: "error"},
 			},
 		},

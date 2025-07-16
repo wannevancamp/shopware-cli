@@ -89,7 +89,7 @@ var projectValidateCmd = &cobra.Command{
 			return err
 		}
 
-		return verifier.DoCheckReport(result.RemoveByIdentifier(toolCfg.ValidationIgnores), reportingFormat)
+		return verifier.DoCheckReport(result.RemoveByIdentifier(toolCfg.ValidationIgnores).(*verifier.Check), reportingFormat)
 	},
 }
 

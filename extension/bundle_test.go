@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+
 func TestCreateBundleEmptyFolder(t *testing.T) {
 	dir := t.TempDir()
 
@@ -91,8 +92,8 @@ func TestCreateBundle(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "1.0.0", version.String())
 
-	// does notthing
-	bundle.Validate(getTestContext(), &ValidationContext{})
+	// does nothing
+	bundle.Validate(getTestContext(), &testCheck{})
 
 	assert.Equal(t, "FALLBACK", bundle.GetMetaData().Description.German)
 }
