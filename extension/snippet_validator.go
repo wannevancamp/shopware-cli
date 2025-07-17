@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/wI2L/jsondiff"
+
 	"github.com/shopware/shopware-cli/internal/validation"
 )
 
@@ -19,7 +20,7 @@ func validateStorefrontSnippets(ext Extension, check validation.Check) {
 	for _, val := range ext.GetResourcesDirs() {
 		storefrontFolder := path.Join(val, "snippet")
 
-		if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, ext, check); err != nil {
+		if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, check); err != nil {
 			return
 		}
 	}
@@ -35,13 +36,13 @@ func validateStorefrontSnippets(ext Extension, check validation.Check) {
 
 		storefrontFolder := path.Join(bundlePath, "Resources", "snippet")
 
-		if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, ext, check); err != nil {
+		if err := validateStorefrontSnippetsByPath(storefrontFolder, rootDir, check); err != nil {
 			return
 		}
 	}
 }
 
-func validateStorefrontSnippetsByPath(snippetFolder, rootDir string, ext Extension, check validation.Check) error {
+func validateStorefrontSnippetsByPath(snippetFolder, rootDir string, check validation.Check) error {
 	if _, err := os.Stat(snippetFolder); err != nil {
 		return nil //nolint:nilerr
 	}
@@ -115,7 +116,7 @@ func validateStorefrontSnippetsByPath(snippetFolder, rootDir string, ext Extensi
 				continue
 			}
 
-			compareSnippets(mainFileContent, mainFile, file, ext, check, rootDir)
+			compareSnippets(mainFileContent, mainFile, file, check, rootDir)
 		}
 	}
 
@@ -128,7 +129,7 @@ func validateAdministrationSnippets(ext Extension, check validation.Check) {
 	for _, val := range ext.GetResourcesDirs() {
 		adminFolder := path.Join(val, "app", "administration")
 
-		if err := validateAdministrationByPath(adminFolder, rootDir, ext, check); err != nil {
+		if err := validateAdministrationByPath(adminFolder, rootDir, check); err != nil {
 			return
 		}
 	}
@@ -144,13 +145,13 @@ func validateAdministrationSnippets(ext Extension, check validation.Check) {
 
 		adminFolder := path.Join(bundlePath, "Resources", "app", "administration")
 
-		if err := validateAdministrationByPath(adminFolder, rootDir, ext, check); err != nil {
+		if err := validateAdministrationByPath(adminFolder, rootDir, check); err != nil {
 			return
 		}
 	}
 }
 
-func validateAdministrationByPath(adminFolder, rootDir string, ext Extension, check validation.Check) error {
+func validateAdministrationByPath(adminFolder, rootDir string, check validation.Check) error {
 	if _, err := os.Stat(adminFolder); err != nil {
 		return nil //nolint:nilerr
 	}
@@ -228,14 +229,14 @@ func validateAdministrationByPath(adminFolder, rootDir string, ext Extension, ch
 				continue
 			}
 
-			compareSnippets(mainFileContent, mainFile, file, ext, check, rootDir)
+			compareSnippets(mainFileContent, mainFile, file, check, rootDir)
 		}
 	}
 
 	return nil
 }
 
-func compareSnippets(mainFile []byte, mainFilePath, file string, ext Extension, check validation.Check, extensionRoot string) {
+func compareSnippets(mainFile []byte, mainFilePath, file string, check validation.Check, extensionRoot string) {
 	checkFile, err := os.ReadFile(file)
 	if err != nil {
 		check.AddResult(validation.CheckResult{

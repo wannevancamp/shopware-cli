@@ -6,7 +6,7 @@ import (
 	"image/png"
 	"os"
 	"strings"
-	
+
 	"github.com/shopware/shopware-cli/internal/validation"
 )
 

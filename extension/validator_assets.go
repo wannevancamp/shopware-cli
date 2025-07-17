@@ -14,7 +14,7 @@ func validateAssets(ext Extension, check validation.Check) {
 	}
 
 	for _, resourceDir := range ext.GetResourcesDirs() {
-		validateAssetByResourceDir(ext, check, resourceDir)
+		validateAssetByResourceDir(check, resourceDir)
 	}
 
 	for _, extraBundle := range ext.GetExtensionConfig().Build.ExtraBundles {
@@ -26,11 +26,11 @@ func validateAssets(ext Extension, check validation.Check) {
 			bundlePath = fmt.Sprintf("%s/%s", bundlePath, extraBundle.Name)
 		}
 
-		validateAssetByResourceDir(ext, check, filepath.Join(bundlePath, "Resources"))
+		validateAssetByResourceDir(check, filepath.Join(bundlePath, "Resources"))
 	}
 }
 
-func validateAssetByResourceDir(ext Extension, check validation.Check, resourceDir string) {
+func validateAssetByResourceDir(check validation.Check, resourceDir string) {
 	_, foundAdminBuildFiles := os.Stat(filepath.Join(resourceDir, "public", "administration"))
 	foundAdminEntrypoint := hasJavascriptEntrypoint(filepath.Join(resourceDir, "app", "administration", "src"))
 	foundStorefrontEntrypoint := hasJavascriptEntrypoint(filepath.Join(resourceDir, "app", "storefront", "src"))

@@ -9,7 +9,6 @@ import (
 	"github.com/shopware/shopware-cli/internal/validation"
 )
 
-
 type ToolList []Tool
 
 var availableTools = ToolList{}
@@ -47,7 +46,6 @@ type ToolConfig struct {
 
 	Extension extension.Extension
 }
-
 
 type Tool interface {
 	Name() string

@@ -57,9 +57,9 @@ func doSummaryReport(result *Check) error {
 		for _, r := range results {
 			totalProblems++
 			switch r.Severity {
-			case "error":
+			case validation.SeverityError:
 				errorCount++
-			case "warn":
+			case validation.SeverityWarning:
 				warningCount++
 			}
 			//nolint:forbidigo

@@ -72,4 +72,3 @@ func (c *Check) RemoveByIdentifier(ignores []validation.ToolConfigIgnore) valida
 
 	return c
 }
-

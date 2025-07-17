@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
 func TestCreateBundleEmptyFolder(t *testing.T) {
 	dir := t.TempDir()
 

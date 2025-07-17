@@ -29,14 +29,14 @@ func (s SWCLI) Check(ctx context.Context, check *Check, config ToolConfig) error
 			Message:    ignore.Message,
 		})
 	}
-	
+
 	if config.InputWasDirectory {
 		// Add additional ignores for directory input
 		ignores = append(ignores, validation.ToolConfigIgnore{
 			Identifier: "zip.disallowed_file",
 		})
 	}
-	
+
 	if len(ignores) > 0 {
 		check.RemoveByIdentifier(ignores)
 	}

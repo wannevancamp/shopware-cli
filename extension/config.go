@@ -177,7 +177,6 @@ func (c *ConfigValidationList) Identifiers() []string {
 	return identifiers
 }
 
-
 type Config struct {
 	FileName string `yaml:"-" jsonschema:"-"`
 	// Store is the store configuration of the extension.

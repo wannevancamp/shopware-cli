@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/shyim/go-version"
+
 	"github.com/shopware/shopware-cli/internal/validation"
 )
 

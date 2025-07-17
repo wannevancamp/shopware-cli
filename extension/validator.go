@@ -14,7 +14,6 @@ import (
 	"github.com/shopware/shopware-cli/internal/validation"
 )
 
-
 func validateExtensionIcon(ext Extension, check validation.Check) {
 	fullIconPath := ext.GetIconPath()
 	relPath, err := filepath.Rel(ext.GetRootDir(), fullIconPath)
