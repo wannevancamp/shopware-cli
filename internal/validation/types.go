@@ -83,6 +83,8 @@ func (c ToolConfigIgnore) JSONSchema() *jsonschema.Schema {
 type Check interface {
 	AddResult(CheckResult)
 	RemoveByIdentifier([]ToolConfigIgnore) Check
+	GetResults() []CheckResult
+	HasErrors() bool
 }
 
 // Severity constants

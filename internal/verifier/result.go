@@ -34,6 +34,12 @@ func (c *Check) HasErrors() bool {
 	return false
 }
 
+func (c *Check) GetResults() []validation.CheckResult {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	return c.Results
+}
+
 func (c *Check) RemoveByIdentifier(ignores []validation.ToolConfigIgnore) validation.Check {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()

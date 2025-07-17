@@ -54,6 +54,19 @@ func (c *testCheck) AddResult(result validation.CheckResult) {
 	c.Results = append(c.Results, result)
 }
 
+func (c *testCheck) GetResults() []validation.CheckResult {
+	return c.Results
+}
+
+func (c *testCheck) HasErrors() bool {
+	for _, r := range c.Results {
+		if r.Severity == validation.SeverityError {
+			return true
+		}
+	}
+	return false
+}
+
 func (c *testCheck) RemoveByIdentifier(ignores []validation.ToolConfigIgnore) validation.Check {
 	filtered := make([]validation.CheckResult, 0)
 	for _, r := range c.Results {
