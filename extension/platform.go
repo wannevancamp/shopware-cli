@@ -207,6 +207,7 @@ func (p PlatformPlugin) GetIconPath() string {
 func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 	if p.Composer.Name == "" {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "metadata.name",
 			Message:    "Key `name` is required",
 			Severity:   validation.SeverityError,
@@ -215,12 +216,14 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 	if p.Composer.Type == "" {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "metadata.type",
 			Message:    "Key `type` is required",
 			Severity:   validation.SeverityError,
 		})
 	} else if p.Composer.Type != ComposerTypePlugin {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "metadata.type",
 			Message:    "The composer type must be shopware-platform-plugin",
 			Severity:   validation.SeverityError,
@@ -229,6 +232,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 	if p.Composer.Description == "" {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "metadata.description",
 			Message:    "Key `description` is required",
 			Severity:   validation.SeverityError,
@@ -237,6 +241,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 	if p.Composer.License == "" {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "metadata.license",
 			Message:    "Key `license` is required",
 			Severity:   validation.SeverityError,
@@ -245,6 +250,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 	if p.Composer.Version == "" {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "metadata.version",
 			Message:    "Key `version` is required",
 			Severity:   validation.SeverityError,
@@ -253,6 +259,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 	if len(p.Composer.Authors) == 0 {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "metadata.author",
 			Message:    "Key `authors` is required",
 			Severity:   validation.SeverityError,
@@ -261,6 +268,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 	if len(p.Composer.Require) == 0 {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "metadata.require",
 			Message:    "Key `require` is required",
 			Severity:   validation.SeverityError,
@@ -270,6 +278,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 		if !exists {
 			check.AddResult(validation.CheckResult{
+				Path:       "composer.json",
 				Identifier: "metadata.require",
 				Message:    "You need to require \"shopware/core\" package",
 				Severity:   validation.SeverityError,
@@ -291,6 +300,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 		if !hasLabel {
 			check.AddResult(validation.CheckResult{
+				Path:       "composer.json",
 				Identifier: "metadata.label",
 				Message:    fmt.Sprintf("extra.label for language %s is required", key),
 				Severity:   validation.SeverityError,
@@ -299,6 +309,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 		if !hasDescription {
 			check.AddResult(validation.CheckResult{
+				Path:       "composer.json",
 				Identifier: "metadata.description",
 				Message:    fmt.Sprintf("extra.description for language %s is required", key),
 				Severity:   validation.SeverityError,
@@ -307,6 +318,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 		if !hasManufacturer {
 			check.AddResult(validation.CheckResult{
+				Path:       "composer.json",
 				Identifier: "metadata.manufacturer",
 				Message:    fmt.Sprintf("extra.manufacturerLink for language %s is required", key),
 				Severity:   validation.SeverityError,
@@ -315,6 +327,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 		if !hasSupportLink {
 			check.AddResult(validation.CheckResult{
+				Path:       "composer.json",
 				Identifier: "metadata.support",
 				Message:    fmt.Sprintf("extra.supportLink for language %s is required", key),
 				Severity:   validation.SeverityError,
@@ -324,6 +337,7 @@ func (p PlatformPlugin) Validate(c context.Context, check validation.Check) {
 
 	if len(p.Composer.Autoload.Psr0) == 0 && len(p.Composer.Autoload.Psr4) == 0 {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "metadata.autoload",
 			Message:    "At least one of the properties psr-0 or psr-4 are required in the composer.json",
 			Severity:   validation.SeverityError,
@@ -340,6 +354,7 @@ func validatePHPFiles(c context.Context, ext Extension, check validation.Check) 
 	constraint, err := ext.GetShopwareVersionConstraint()
 	if err != nil {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "php.linter",
 			Message:    fmt.Sprintf("Could not parse shopware version constraint: %s", err.Error()),
 			Severity:   validation.SeverityError,
@@ -350,6 +365,7 @@ func validatePHPFiles(c context.Context, ext Extension, check validation.Check) 
 	phpVersion, err := GetPhpVersion(c, constraint)
 	if err != nil {
 		check.AddResult(validation.CheckResult{
+			Path:       "composer.json",
 			Identifier: "php.linter",
 			Message:    fmt.Sprintf("Could not find min php version for plugin: %s", err.Error()),
 			Severity:   validation.SeverityWarning,
@@ -367,6 +383,7 @@ func validatePHPFiles(c context.Context, ext Extension, check validation.Check) 
 
 		if err != nil {
 			check.AddResult(validation.CheckResult{
+				Path:       "composer.json",
 				Identifier: "php.linter",
 				Message:    fmt.Sprintf("Could not lint php files: %s", err.Error()),
 				Severity:   validation.SeverityWarning,
@@ -376,6 +393,7 @@ func validatePHPFiles(c context.Context, ext Extension, check validation.Check) 
 
 		for _, error := range phpErrors {
 			check.AddResult(validation.CheckResult{
+				Path:       error.File,
 				Identifier: "php.linter",
 				Message:    fmt.Sprintf("%s: %s", error.File, error.Message),
 				Severity:   validation.SeverityError,

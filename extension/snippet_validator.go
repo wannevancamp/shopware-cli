@@ -88,6 +88,7 @@ func validateStorefrontSnippetsByPath(snippetFolder, rootDir string, check valid
 
 		if len(mainFile) == 0 {
 			check.AddResult(validation.CheckResult{
+				Path:       snippetFolder,
 				Identifier: "snippet.validator",
 				Message:    fmt.Sprintf("No en-GB.json file found in %s, using %s", snippetFolder, files[0]),
 				Severity:   validation.SeverityWarning,
@@ -102,6 +103,7 @@ func validateStorefrontSnippetsByPath(snippetFolder, rootDir string, check valid
 
 		if !json.Valid(mainFileContent) {
 			check.AddResult(validation.CheckResult{
+				Path:       mainFile,
 				Identifier: "snippet.validator",
 				Message:    fmt.Sprintf("File '%s' contains invalid JSON", mainFile),
 				Severity:   validation.SeverityError,
@@ -240,6 +242,7 @@ func compareSnippets(mainFile []byte, mainFilePath, file string, check validatio
 	checkFile, err := os.ReadFile(file)
 	if err != nil {
 		check.AddResult(validation.CheckResult{
+			Path:       file,
 			Identifier: "snippet.validator",
 			Message:    fmt.Sprintf("Cannot read file '%s', due '%s'", file, err),
 			Severity:   validation.SeverityError,
@@ -250,6 +253,7 @@ func compareSnippets(mainFile []byte, mainFilePath, file string, check validatio
 
 	if !json.Valid(checkFile) {
 		check.AddResult(validation.CheckResult{
+			Path:       file,
 			Identifier: "snippet.validator",
 			Message:    fmt.Sprintf("File '%s' contains invalid JSON", file),
 			Severity:   validation.SeverityError,
@@ -261,6 +265,7 @@ func compareSnippets(mainFile []byte, mainFilePath, file string, check validatio
 	compare, err := jsondiff.CompareJSON(mainFile, checkFile)
 	if err != nil {
 		check.AddResult(validation.CheckResult{
+			Path:       file,
 			Identifier: "snippet.validator",
 			Message:    fmt.Sprintf("Cannot compare file '%s', due '%s'", file, err),
 			Severity:   validation.SeverityError,
@@ -276,6 +281,7 @@ func compareSnippets(mainFile []byte, mainFilePath, file string, check validatio
 
 		if diff.Type == jsondiff.OperationReplace && reflect.TypeOf(diff.OldValue) != reflect.TypeOf(diff.Value) {
 			check.AddResult(validation.CheckResult{
+				Path:       normalizedPath,
 				Identifier: "snippet.validator",
 				Message:    fmt.Sprintf("Snippet file: %s, key: %s, has the type %s, but in the main language it is %s", normalizedPath, diff.Path, reflect.TypeOf(diff.OldValue), reflect.TypeOf(diff.Value)),
 				Severity:   validation.SeverityWarning,
@@ -285,6 +291,7 @@ func compareSnippets(mainFile []byte, mainFilePath, file string, check validatio
 
 		if diff.Type == jsondiff.OperationAdd {
 			check.AddResult(validation.CheckResult{
+				Path:       normalizedPath,
 				Identifier: "snippet.validator",
 				Message:    fmt.Sprintf("Snippet file: %s, missing key \"%s\" in this snippet file, but defined in the main language (%s)", normalizedPath, diff.Path, normalizedMainFilePath),
 				Severity:   validation.SeverityWarning,
@@ -294,6 +301,7 @@ func compareSnippets(mainFile []byte, mainFilePath, file string, check validatio
 
 		if diff.Type == jsondiff.OperationRemove {
 			check.AddResult(validation.CheckResult{
+				Path:       normalizedPath,
 				Identifier: "snippet.validator",
 				Message:    fmt.Sprintf("Snippet file: %s, key %s is missing, but defined in the main language file", normalizedPath, diff.Path),
 				Severity:   validation.SeverityWarning,

@@ -25,6 +25,7 @@ func validateExtensionIcon(ext Extension, check validation.Check) {
 
 	if os.IsNotExist(err) {
 		check.AddResult(validation.CheckResult{
+			Path:       relPath,
 			Identifier: "metadata.icon",
 			Message:    fmt.Sprintf("The extension icon %s does not exist", relPath),
 			Severity:   validation.SeverityError,
@@ -32,6 +33,7 @@ func validateExtensionIcon(ext Extension, check validation.Check) {
 	} else if err == nil {
 		if info.Size() > 30*1024 {
 			check.AddResult(validation.CheckResult{
+				Path:       relPath,
 				Identifier: "metadata.icon.size",
 				Message:    fmt.Sprintf("The extension icon %s is bigger than 30kb", relPath),
 				Severity:   validation.SeverityError,
@@ -41,6 +43,7 @@ func validateExtensionIcon(ext Extension, check validation.Check) {
 		file, err := os.Open(fullIconPath)
 		if err != nil {
 			check.AddResult(validation.CheckResult{
+				Path:       relPath,
 				Identifier: "metadata.icon",
 				Message:    fmt.Sprintf("Could not open icon file %s: %s", relPath, err.Error()),
 				Severity:   validation.SeverityError,
@@ -49,6 +52,7 @@ func validateExtensionIcon(ext Extension, check validation.Check) {
 			config, _, err := image.DecodeConfig(file)
 			if err != nil {
 				check.AddResult(validation.CheckResult{
+					Path:       relPath,
 					Identifier: "metadata.icon",
 					Message:    fmt.Sprintf("Could not decode icon image %s: %s", relPath, err.Error()),
 					Severity:   validation.SeverityError,
@@ -56,12 +60,14 @@ func validateExtensionIcon(ext Extension, check validation.Check) {
 			} else {
 				if config.Width < 112 || config.Height < 112 {
 					check.AddResult(validation.CheckResult{
+						Path:       relPath,
 						Identifier: "metadata.icon.size",
 						Message:    fmt.Sprintf("The extension icon %s dimensions (%dx%d) are smaller than required 112x112 and maximum 256x256 pixels with max file size 30kb and 72dpi", relPath, config.Width, config.Height),
 						Severity:   validation.SeverityError,
 					})
 				} else if config.Width > 256 || config.Height > 256 {
 					check.AddResult(validation.CheckResult{
+						Path:       relPath,
 						Identifier: "metadata.icon.size",
 						Message:    fmt.Sprintf("The extension icon %s dimensions (%dx%d) are larger than maximum 256x256 pixels with max file size 30kb and 72dpi", relPath, config.Width, config.Height),
 						Severity:   validation.SeverityError,
@@ -71,6 +77,7 @@ func validateExtensionIcon(ext Extension, check validation.Check) {
 
 			if err := file.Close(); err != nil {
 				check.AddResult(validation.CheckResult{
+					Path:       relPath,
 					Identifier: "metadata.icon",
 					Message:    fmt.Sprintf("Failed to close icon file %s: %s", relPath, err.Error()),
 					Severity:   validation.SeverityError,
@@ -95,9 +102,16 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 	name, nameErr := ext.GetName()
 	_, shopwareVersionErr := ext.GetShopwareVersionConstraint()
 
+	rootFile := "composer.json"
+
+	if ext.GetType() == TypePlatformApp {
+		rootFile = "manifest.xml"
+	}
+
 	// Skip version validation for ShopwareBundle
 	if versionErr != nil && ext.GetType() != TypeShopwareBundle {
 		check.AddResult(validation.CheckResult{
+			Path:       rootFile,
 			Identifier: "metadata.version",
 			Message:    versionErr.Error(),
 			Severity:   validation.SeverityError,
@@ -106,6 +120,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 
 	if nameErr != nil {
 		check.AddResult(validation.CheckResult{
+			Path:       rootFile,
 			Identifier: "metadata.name",
 			Message:    nameErr.Error(),
 			Severity:   validation.SeverityError,
@@ -114,6 +129,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 
 	if shopwareVersionErr != nil {
 		check.AddResult(validation.CheckResult{
+			Path:       rootFile,
 			Identifier: "metadata.shopware_version",
 			Message:    shopwareVersionErr.Error(),
 			Severity:   validation.SeverityError,
@@ -122,6 +138,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 
 	if len(name) == 0 {
 		check.AddResult(validation.CheckResult{
+			Path:       rootFile,
 			Identifier: "metadata.name",
 			Message:    "Extension name cannot be empty",
 			Severity:   validation.SeverityError,
@@ -134,6 +151,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 
 		if base == ".." {
 			check.AddResult(validation.CheckResult{
+				Path:       p,
 				Identifier: "zip.path_travel",
 				Message:    "Path travel detected in zip file",
 				Severity:   validation.SeverityError,
@@ -143,6 +161,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 		for _, file := range defaultNotAllowedPaths {
 			if strings.HasPrefix(p, file) {
 				check.AddResult(validation.CheckResult{
+					Path:       p,
 					Identifier: "zip.disallowed_file",
 					Message:    fmt.Sprintf(notAllowedErrorFormat, p),
 					Severity:   validation.SeverityError,
@@ -153,6 +172,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 		for _, file := range defaultNotAllowedFiles {
 			if file == base {
 				check.AddResult(validation.CheckResult{
+					Path:       p,
 					Identifier: "zip.disallowed_file",
 					Message:    fmt.Sprintf(notAllowedErrorFormat, p),
 					Severity:   validation.SeverityError,
@@ -163,6 +183,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 		for _, extFile := range defaultNotAllowedExtensions {
 			if strings.HasSuffix(base, extFile) {
 				check.AddResult(validation.CheckResult{
+					Path:       p,
 					Identifier: "zip.disallowed_file",
 					Message:    fmt.Sprintf(notAllowedErrorFormat, p),
 					Severity:   validation.SeverityError,
@@ -174,6 +195,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 
 		if err != nil {
 			check.AddResult(validation.CheckResult{
+				Path:       rootFile,
 				Identifier: "metadata.license",
 				Message:    fmt.Sprintf("Could not read the license of the extension: %s", err.Error()),
 				Severity:   validation.SeverityError,
@@ -182,6 +204,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 			spdxList, err := spdx.NewSpdxLicenses()
 			if err != nil {
 				check.AddResult(validation.CheckResult{
+					Path:       rootFile,
 					Identifier: "metadata.license",
 					Message:    fmt.Sprintf("Could not load the SPDX license list: %s", err.Error()),
 					Severity:   validation.SeverityWarning,
@@ -190,12 +213,14 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 				valid, err := spdxList.Validate(license)
 				if err != nil {
 					check.AddResult(validation.CheckResult{
+						Path:       rootFile,
 						Identifier: "metadata.license",
 						Message:    fmt.Sprintf("Could not validate the license: %s", err.Error()),
 						Severity:   validation.SeverityError,
 					})
 				} else if !valid {
 					check.AddResult(validation.CheckResult{
+						Path:       rootFile,
 						Identifier: "metadata.license",
 						Message:    fmt.Sprintf("The license %s is not a valid SPDX license", license),
 						Severity:   validation.SeverityError,
@@ -210,6 +235,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 	metaData := ext.GetMetaData()
 	if len([]rune(metaData.Label.German)) == 0 {
 		check.AddResult(validation.CheckResult{
+			Path:       rootFile,
 			Identifier: "metadata.label",
 			Message:    "in composer.json, label is not translated in german",
 			Severity:   validation.SeverityError,
@@ -218,6 +244,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 
 	if len(metaData.Label.English) == 0 {
 		check.AddResult(validation.CheckResult{
+			Path:       rootFile,
 			Identifier: "metadata.label",
 			Message:    "in composer.json, label is not translated in english",
 			Severity:   validation.SeverityError,
@@ -228,6 +255,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 	if ext.GetType() != TypeShopwareBundle {
 		if len([]rune(metaData.Description.German)) == 0 {
 			check.AddResult(validation.CheckResult{
+				Path:       rootFile,
 				Identifier: "metadata.description",
 				Message:    "in composer.json, description is not translated in german",
 				Severity:   validation.SeverityError,
@@ -236,6 +264,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 
 		if len(metaData.Description.English) == 0 {
 			check.AddResult(validation.CheckResult{
+				Path:       rootFile,
 				Identifier: "metadata.description",
 				Message:    "in composer.json, description is not translated in english",
 				Severity:   validation.SeverityError,
@@ -244,6 +273,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 
 		if len([]rune(metaData.Description.German)) < 150 || len([]rune(metaData.Description.German)) > 185 {
 			check.AddResult(validation.CheckResult{
+				Path:       rootFile,
 				Identifier: "metadata.description",
 				Message:    fmt.Sprintf("in composer.json, the german description with length of %d should have a length from 150 up to 185 characters.", len([]rune(metaData.Description.German))),
 				Severity:   validation.SeverityError,
@@ -252,6 +282,7 @@ func runDefaultValidate(ext Extension, check validation.Check) {
 
 		if len(metaData.Description.English) < 150 || len(metaData.Description.English) > 185 {
 			check.AddResult(validation.CheckResult{
+				Path:       rootFile,
 				Identifier: "metadata.description",
 				Message:    fmt.Sprintf("in composer.json, the english description with length of %d should have a length from 150 up to 185 characters.", len(metaData.Description.English)),
 				Severity:   validation.SeverityError,

@@ -162,6 +162,7 @@ func (a App) Validate(_ context.Context, check validation.Check) {
 	_ = filepath.Walk(a.GetRootDir(), func(path string, info os.FileInfo, err error) error {
 		if filepath.Ext(path) == ".php" {
 			check.AddResult(validation.CheckResult{
+				Path:       path,
 				Identifier: "zip.disallowed_php_file",
 				Message:    fmt.Sprintf("Found unexpected PHP file %s, PHP files are not allowed in Apps", path),
 				Severity:   validation.SeverityError,
@@ -170,6 +171,7 @@ func (a App) Validate(_ context.Context, check validation.Check) {
 
 		if filepath.Ext(path) == ".twig" && (!strings.HasPrefix(path, allowedTwigLocations[0]) && !strings.HasPrefix(path, allowedTwigLocations[1])) {
 			check.AddResult(validation.CheckResult{
+				Path:       path,
 				Identifier: "zip.disallowed_twig_file",
 				Message:    fmt.Sprintf("Found unexpected Twig file %s. Twig files should be at Resources/views or Resources/scripts", path),
 				Severity:   validation.SeverityError,
@@ -181,6 +183,7 @@ func (a App) Validate(_ context.Context, check validation.Check) {
 
 	if a.manifest.Meta.Author == "" {
 		check.AddResult(validation.CheckResult{
+			Path:       "manifest.xml",
 			Identifier: "metadata.author",
 			Message:    "The element meta:author was not found in the manifest.xml",
 			Severity:   validation.SeverityError,
@@ -189,6 +192,7 @@ func (a App) Validate(_ context.Context, check validation.Check) {
 
 	if a.manifest.Meta.Copyright == "" {
 		check.AddResult(validation.CheckResult{
+			Path:       "manifest.xml",
 			Identifier: "metadata.copyright",
 			Message:    "The element meta:copyright was not found in the manifest.xml",
 			Severity:   validation.SeverityError,
@@ -197,6 +201,7 @@ func (a App) Validate(_ context.Context, check validation.Check) {
 
 	if a.manifest.Meta.License == "" {
 		check.AddResult(validation.CheckResult{
+			Path:       "manifest.xml",
 			Identifier: "metadata.license",
 			Message:    "The element meta:license was not found in the manifest.xml",
 			Severity:   validation.SeverityError,
@@ -205,6 +210,7 @@ func (a App) Validate(_ context.Context, check validation.Check) {
 
 	if a.manifest.Setup != nil && a.manifest.Setup.Secret != "" {
 		check.AddResult(validation.CheckResult{
+			Path:       "manifest.xml",
 			Identifier: "metadata.setup",
 			Message:    "The xml element setup:secret is only for local development, please remove it. You can find your generated app secret on your extension detail page in the master data section. For more information see https://docs.shopware.com/en/shopware-platform-dev-en/app-system-guide/setup#authorisation",
 			Severity:   validation.SeverityError,

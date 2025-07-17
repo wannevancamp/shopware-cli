@@ -16,6 +16,7 @@ type mockExtension struct {
 	name       string
 	extVersion *version.Version
 	config     *Config
+	rootDir    string
 }
 
 func (m *mockExtension) GetName() (string, error) {
@@ -42,6 +43,9 @@ func (m *mockExtension) GetIconPath() string {
 }
 
 func (m *mockExtension) GetRootDir() string {
+	if m.rootDir != "" {
+		return m.rootDir
+	}
 	return "src"
 }
 
