@@ -6,10 +6,8 @@ import (
 	"strings"
 
 	"github.com/shopware/shopware-cli/extension"
+	"github.com/shopware/shopware-cli/internal/validation"
 )
-
-const SeverityError = "error"
-const SeverityWarning = "warning"
 
 type ToolList []Tool
 
@@ -40,19 +38,13 @@ type ToolConfig struct {
 	// Contains a list of directories that are considered as source code
 	SourceDirectories []string
 	// Contains a list of identifiers that are ignored
-	ValidationIgnores []ToolConfigIgnore
+	ValidationIgnores []validation.ToolConfigIgnore
 	// Contains a list of directories that are considered as admin code
 	AdminDirectories []string
 	// Contains a list of directories that are considered as storefront code
 	StorefrontDirectories []string
 
 	Extension extension.Extension
-}
-
-type ToolConfigIgnore struct {
-	Identifier string
-	Path       string
-	Message    string
 }
 
 type Tool interface {

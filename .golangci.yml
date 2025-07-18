@@ -49,6 +49,9 @@ linters:
       - path: internal\/ci\/*
         linters:
           - forbidigo
+      - path: internal\/validation\/*
+        linters:
+          - forbidigo
 
 formatters:
   enable:

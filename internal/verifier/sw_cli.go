@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/shopware/shopware-cli/extension"
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 type SWCLI struct{}
@@ -17,34 +18,27 @@ func (s SWCLI) Check(ctx context.Context, check *Check, config ToolConfig) error
 		return nil
 	}
 
-	validationContext := extension.RunValidation(ctx, config.Extension)
+	extension.RunValidation(ctx, config.Extension, check)
+
+	// Apply ignores from extension config
+	ignores := make([]validation.ToolConfigIgnore, 0)
+	for _, ignore := range config.Extension.GetExtensionConfig().Validation.Ignore {
+		ignores = append(ignores, validation.ToolConfigIgnore{
+			Identifier: ignore.Identifier,
+			Path:       ignore.Path,
+			Message:    ignore.Message,
+		})
+	}
 
 	if config.InputWasDirectory {
-		validationContext.ApplyIgnores([]extension.ConfigValidationIgnoreItem{
-			{
-				Identifier: "zip.disallowed_file",
-			},
+		// Add additional ignores for directory input
+		ignores = append(ignores, validation.ToolConfigIgnore{
+			Identifier: "zip.disallowed_file",
 		})
 	}
 
-	for _, err := range validationContext.Errors() {
-		check.AddResult(CheckResult{
-			Path:       "",
-			Line:       0,
-			Message:    err.Message,
-			Identifier: err.Identifier,
-			Severity:   "error",
-		})
-	}
-
-	for _, err := range validationContext.Warnings() {
-		check.AddResult(CheckResult{
-			Path:       "",
-			Line:       0,
-			Message:    err.Message,
-			Identifier: err.Identifier,
-			Severity:   "warning",
-		})
+	if len(ignores) > 0 {
+		check.RemoveByIdentifier(ignores)
 	}
 
 	return nil

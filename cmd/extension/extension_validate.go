@@ -10,6 +10,7 @@ import (
 
 	"github.com/shopware/shopware-cli/extension"
 	"github.com/shopware/shopware-cli/internal/system"
+	"github.com/shopware/shopware-cli/internal/validation"
 	"github.com/shopware/shopware-cli/internal/verifier"
 	"github.com/shopware/shopware-cli/logging"
 )
@@ -32,7 +33,7 @@ var extensionValidateCmd = &cobra.Command{
 		}
 
 		if reportingFormat == "" {
-			reportingFormat = verifier.DetectDefaultReporter()
+			reportingFormat = validation.DetectDefaultReporter()
 		}
 
 		if err != nil {
@@ -117,7 +118,7 @@ var extensionValidateCmd = &cobra.Command{
 			return err
 		}
 
-		return verifier.DoCheckReport(result.RemoveByIdentifier(toolCfg.ValidationIgnores), reportingFormat)
+		return validation.DoCheckReport(result.RemoveByIdentifier(toolCfg.ValidationIgnores), reportingFormat)
 	},
 }
 

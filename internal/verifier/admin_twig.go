@@ -12,6 +12,7 @@ import (
 	"github.com/shyim/go-version"
 
 	"github.com/shopware/shopware-cli/internal/html"
+	"github.com/shopware/shopware-cli/internal/validation"
 	"github.com/shopware/shopware-cli/internal/verifier/admintwiglinter"
 	"github.com/shopware/shopware-cli/logging"
 )
@@ -51,7 +52,7 @@ func (a AdminTwigLinter) Check(ctx context.Context, check *Check, config ToolCon
 
 			for _, fixer := range fixers {
 				for _, message := range fixer.Check(parsed) {
-					check.AddResult(CheckResult{
+					check.AddResult(validation.CheckResult{
 						Message:    message.Message,
 						Path:       strings.TrimPrefix(strings.TrimPrefix(path, "/private"), config.RootDir+"/"),
 						Line:       0,

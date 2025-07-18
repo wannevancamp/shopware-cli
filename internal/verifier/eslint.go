@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"golang.org/x/sync/errgroup"
+
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 type EslintOutput []struct {
@@ -83,13 +85,13 @@ func (e Eslint) Check(ctx context.Context, check *Check, config ToolConfig) erro
 				fixedPath := strings.TrimPrefix(strings.TrimPrefix(diagnostic.FilePath, "/private"), config.RootDir+"/")
 
 				for _, message := range diagnostic.Messages {
-					severity := SeverityWarning
+					severity := validation.SeverityWarning
 
 					if message.Severity == 2 {
-						severity = SeverityError
+						severity = validation.SeverityError
 					}
 
-					check.AddResult(CheckResult{
+					check.AddResult(validation.CheckResult{
 						Path:       fixedPath,
 						Line:       message.Line,
 						Message:    message.Message,

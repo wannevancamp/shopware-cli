@@ -8,6 +8,8 @@ import (
 	"path"
 
 	"github.com/shyim/go-version"
+
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 type ShopwareBundle struct {
@@ -177,5 +179,6 @@ func (p ShopwareBundle) GetMetaData() *extensionMetadata {
 	}
 }
 
-func (p ShopwareBundle) Validate(c context.Context, ctx *ValidationContext) {
+func (p ShopwareBundle) Validate(c context.Context, check validation.Check) {
+	// ShopwareBundle validation is currently empty but signature updated to match interface
 }

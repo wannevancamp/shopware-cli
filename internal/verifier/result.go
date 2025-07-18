@@ -3,20 +3,22 @@ package verifier
 import (
 	"strings"
 	"sync"
+
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 type Check struct {
-	Results []CheckResult `json:"results"`
+	Results []validation.CheckResult `json:"results"`
 	mutex   sync.Mutex
 }
 
 func NewCheck() *Check {
 	return &Check{
-		Results: []CheckResult{},
+		Results: []validation.CheckResult{},
 	}
 }
 
-func (c *Check) AddResult(result CheckResult) {
+func (c *Check) AddResult(result validation.CheckResult) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	c.Results = append(c.Results, result)
@@ -32,11 +34,17 @@ func (c *Check) HasErrors() bool {
 	return false
 }
 
-func (c *Check) RemoveByIdentifier(ignores []ToolConfigIgnore) *Check {
+func (c *Check) GetResults() []validation.CheckResult {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	return c.Results
+}
+
+func (c *Check) RemoveByIdentifier(ignores []validation.ToolConfigIgnore) validation.Check {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 
-	filtered := make([]CheckResult, 0)
+	filtered := make([]validation.CheckResult, 0)
 	for _, r := range c.Results {
 		shouldKeep := true
 		for _, ignore := range ignores {
@@ -70,20 +78,3 @@ func (c *Check) RemoveByIdentifier(ignores []ToolConfigIgnore) *Check {
 
 	return c
 }
-
-type CheckResult struct {
-	// The path to the file that was checked
-	Path string `json:"path"`
-	// The line number of the issue
-	Line    int    `json:"line"`
-	Message string `json:"message"`
-	// The severity of the issue
-	Severity string `json:"severity"`
-
-	Identifier string `json:"identifier"`
-}
-
-const (
-	CheckSeverityError = "error"
-	CheckSeverityWarn  = "warning"
-)

@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	"golang.org/x/sync/errgroup"
+
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 type StylintError struct {
@@ -80,7 +82,7 @@ func (s StyleLint) Check(ctx context.Context, check *Check, config ToolConfig) e
 						msg.Severity = "warn"
 					}
 
-					check.AddResult(CheckResult{
+					check.AddResult(validation.CheckResult{
 						Path:       fixedPath,
 						Line:       msg.Line,
 						Message:    msg.Text,
@@ -94,7 +96,7 @@ func (s StyleLint) Check(ctx context.Context, check *Check, config ToolConfig) e
 						msg.Severity = "warn"
 					}
 
-					check.AddResult(CheckResult{
+					check.AddResult(validation.CheckResult{
 						Path:       fixedPath,
 						Line:       msg.Line,
 						Message:    msg.Text,

@@ -6,6 +6,8 @@ import (
 
 	"github.com/shyim/go-version"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
 type mockExtension struct {
@@ -14,6 +16,7 @@ type mockExtension struct {
 	name       string
 	extVersion *version.Version
 	config     *Config
+	rootDir    string
 }
 
 func (m *mockExtension) GetName() (string, error) {
@@ -40,6 +43,9 @@ func (m *mockExtension) GetIconPath() string {
 }
 
 func (m *mockExtension) GetRootDir() string {
+	if m.rootDir != "" {
+		return m.rootDir
+	}
 	return "src"
 }
 
@@ -86,7 +92,7 @@ func (m *mockExtension) GetExtensionConfig() *Config {
 	return m.config
 }
 
-func (m *mockExtension) Validate(ctx context.Context, validationContext *ValidationContext) {
+func (m *mockExtension) Validate(ctx context.Context, check validation.Check) {
 }
 
 func TestMockExtension(t *testing.T) {

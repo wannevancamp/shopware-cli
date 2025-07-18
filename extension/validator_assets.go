@@ -4,19 +4,21 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/shopware/shopware-cli/internal/validation"
 )
 
-func validateAssets(ctx *ValidationContext) {
-	if !ctx.Extension.GetExtensionConfig().Validation.StoreCompliance {
+func validateAssets(ext Extension, check validation.Check) {
+	if !ext.GetExtensionConfig().Validation.StoreCompliance {
 		return
 	}
 
-	for _, resourceDir := range ctx.Extension.GetResourcesDirs() {
-		validateAssetByResourceDir(ctx, resourceDir)
+	for _, resourceDir := range ext.GetResourcesDirs() {
+		validateAssetByResourceDir(check, resourceDir)
 	}
 
-	for _, extraBundle := range ctx.Extension.GetExtensionConfig().Build.ExtraBundles {
-		bundlePath := ctx.Extension.GetRootDir()
+	for _, extraBundle := range ext.GetExtensionConfig().Build.ExtraBundles {
+		bundlePath := ext.GetRootDir()
 
 		if extraBundle.Path != "" {
 			bundlePath = fmt.Sprintf("%s/%s", bundlePath, extraBundle.Path)
@@ -24,30 +26,50 @@ func validateAssets(ctx *ValidationContext) {
 			bundlePath = fmt.Sprintf("%s/%s", bundlePath, extraBundle.Name)
 		}
 
-		validateAssetByResourceDir(ctx, filepath.Join(bundlePath, "Resources"))
+		validateAssetByResourceDir(check, filepath.Join(bundlePath, "Resources"))
 	}
 }
 
-func validateAssetByResourceDir(ctx *ValidationContext, resourceDir string) {
+func validateAssetByResourceDir(check validation.Check, resourceDir string) {
 	_, foundAdminBuildFiles := os.Stat(filepath.Join(resourceDir, "public", "administration"))
 	foundAdminEntrypoint := hasJavascriptEntrypoint(filepath.Join(resourceDir, "app", "administration", "src"))
 	foundStorefrontEntrypoint := hasJavascriptEntrypoint(filepath.Join(resourceDir, "app", "storefront", "src"))
 	_, foundStorefrontDistFiles := os.Stat(filepath.Join(resourceDir, "app", "storefront", "dist"))
 
 	if foundAdminBuildFiles == nil && !foundAdminEntrypoint {
-		ctx.AddError("assets.administration.sources_missing", fmt.Sprintf("Found administration build files in %s but no source files to rebuild the assets.", resourceDir))
+		check.AddResult(validation.CheckResult{
+			Path:       resourceDir,
+			Identifier: "assets.administration.sources_missing",
+			Message:    fmt.Sprintf("Found administration build files in %s but no source files to rebuild the assets.", resourceDir),
+			Severity:   validation.SeverityError,
+		})
 	}
 
 	if foundAdminBuildFiles != nil && foundAdminEntrypoint {
-		ctx.AddError("assets.administration.build_missing", fmt.Sprintf("Found administration source files in %s but no build files. Please run the build command to generate the assets.", resourceDir))
+		check.AddResult(validation.CheckResult{
+			Path:       resourceDir,
+			Identifier: "assets.administration.build_missing",
+			Message:    fmt.Sprintf("Found administration source files in %s but no build files. Please run the build command to generate the assets.", resourceDir),
+			Severity:   validation.SeverityError,
+		})
 	}
 
 	if foundStorefrontDistFiles != nil && foundStorefrontEntrypoint {
-		ctx.AddError("assets.storefront.sources_missing", fmt.Sprintf("Found storefront build files in %s but no source files to rebuild the assets.", resourceDir))
+		check.AddResult(validation.CheckResult{
+			Path:       resourceDir,
+			Identifier: "assets.storefront.sources_missing",
+			Message:    fmt.Sprintf("Found storefront build files in %s but no source files to rebuild the assets.", resourceDir),
+			Severity:   validation.SeverityError,
+		})
 	}
 
 	if foundStorefrontDistFiles == nil && !foundStorefrontEntrypoint {
-		ctx.AddError("assets.storefront.build_missing", fmt.Sprintf("Found storefront source files in %s but no build files. Please run the build command to generate the assets.", resourceDir))
+		check.AddResult(validation.CheckResult{
+			Path:       resourceDir,
+			Identifier: "assets.storefront.build_missing",
+			Message:    fmt.Sprintf("Found storefront source files in %s but no build files. Please run the build command to generate the assets.", resourceDir),
+			Severity:   validation.SeverityError,
+		})
 	}
 }
 

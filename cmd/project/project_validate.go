@@ -9,6 +9,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/shopware/shopware-cli/internal/system"
+	"github.com/shopware/shopware-cli/internal/validation"
 	"github.com/shopware/shopware-cli/internal/verifier"
 	"github.com/shopware/shopware-cli/logging"
 )
@@ -45,7 +46,7 @@ var projectValidateCmd = &cobra.Command{
 		}
 
 		if reportingFormat == "" {
-			reportingFormat = verifier.DetectDefaultReporter()
+			reportingFormat = validation.DetectDefaultReporter()
 		}
 
 		if !noCopy {
@@ -89,7 +90,9 @@ var projectValidateCmd = &cobra.Command{
 			return err
 		}
 
-		return verifier.DoCheckReport(result.RemoveByIdentifier(toolCfg.ValidationIgnores), reportingFormat)
+		filtered := result.RemoveByIdentifier(toolCfg.ValidationIgnores)
+
+		return validation.DoCheckReport(filtered, reportingFormat)
 	},
 }
 

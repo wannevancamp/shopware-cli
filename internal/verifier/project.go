@@ -13,6 +13,7 @@ import (
 	"github.com/shyim/go-version"
 
 	"github.com/shopware/shopware-cli/extension"
+	"github.com/shopware/shopware-cli/internal/validation"
 	"github.com/shopware/shopware-cli/logging"
 	"github.com/shopware/shopware-cli/shop"
 )
@@ -166,11 +167,11 @@ func GetConfigFromProject(root string) (*ToolConfig, error) {
 		}
 	}
 
-	var validationIgnores []ToolConfigIgnore
+	var validationIgnores []validation.ToolConfigIgnore
 
 	if shopCfg.Validation != nil {
 		for _, ignore := range shopCfg.Validation.Ignore {
-			validationIgnores = append(validationIgnores, ToolConfigIgnore{
+			validationIgnores = append(validationIgnores, validation.ToolConfigIgnore{
 				Identifier: ignore.Identifier,
 				Path:       ignore.Path,
 				Message:    ignore.Message,
