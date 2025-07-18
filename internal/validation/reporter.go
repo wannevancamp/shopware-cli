@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -40,9 +41,32 @@ func doSummaryReport(result Check) error {
 		fileGroups[r.Path] = append(fileGroups[r.Path], r)
 	}
 
+	// Sort results within each file group for deterministic output
+	for path, results := range fileGroups {
+		sort.Slice(results, func(i, j int) bool {
+			// Sort by line number first, then by identifier, then by message
+			if results[i].Line != results[j].Line {
+				return results[i].Line < results[j].Line
+			}
+			if results[i].Identifier != results[j].Identifier {
+				return results[i].Identifier < results[j].Identifier
+			}
+			return results[i].Message < results[j].Message
+		})
+		fileGroups[path] = results
+	}
+
+	// Get sorted list of file paths for deterministic output
+	var sortedPaths []string
+	for path := range fileGroups {
+		sortedPaths = append(sortedPaths, path)
+	}
+	sort.Strings(sortedPaths)
+
 	// Print results grouped by file
 	totalProblems := 0
-	for path, results := range fileGroups {
+	for _, path := range sortedPaths {
+		results := fileGroups[path]
 		totalProblems += len(results)
 		if len(results) == 0 {
 			continue
@@ -89,7 +113,23 @@ func doJSONReport(result Check) error {
 }
 
 func doGitHubReport(result Check) error {
-	for _, r := range result.GetResults() {
+	// Sort results for deterministic output
+	results := result.GetResults()
+	sort.Slice(results, func(i, j int) bool {
+		// Sort by path first, then by line number, then by identifier, then by message
+		if results[i].Path != results[j].Path {
+			return results[i].Path < results[j].Path
+		}
+		if results[i].Line != results[j].Line {
+			return results[i].Line < results[j].Line
+		}
+		if results[i].Identifier != results[j].Identifier {
+			return results[i].Identifier < results[j].Identifier
+		}
+		return results[i].Message < results[j].Message
+	})
+
+	for _, r := range results {
 		file := r.Path
 		if file == "" {
 			file = "."
@@ -125,11 +165,34 @@ func doMarkdownReport(result Check) error {
 		fileGroups[r.Path] = append(fileGroups[r.Path], r)
 	}
 
+	// Sort results within each file group for deterministic output
+	for path, results := range fileGroups {
+		sort.Slice(results, func(i, j int) bool {
+			// Sort by line number first, then by identifier, then by message
+			if results[i].Line != results[j].Line {
+				return results[i].Line < results[j].Line
+			}
+			if results[i].Identifier != results[j].Identifier {
+				return results[i].Identifier < results[j].Identifier
+			}
+			return results[i].Message < results[j].Message
+		})
+		fileGroups[path] = results
+	}
+
+	// Get sorted list of file paths for deterministic output
+	var sortedPaths []string
+	for path := range fileGroups {
+		sortedPaths = append(sortedPaths, path)
+	}
+	sort.Strings(sortedPaths)
+
 	fmt.Println("# Validation Report")
 	fmt.Println()
 
 	totalProblems := 0
-	for path, results := range fileGroups {
+	for _, path := range sortedPaths {
+		results := fileGroups[path]
 		totalProblems += len(results)
 		if len(results) == 0 {
 			continue
@@ -192,7 +255,23 @@ func doJUnitReport(result Check) error {
 	errors := 0
 	failures := 0
 
-	for _, r := range result.GetResults() {
+	// Sort results for deterministic output
+	results := result.GetResults()
+	sort.Slice(results, func(i, j int) bool {
+		// Sort by path first, then by line number, then by identifier, then by message
+		if results[i].Path != results[j].Path {
+			return results[i].Path < results[j].Path
+		}
+		if results[i].Line != results[j].Line {
+			return results[i].Line < results[j].Line
+		}
+		if results[i].Identifier != results[j].Identifier {
+			return results[i].Identifier < results[j].Identifier
+		}
+		return results[i].Message < results[j].Message
+	})
+
+	for _, r := range results {
 		testCase := JUnitTestCase{
 			Name:      r.Identifier,
 			ClassName: r.Path,
