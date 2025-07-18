@@ -65,39 +65,28 @@ func doSummaryReport(result Check) error {
 
 	// Print results grouped by file
 	totalProblems := 0
-	for _, path := range sortedPaths {
-		results := fileGroups[path]
-		totalProblems += len(results)
-		if len(results) == 0 {
-			continue
-		}
+	errorCount := 0
+	warningCount := 0
 
-		fmt.Printf("❌ %s (%d problems)\n", path, len(results))
+	for _, file := range sortedPaths {
+		results := fileGroups[file]
+		//nolint:forbidigo
+		fmt.Printf("\n%s\n", file)
 		for _, r := range results {
-			severity := "⚠️"
-			if r.Severity == SeverityError {
-				severity = "❌"
+			totalProblems++
+			switch r.Severity {
+			case SeverityError:
+				errorCount++
+			case SeverityWarning:
+				warningCount++
 			}
-
-			location := ""
-			if r.Line > 0 {
-				location = fmt.Sprintf(":%d", r.Line)
-			}
-
-			fmt.Printf("  %s %s%s: %s (%s)\n", severity, r.Path, location, r.Message, r.Identifier)
+			//nolint:forbidigo
+			fmt.Printf("  %d  %-7s  %s  %s\n", r.Line, r.Severity, r.Message, r.Identifier)
 		}
-		fmt.Println()
 	}
 
-	if totalProblems > 0 {
-		fmt.Printf("Found %d problems\n", totalProblems)
-	} else {
-		fmt.Println("✅ No problems found")
-	}
-
-	if result.HasErrors() {
-		return fmt.Errorf("found errors")
-	}
+	//nolint:forbidigo
+	fmt.Printf("\n✖ %d problems (%d errors, %d warnings)\n", totalProblems, errorCount, warningCount)
 
 	return nil
 }

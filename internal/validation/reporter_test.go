@@ -54,17 +54,18 @@ func TestReportingOutputIsDeterministic(t *testing.T) {
 
 		// Check that files are sorted alphabetically
 		lines := strings.Split(output, "\n")
-		var fileLines []string
+		var fileHeaderLines []string
 		for _, line := range lines {
-			if strings.HasPrefix(line, "❌ ") && strings.Contains(line, "problems)") {
-				fileLines = append(fileLines, line)
+			// File headers are lines that contain .go but not indented (no leading spaces)
+			if strings.Contains(line, ".go") && !strings.HasPrefix(line, " ") {
+				fileHeaderLines = append(fileHeaderLines, strings.TrimSpace(line))
 			}
 		}
 
-		assert.Len(t, fileLines, 3) // 3 files
-		assert.Contains(t, fileLines[0], "a_file.go")
-		assert.Contains(t, fileLines[1], "b_file.go")
-		assert.Contains(t, fileLines[2], "z_file.go")
+		assert.Len(t, fileHeaderLines, 3) // 3 files
+		assert.Equal(t, "a_file.go", fileHeaderLines[0])
+		assert.Equal(t, "b_file.go", fileHeaderLines[1])
+		assert.Equal(t, "z_file.go", fileHeaderLines[2])
 	}
 
 	// Test GitHub report multiple times to ensure deterministic output
