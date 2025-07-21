@@ -81,14 +81,14 @@ func TestFillAuthStruct(t *testing.T) {
 		t.Setenv("SHOPWARE_PACKAGES_TOKEN", "my-token")
 		composerAuth := `{
 			"bearer": {
-				"packages.shopware.com": "override-token"
+				"packages.shopware.com": "composer-token"
 			}
 		}`
 		t.Setenv("COMPOSER_AUTH", composerAuth)
 		auth := &ComposerAuth{}
 		filledAuth := fillAuthStruct(auth)
 
-		assert.Equal(t, "override-token", filledAuth.BearerAuth["packages.shopware.com"])
+		assert.Equal(t, "my-token", filledAuth.BearerAuth["packages.shopware.com"])
 	})
 }
 
