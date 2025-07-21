@@ -117,7 +117,7 @@ var projectExtensionUploadCmd = &cobra.Command{
 			}
 		}
 
-		if cfg, err = shop.ReadConfig(projectConfigPath, false); err != nil {
+		if cfg, err = shop.ReadConfig(projectConfigPath, true); err != nil {
 			return err
 		}
 
