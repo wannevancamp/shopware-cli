@@ -13,7 +13,7 @@ import (
 
 	"github.com/shopware/shopware-cli/internal/html"
 	"github.com/shopware/shopware-cli/internal/validation"
-	"github.com/shopware/shopware-cli/internal/verifier/admintwiglinter"
+	"github.com/shopware/shopware-cli/internal/verifier/twiglinter"
 	"github.com/shopware/shopware-cli/logging"
 )
 
@@ -24,7 +24,7 @@ func (a AdminTwigLinter) Name() string {
 }
 
 func (a AdminTwigLinter) Check(ctx context.Context, check *Check, config ToolConfig) error {
-	fixers := admintwiglinter.GetFixers(version.Must(version.NewVersion(config.MinShopwareVersion)))
+	fixers := twiglinter.GetAdministrationFixers(version.Must(version.NewVersion(config.MinShopwareVersion)))
 
 	for _, p := range config.AdminDirectories {
 		err := filepath.WalkDir(p, func(path string, d fs.DirEntry, err error) error {
@@ -36,7 +36,7 @@ func (a AdminTwigLinter) Check(ctx context.Context, check *Check, config ToolCon
 				return nil
 			}
 
-			if filepath.Ext(path) != admintwiglinter.TwigExtension {
+			if filepath.Ext(path) != twiglinter.TwigExtension {
 				return nil
 			}
 
@@ -73,7 +73,7 @@ func (a AdminTwigLinter) Check(ctx context.Context, check *Check, config ToolCon
 }
 
 func (a AdminTwigLinter) Fix(ctx context.Context, config ToolConfig) error {
-	fixers := admintwiglinter.GetFixers(version.Must(version.NewVersion(config.MinShopwareVersion)))
+	fixers := twiglinter.GetAdministrationFixers(version.Must(version.NewVersion(config.MinShopwareVersion)))
 
 	for _, p := range config.AdminDirectories {
 		err := filepath.WalkDir(p, func(path string, d fs.DirEntry, err error) error {
@@ -85,7 +85,7 @@ func (a AdminTwigLinter) Fix(ctx context.Context, config ToolConfig) error {
 				return nil
 			}
 
-			if filepath.Ext(path) != admintwiglinter.TwigExtension {
+			if filepath.Ext(path) != twiglinter.TwigExtension {
 				return nil
 			}
 
@@ -128,7 +128,7 @@ func (a AdminTwigLinter) Format(ctx context.Context, config ToolConfig, dryRun b
 				return nil
 			}
 
-			if filepath.Ext(path) != admintwiglinter.TwigExtension {
+			if filepath.Ext(path) != twiglinter.TwigExtension {
 				return nil
 			}
 
