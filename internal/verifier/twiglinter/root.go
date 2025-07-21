@@ -7,24 +7,36 @@ import (
 	"github.com/shopware/shopware-cli/internal/validation"
 )
 
+var Shopware67Constraint = version.MustConstraints(version.NewConstraint(">=6.7.0"))
+
 const TwigExtension = ".twig"
 
 var availableStorefrontFixers = []TwigFixer{}
+
+var availableAdministrationFixers = []TwigFixer{}
 
 func AddStorefrontFixer(fixer TwigFixer) {
 	availableStorefrontFixers = append(availableStorefrontFixers, fixer)
 }
 
-type CheckError struct {
-	Message    string
-	Severity   string
-	Identifier string
-	Line       int
+func AddAdministrationFixer(fixer TwigFixer) {
+	availableAdministrationFixers = append(availableAdministrationFixers, fixer)
 }
 
 func GetStorefrontFixers(version *version.Version) []TwigFixer {
 	fixers := []TwigFixer{}
 	for _, fixer := range availableStorefrontFixers {
+		if fixer.Supports(version) {
+			fixers = append(fixers, fixer)
+		}
+	}
+
+	return fixers
+}
+
+func GetAdministrationFixers(version *version.Version) []TwigFixer {
+	fixers := []TwigFixer{}
+	for _, fixer := range availableAdministrationFixers {
 		if fixer.Supports(version) {
 			fixers = append(fixers, fixer)
 		}
