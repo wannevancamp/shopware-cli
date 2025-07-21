@@ -13,7 +13,7 @@ require (
 	github.com/charmbracelet/huh/spinner v0.0.0-20250603124601-31a1db2cbc39
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/doutorfinancas/go-mad v0.0.0-20240205120830-463c1e9760f0
-	github.com/evanw/esbuild v0.25.6
+	github.com/evanw/esbuild v0.25.8
 	github.com/friendsofshopware/go-shopware-admin-api-sdk v0.0.0-20250625202956-e984fc9cf9e8
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/google/generative-ai-go v0.20.1
@@ -36,7 +36,7 @@ require (
 	golang.org/x/image v0.29.0
 	golang.org/x/text v0.27.0
 	golang.org/x/time v0.12.0
-	google.golang.org/api v0.241.0
+	google.golang.org/api v0.242.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
