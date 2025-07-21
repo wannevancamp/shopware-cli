@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@6c439dc8bdf85cadbbce9ed30d1c7b959517bc49 # ratchet:step-security/harden-runner@v2.12.2
+        uses: step-security/harden-runner@ec9f2d5744a09debf3a187a3f4f675c53b671911 # ratchet:step-security/harden-runner@v2.13.0
         with:
           egress-policy: audit
 
@@ -41,13 +41,13 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@c723f3a885e3f1d866d91f4f0c33dd44b1fc7c60 # ratchet:DeterminateSystems/nix-installer-action@main
+        uses: DeterminateSystems/nix-installer-action@90bb610b90bf290cad97484ba341453bd1cbefea # ratchet:DeterminateSystems/nix-installer-action@main
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # ratchet:docker/setup-buildx-action@v3
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@398d4b0eeef1380460a10c8013a76f728fb906ac # ratchet:sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # ratchet:sigstore/cosign-installer@v3
 
       - name: Install Syft
         uses: anchore/sbom-action/download-syft@cee1b8e05ae5b2593a75e197229729eabaa9f8ec # ratchet:anchore/sbom-action/download-syft@v0.20.2
