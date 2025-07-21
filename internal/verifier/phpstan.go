@@ -88,7 +88,7 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 			check.AddResult(validation.CheckResult{
 				Path:       "phpstan.neon",
 				Message:    "failed to unmarshal phpstan output: " + stderr.String(),
-				Severity:   "error",
+				Severity:   validation.SeverityError,
 				Line:       0,
 				Identifier: "phpstan/error",
 			})
@@ -100,7 +100,7 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 			check.AddResult(validation.CheckResult{
 				Path:       "phpstan.neon",
 				Message:    error,
-				Severity:   "error",
+				Severity:   validation.SeverityError,
 				Line:       0,
 				Identifier: "phpstan/error",
 			})
@@ -116,7 +116,7 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 					Path:       strings.TrimPrefix(strings.TrimPrefix(fileName, "/private"), config.RootDir+"/"),
 					Line:       message.Line,
 					Message:    message.Message,
-					Severity:   "error",
+					Severity:   validation.SeverityError,
 					Identifier: fmt.Sprintf("phpstan/%s", message.Identifier),
 				})
 			}

@@ -20,7 +20,7 @@ func TestAddResult(t *testing.T) {
 		Path:       "test.go",
 		Line:       1,
 		Message:    "test message",
-		Severity:   "error",
+		Severity:   validation.SeverityError,
 		Identifier: "TEST001",
 	}
 
@@ -183,21 +183,21 @@ func TestRemoveByMessage(t *testing.T) {
 		{
 			name: "remove_single_result_by_exact_message",
 			initialResults: []validation.CheckResult{
-				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
-				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
+				{Path: "file1.go", Line: 1, Message: "test error message", Severity: validation.SeverityError},
+				{Path: "file2.go", Line: 2, Message: "another error message", Severity: validation.SeverityError},
 			},
 			ignores: []validation.ToolConfigIgnore{
 				{Path: "file1.go", Message: "test error message"},
 			},
 			expectedResults: []validation.CheckResult{
-				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
+				{Path: "file2.go", Line: 2, Message: "another error message", Severity: validation.SeverityError},
 			},
 		},
 		{
 			name: "remove_by_message_only",
 			initialResults: []validation.CheckResult{
-				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
-				{Path: "file2.go", Line: 2, Message: "test error message", Severity: "error"},
+				{Path: "file1.go", Line: 1, Message: "test error message", Severity: validation.SeverityError},
+				{Path: "file2.go", Line: 2, Message: "test error message", Severity: validation.SeverityError},
 			},
 			ignores: []validation.ToolConfigIgnore{
 				{Message: "test error message"},
@@ -207,41 +207,41 @@ func TestRemoveByMessage(t *testing.T) {
 		{
 			name: "remove_by_partial_message_match",
 			initialResults: []validation.CheckResult{
-				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
-				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
+				{Path: "file1.go", Line: 1, Message: "test error message", Severity: validation.SeverityError},
+				{Path: "file2.go", Line: 2, Message: "another error message", Severity: validation.SeverityError},
 			},
 			ignores: []validation.ToolConfigIgnore{
 				{Message: "test error"},
 			},
 			expectedResults: []validation.CheckResult{
-				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
+				{Path: "file2.go", Line: 2, Message: "another error message", Severity: validation.SeverityError},
 			},
 		},
 		{
 			name: "no_matches",
 			initialResults: []validation.CheckResult{
-				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
-				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
+				{Path: "file1.go", Line: 1, Message: "test error message", Severity: validation.SeverityError},
+				{Path: "file2.go", Line: 2, Message: "another error message", Severity: validation.SeverityError},
 			},
 			ignores: []validation.ToolConfigIgnore{
 				{Message: "non-existent message"},
 			},
 			expectedResults: []validation.CheckResult{
-				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
-				{Path: "file2.go", Line: 2, Message: "another error message", Severity: "error"},
+				{Path: "file1.go", Line: 1, Message: "test error message", Severity: validation.SeverityError},
+				{Path: "file2.go", Line: 2, Message: "another error message", Severity: validation.SeverityError},
 			},
 		},
 		{
 			name: "remove_by_path_and_partial_message",
 			initialResults: []validation.CheckResult{
-				{Path: "file1.go", Line: 1, Message: "test error message", Severity: "error"},
-				{Path: "file2.go", Line: 2, Message: "test error message", Severity: "error"},
+				{Path: "file1.go", Line: 1, Message: "test error message", Severity: validation.SeverityError},
+				{Path: "file2.go", Line: 2, Message: "test error message", Severity: validation.SeverityError},
 			},
 			ignores: []validation.ToolConfigIgnore{
 				{Path: "file1.go", Message: "test"},
 			},
 			expectedResults: []validation.CheckResult{
-				{Path: "file2.go", Line: 2, Message: "test error message", Severity: "error"},
+				{Path: "file2.go", Line: 2, Message: "test error message", Severity: validation.SeverityError},
 			},
 		},
 	}

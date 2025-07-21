@@ -190,7 +190,7 @@ func doMarkdownReport(result Check) error {
 		fmt.Printf("## %s (%d problems)\n\n", path, len(results))
 		for _, r := range results {
 			severity := "⚠️ Warning"
-			if r.Severity == "error" {
+			if r.Severity == SeverityError {
 				severity = "❌ Error"
 			}
 

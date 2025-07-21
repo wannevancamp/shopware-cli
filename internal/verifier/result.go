@@ -26,7 +26,7 @@ func (c *Check) AddResult(result validation.CheckResult) {
 
 func (c *Check) HasErrors() bool {
 	for _, r := range c.Results {
-		if r.Severity == "error" {
+		if r.Severity == validation.SeverityError {
 			return true
 		}
 	}
