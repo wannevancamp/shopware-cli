@@ -13,8 +13,9 @@ import (
 )
 
 var projectAdminWatchCmd = &cobra.Command{
-	Use:   "admin-watch [path]",
-	Short: "Starts the Shopware Admin Watcher",
+	Use:     "admin-watch [path]",
+	Short:   "Starts the Shopware Admin Watcher",
+	Aliases: []string{"watch-admin"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var projectRoot string
 		var err error
