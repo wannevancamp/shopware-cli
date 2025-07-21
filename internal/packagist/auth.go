@@ -158,10 +158,6 @@ func fillAuthStruct(auth *ComposerAuth) *ComposerAuth {
 	composerToken := os.Getenv("SHOPWARE_PACKAGES_TOKEN")
 	composerAuth := os.Getenv("COMPOSER_AUTH")
 
-	if composerToken != "" {
-		auth.BearerAuth["packages.shopware.com"] = composerToken
-	}
-
 	if composerAuth != "" {
 		var envAuth ComposerAuth
 		if err := json.Unmarshal([]byte(composerAuth), &envAuth); err != nil {
@@ -181,6 +177,10 @@ func fillAuthStruct(auth *ComposerAuth) *ComposerAuth {
 		if len(envAuth.GithubDomains) > 0 {
 			auth.GithubDomains = envAuth.GithubDomains
 		}
+	}
+
+	if composerToken != "" {
+		auth.BearerAuth["packages.shopware.com"] = composerToken
 	}
 
 	return auth
