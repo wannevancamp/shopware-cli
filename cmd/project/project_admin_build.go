@@ -12,8 +12,9 @@ import (
 )
 
 var projectAdminBuildCmd = &cobra.Command{
-	Use:   "admin-build [project-dir]",
-	Short: "Builds the Administration",
+	Use:     "admin-build [project-dir]",
+	Short:   "Builds the Administration",
+	Aliases: []string{"build-admin"},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var projectRoot string
 		var err error
