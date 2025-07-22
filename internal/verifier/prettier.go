@@ -49,6 +49,8 @@ func (b Prettier) Format(ctx context.Context, config ToolConfig, dryRun bool) er
 
 		if !dryRun {
 			args = append(args, "--write")
+		} else {
+			args = append(args, "--check")
 		}
 
 		gr.Go(func() error {

@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/shyim/go-version"
 
 	"github.com/shopware/shopware-cli/internal/html"
@@ -116,8 +115,6 @@ func (a AdminTwigLinter) Fix(ctx context.Context, config ToolConfig) error {
 }
 
 func (a AdminTwigLinter) Format(ctx context.Context, config ToolConfig, dryRun bool) error {
-	dmp := diffmatchpatch.New()
-
 	for _, p := range config.AdminDirectories {
 		err := filepath.WalkDir(p, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
@@ -143,9 +140,9 @@ func (a AdminTwigLinter) Format(ctx context.Context, config ToolConfig, dryRun b
 			}
 
 			if dryRun {
-				diffs := dmp.DiffMain(string(file), parsed.Dump(0), false)
-
-				logging.FromContext(ctx).Info(dmp.DiffPrettyText(diffs))
+				if string(file) != parsed.Dump(0) {
+					logging.FromContext(ctx).Infof("File %s is not correctly formatted", strings.TrimPrefix(strings.TrimPrefix(path, "/private"), config.RootDir+"/"))
+				}
 
 				return nil
 			} else {
