@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -9,7 +10,7 @@ import (
 )
 
 // GetInstalledNodeVersion checks the installed Node.js version on the system.
-func GetInstalledNodeVersion() (string, error) {
+func GetInstalledNodeVersion(ctx context.Context) (string, error) {
 	// Check if Node.js is installed
 	nodePath, err := exec.LookPath("node")
 	if err != nil {
@@ -17,7 +18,7 @@ func GetInstalledNodeVersion() (string, error) {
 	}
 
 	// Get the Node.js version
-	cmd := exec.Command(nodePath, "-v")
+	cmd := exec.CommandContext(ctx, nodePath, "-v")
 	output, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("failed to get Node.js version: %w, output: %s", err, string(output))
@@ -33,8 +34,8 @@ func GetInstalledNodeVersion() (string, error) {
 }
 
 // IsNodeVersionAtLeast checks if the installed Node.js version meets the minimum required version.
-func IsNodeVersionAtLeast(requiredVersion string) (bool, error) {
-	installedVersion, err := GetInstalledNodeVersion()
+func IsNodeVersionAtLeast(ctx context.Context, requiredVersion string) (bool, error) {
+	installedVersion, err := GetInstalledNodeVersion(ctx)
 	if err != nil {
 		return false, err
 	}

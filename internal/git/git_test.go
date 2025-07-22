@@ -94,7 +94,7 @@ func TestGetPublicVCSURL(t *testing.T) {
 func runCommand(t *testing.T, tmpDir string, args ...string) {
 	t.Helper()
 
-	c := exec.Command("git", args...)
+	c := exec.CommandContext(t.Context(), "git", args...)
 	c.Dir = tmpDir
 
 	out, err := c.CombinedOutput()

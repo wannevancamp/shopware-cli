@@ -1,6 +1,7 @@
 package system
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -9,7 +10,7 @@ import (
 )
 
 // GetInstalledPHPVersion checks the installed PHP version on the system.
-func GetInstalledPHPVersion() (string, error) {
+func GetInstalledPHPVersion(ctx context.Context) (string, error) {
 	// Check if PHP is installed
 	phpPath, err := exec.LookPath("php")
 	if err != nil {
@@ -17,7 +18,7 @@ func GetInstalledPHPVersion() (string, error) {
 	}
 
 	// Get the PHP version
-	cmd := exec.Command(phpPath, "-v")
+	cmd := exec.CommandContext(ctx, phpPath, "-v")
 	output, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("failed to get PHP version: %w, output: %s", err, string(output))
@@ -34,8 +35,8 @@ func GetInstalledPHPVersion() (string, error) {
 	return strings.TrimSpace(version), nil
 }
 
-func IsPHPVersionAtLeast(requiredVersion string) (bool, error) {
-	installedVersion, err := GetInstalledPHPVersion()
+func IsPHPVersionAtLeast(ctx context.Context, requiredVersion string) (bool, error) {
+	installedVersion, err := GetInstalledPHPVersion(ctx)
 	if err != nil {
 		return false, err
 	}

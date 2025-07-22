@@ -138,7 +138,7 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 					additionalNpmParameters = []string{"--production"}
 				}
 
-				if err := InstallNPMDependencies(administrationRoot, npmPackage, additionalNpmParameters...); err != nil {
+				if err := InstallNPMDependencies(ctx, administrationRoot, npmPackage, additionalNpmParameters...); err != nil {
 					return err
 				}
 			}
@@ -150,6 +150,7 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 			}
 
 			err = npmRunBuild(
+				ctx,
 				administrationRoot,
 				"build",
 				envList,
@@ -243,13 +244,13 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 					additionalNpmParameters = append(additionalNpmParameters, "--production")
 				}
 
-				if err := InstallNPMDependencies(storefrontRoot, npmPackage, additionalNpmParameters...); err != nil {
+				if err := InstallNPMDependencies(ctx, storefrontRoot, npmPackage, additionalNpmParameters...); err != nil {
 					return err
 				}
 
 				// As we call npm install caniuse-lite, we need to run the postinstal script manually.
 				if npmPackage.HasScript("postinstall") {
-					npmRunPostInstall := exec.Command("npm", "run", "postinstall")
+					npmRunPostInstall := exec.CommandContext(ctx, "npm", "run", "postinstall")
 					npmRunPostInstall.Dir = storefrontRoot
 					npmRunPostInstall.Stdout = os.Stdout
 					npmRunPostInstall.Stderr = os.Stderr
@@ -280,7 +281,7 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 				envList = append(envList, fmt.Sprintf("BROWSERSLIST=%s", assetConfig.Browserslist))
 			}
 
-			nodeWebpackCmd := exec.Command("node", "node_modules/.bin/webpack", "--config", "webpack.config.js")
+			nodeWebpackCmd := exec.CommandContext(ctx, "node", "node_modules/.bin/webpack", "--config", "webpack.config.js")
 			nodeWebpackCmd.Dir = storefrontRoot
 			nodeWebpackCmd.Env = os.Environ()
 			nodeWebpackCmd.Env = append(nodeWebpackCmd.Env, envList...)
@@ -429,7 +430,7 @@ func processNpmInstallJob(ctx context.Context, job npmInstallJob) npmInstallResu
 
 	logging.FromContext(ctx).Infof("Installing npm dependencies in %s %s\n", job.npmPath, job.additionalText)
 
-	if err := InstallNPMDependencies(job.npmPath, npmPackage, job.additionalNpmParams...); err != nil {
+	if err := InstallNPMDependencies(ctx, job.npmPath, npmPackage, job.additionalNpmParams...); err != nil {
 		return npmInstallResult{err: err}
 	}
 
@@ -447,8 +448,8 @@ func deletePaths(ctx context.Context, nodeModulesPaths ...string) {
 	}
 }
 
-func npmRunBuild(path string, buildCmd string, buildEnvVariables []string) error {
-	npmBuildCmd := exec.Command("npm", "--prefix", path, "run", buildCmd) //nolint:gosec
+func npmRunBuild(ctx context.Context, path string, buildCmd string, buildEnvVariables []string) error {
+	npmBuildCmd := exec.CommandContext(ctx, "npm", "--prefix", path, "run", buildCmd) //nolint:gosec
 	npmBuildCmd.Env = os.Environ()
 	npmBuildCmd.Env = append(npmBuildCmd.Env, buildEnvVariables...)
 	npmBuildCmd.Stdout = os.Stdout
@@ -461,7 +462,7 @@ func npmRunBuild(path string, buildCmd string, buildEnvVariables []string) error
 	return nil
 }
 
-func InstallNPMDependencies(path string, packageJsonData NpmPackage, additionalParams ...string) error {
+func InstallNPMDependencies(ctx context.Context, path string, packageJsonData NpmPackage, additionalParams ...string) error {
 	isProductionMode := false
 
 	for _, param := range additionalParams {
@@ -474,7 +475,7 @@ func InstallNPMDependencies(path string, packageJsonData NpmPackage, additionalP
 		return nil
 	}
 
-	installCmd := exec.Command("npm", "install", "--no-audit", "--no-fund", "--prefer-offline", "--loglevel=error")
+	installCmd := exec.CommandContext(ctx, "npm", "install", "--no-audit", "--no-fund", "--prefer-offline", "--loglevel=error")
 	installCmd.Args = append(installCmd.Args, additionalParams...)
 	installCmd.Dir = path
 	installCmd.Env = os.Environ()
@@ -681,7 +682,7 @@ func setupShopwareInTemp(ctx context.Context, minVersion string) (string, error)
 
 	logging.FromContext(ctx).Infof("Cloning shopware with branch: %s into %s", branch, dir)
 
-	gitCheckoutCmd := exec.Command("git", "clone", "https://github.com/shopware/shopware.git", "--depth=1", "-b", branch, dir)
+	gitCheckoutCmd := exec.CommandContext(ctx, "git", "clone", "https://github.com/shopware/shopware.git", "--depth=1", "-b", branch, dir)
 	gitCheckoutCmd.Stdout = os.Stdout
 	gitCheckoutCmd.Stderr = os.Stderr
 	err = gitCheckoutCmd.Run()

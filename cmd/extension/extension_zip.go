@@ -1,6 +1,7 @@
 package extension
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -95,7 +96,7 @@ var extensionZipCmd = &cobra.Command{
 		} else {
 			gitCommit, _ := cmd.Flags().GetString("git-commit")
 
-			tag, err = extension.GitCopyFolder(extPath, extDir, gitCommit)
+			tag, err = extension.GitCopyFolder(cmd.Context(), extPath, extDir, gitCommit)
 			if err != nil {
 				return fmt.Errorf("copy via git: %w", err)
 			}
@@ -109,7 +110,7 @@ var extensionZipCmd = &cobra.Command{
 		}
 
 		if extCfg.Build.Zip.Composer.Enabled {
-			if err := executeHooks(ext, extCfg.Build.Zip.Composer.BeforeHooks, extDir); err != nil {
+			if err := executeHooks(cmd.Context(), ext, extCfg.Build.Zip.Composer.BeforeHooks, extDir); err != nil {
 				return fmt.Errorf("before hooks composer: %w", err)
 			}
 
@@ -117,7 +118,7 @@ var extensionZipCmd = &cobra.Command{
 				return fmt.Errorf("prepare package: %w", err)
 			}
 
-			if err := executeHooks(ext, extCfg.Build.Zip.Composer.AfterHooks, extDir); err != nil {
+			if err := executeHooks(cmd.Context(), ext, extCfg.Build.Zip.Composer.AfterHooks, extDir); err != nil {
 				return fmt.Errorf("after hooks composer: %w", err)
 			}
 		}
@@ -127,7 +128,7 @@ var extensionZipCmd = &cobra.Command{
 		}
 
 		if extCfg.Build.Zip.Assets.Enabled {
-			if err := executeHooks(ext, extCfg.Build.Zip.Assets.BeforeHooks, extDir); err != nil {
+			if err := executeHooks(cmd.Context(), ext, extCfg.Build.Zip.Assets.BeforeHooks, extDir); err != nil {
 				return fmt.Errorf("before hooks assets: %w", err)
 			}
 
@@ -146,7 +147,7 @@ var extensionZipCmd = &cobra.Command{
 				return fmt.Errorf("building assets: %w", err)
 			}
 
-			if err := executeHooks(ext, extCfg.Build.Zip.Assets.AfterHooks, extDir); err != nil {
+			if err := executeHooks(cmd.Context(), ext, extCfg.Build.Zip.Assets.AfterHooks, extDir); err != nil {
 				return fmt.Errorf("after hooks assets: %w", err)
 			}
 		}
@@ -202,7 +203,7 @@ var extensionZipCmd = &cobra.Command{
 			fileName = path.Join(outputDir, fileName)
 		}
 
-		if err := executeHooks(ext, extCfg.Build.Zip.Pack.BeforeHooks, extDir); err != nil {
+		if err := executeHooks(cmd.Context(), ext, extCfg.Build.Zip.Pack.BeforeHooks, extDir); err != nil {
 			return fmt.Errorf("before hooks pack: %w", err)
 		}
 
@@ -237,14 +238,14 @@ func getStringOnStringError(val string, _ error) string {
 	return val
 }
 
-func executeHooks(ext extension.Extension, hooks []string, extDir string) error {
+func executeHooks(ctx context.Context, ext extension.Extension, hooks []string, extDir string) error {
 	env := []string{
 		fmt.Sprintf("EXTENSION_DIR=%s", extDir),
 		fmt.Sprintf("ORIGINAL_EXTENSION_DIR=%s", ext.GetPath()),
 	}
 
 	for _, hook := range hooks {
-		hookCmd := exec.Command("sh", "-c", hook)
+		hookCmd := exec.CommandContext(ctx, "sh", "-c", hook)
 		hookCmd.Stdout = os.Stdout
 		hookCmd.Stderr = os.Stderr
 		hookCmd.Dir = extDir

@@ -11,7 +11,7 @@ import (
 
 func TestGetNodeVersionNotInstalled(t *testing.T) {
 	t.Setenv("PATH", "")
-	_, err := GetInstalledNodeVersion()
+	_, err := GetInstalledNodeVersion(t.Context())
 	assert.ErrorContains(t, err, "node.js is not installed")
 }
 
@@ -20,14 +20,14 @@ func TestGetNodeVersion(t *testing.T) {
 
 	setupFakeNode(t, tmpDir, "18.16.0")
 
-	nodeVersion, err := GetInstalledNodeVersion()
+	nodeVersion, err := GetInstalledNodeVersion(t.Context())
 	assert.NoError(t, err)
 	assert.Equal(t, "18.16.0", nodeVersion)
 }
 
 func TestNodeVersionIsAtLeast(t *testing.T) {
 	setupFakeNode(t, t.TempDir(), "18.16.0")
-	hit, err := IsNodeVersionAtLeast("16.0.0")
+	hit, err := IsNodeVersionAtLeast(t.Context(), "16.0.0")
 
 	assert.NoError(t, err)
 	assert.True(t, hit, "node.js version should be at least 16.0.0")
@@ -35,7 +35,7 @@ func TestNodeVersionIsAtLeast(t *testing.T) {
 
 func TestNodeVersionIsNotAtLeast(t *testing.T) {
 	setupFakeNode(t, t.TempDir(), "14.17.0")
-	hit, err := IsNodeVersionAtLeast("16.0.0")
+	hit, err := IsNodeVersionAtLeast(t.Context(), "16.0.0")
 
 	assert.NoError(t, err)
 	assert.False(t, hit, "node.js version should not be at least 16.0.0")

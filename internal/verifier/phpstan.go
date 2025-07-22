@@ -60,7 +60,7 @@ func (p PhpStan) Check(ctx context.Context, check *Check, config ToolConfig) err
 		return nil
 	}
 
-	if err := installComposerDeps(config.RootDir, config.CheckAgainst); err != nil {
+	if err := installComposerDeps(ctx, config.RootDir, config.CheckAgainst); err != nil {
 		return err
 	}
 

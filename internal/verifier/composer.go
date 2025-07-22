@@ -1,6 +1,7 @@
 package verifier
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -10,7 +11,7 @@ import (
 	"github.com/shopware/shopware-cli/internal/packagist"
 )
 
-func installComposerDeps(rootDir string, checkAgainst string) error {
+func installComposerDeps(ctx context.Context, rootDir string, checkAgainst string) error {
 	suggets := getComposerSuggets(rootDir)
 
 	if _, err := os.Stat(path.Join(rootDir, "vendor")); os.IsNotExist(err) {
@@ -30,7 +31,7 @@ func installComposerDeps(rootDir string, checkAgainst string) error {
 				additionalParams = append(additionalParams, fmt.Sprintf("%s:*", suggest))
 			}
 
-			composerInstall := exec.Command("composer", additionalParams...)
+			composerInstall := exec.CommandContext(ctx, "composer", additionalParams...)
 			composerInstall.Env = append(os.Environ(), fmt.Sprintf("COMPOSER_AUTH=%s", encoded))
 			composerInstall.Dir = rootDir
 
@@ -49,7 +50,7 @@ func installComposerDeps(rootDir string, checkAgainst string) error {
 			additionalParams = append(additionalParams, "--prefer-lowest")
 		}
 
-		composerInstall := exec.Command("composer", additionalParams...)
+		composerInstall := exec.CommandContext(ctx, "composer", additionalParams...)
 		composerInstall.Env = append(os.Environ(), fmt.Sprintf("COMPOSER_AUTH=%s", encoded))
 		composerInstall.Dir = rootDir
 

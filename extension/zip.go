@@ -421,7 +421,7 @@ func PrepareFolderForZipping(ctx context.Context, path string, ext Extension, ex
 	}
 
 	// Execute composer in this directory
-	composerInstallCmd := exec.Command("composer", "install", "-d", path, "--no-dev", "-n", "-o")
+	composerInstallCmd := exec.CommandContext(ctx, "composer", "install", "-d", path, "--no-dev", "-n", "-o")
 	composerInstallCmd.Stdout = os.Stdout
 	composerInstallCmd.Stderr = os.Stderr
 	err = composerInstallCmd.Run()

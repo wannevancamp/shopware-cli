@@ -33,13 +33,13 @@ func SetupTools(ctx context.Context, currentVersion string) error {
 		return nil
 	}
 
-	if ok, err := system.IsPHPVersionAtLeast("8.2.0"); err != nil {
+	if ok, err := system.IsPHPVersionAtLeast(ctx, "8.2.0"); err != nil {
 		return fmt.Errorf("failed to check installed PHP version: %w", err)
 	} else if !ok {
 		return fmt.Errorf("php version must be at least 8.2.0 to use this. Update your PHP version or use the shopware-cli docker image")
 	}
 
-	if ok, err := system.IsNodeVersionAtLeast("20.0.0"); err != nil {
+	if ok, err := system.IsNodeVersionAtLeast(ctx, "20.0.0"); err != nil {
 		return fmt.Errorf("failed to check installed Node.js version: %w", err)
 	} else if !ok {
 		return fmt.Errorf("node.js version must be at least 20.0.0 to use this. Update your Node.js version or use the shopware-cli docker image")
@@ -57,7 +57,7 @@ func SetupTools(ctx context.Context, currentVersion string) error {
 		return fmt.Errorf("failed to unpack file: %w", err)
 	}
 
-	composerInstall := exec.Command("composer", "install", "--no-dev")
+	composerInstall := exec.CommandContext(ctx, "composer", "install", "--no-dev")
 	composerInstall.Dir = path.Join(toolsDir, "php")
 
 	if output, err := composerInstall.CombinedOutput(); err != nil {
@@ -68,7 +68,7 @@ func SetupTools(ctx context.Context, currentVersion string) error {
 		return fmt.Errorf("failed to install composer dependencies: %w", err)
 	}
 
-	jsInstall := exec.Command("npm", "install")
+	jsInstall := exec.CommandContext(ctx, "npm", "install")
 	jsInstall.Dir = path.Join(toolsDir, "js")
 
 	if output, err := jsInstall.CombinedOutput(); err != nil {
