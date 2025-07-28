@@ -147,12 +147,6 @@ var projectDatabaseDumpCmd = &cobra.Command{
 				"product_review": map[string]string{
 					"email": "faker.Internet.Email()",
 				},
-				"user": map[string]string{
-					"username":   "faker.Person.Name()",
-					"first_name": "faker.Person.FirstName()",
-					"last_name":  "faker.Person.LastName()",
-					"email":      "faker.Internet.Email()",
-				},
 			}
 		}
 
