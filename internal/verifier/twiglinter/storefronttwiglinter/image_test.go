@@ -35,7 +35,7 @@ func TestImageAltDetection(t *testing.T) {
 			expectedCount: 1,
 		},
 		{
-			name:          "Multiple images - some valid, some invalid",
+			name: "Multiple images - some valid, some invalid",
 			content: `
 				<img src="valid.jpg" alt="Valid description">
 				<img src="invalid1.jpg">
@@ -60,7 +60,7 @@ func TestImageAltDetection(t *testing.T) {
 			expectedCount: 1,
 		},
 		{
-			name:          "Nested image in complex HTML",
+			name: "Nested image in complex HTML",
 			content: `
 				<div class="gallery">
 					<figure>
