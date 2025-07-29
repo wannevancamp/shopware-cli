@@ -35,7 +35,7 @@ func validateExtensionIcon(ext Extension, check validation.Check) {
 			check.AddResult(validation.CheckResult{
 				Path:       relPath,
 				Identifier: "metadata.icon.size",
-				Message:    fmt.Sprintf("The extension icon %s is bigger than 30kb", relPath),
+				Message:    fmt.Sprintf("The extension icon %s is bigger than 30kb. Please think of loading times and shrink your PNG file with tools like tinypng.com to less than 30kb", relPath),
 				Severity:   validation.SeverityError,
 			})
 		}
