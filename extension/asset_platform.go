@@ -330,11 +330,17 @@ func InstallNodeModulesOfConfigs(ctx context.Context, cfgs ExtensionAssetConfig,
 	// Collect all npm install jobs
 	jobs := make([]npmInstallJob, 0)
 
+	addedJobs := make(map[string]bool)
+
 	// Install shared node_modules between admin and storefront
 	for _, entry := range cfgs {
 		possibleNodePaths := []string{
 			// shared between admin and storefront
 			path.Join(entry.BasePath, "Resources", "app", "package.json"),
+			path.Join(entry.BasePath, "package.json"),
+			path.Join(path.Dir(entry.BasePath), "package.json"),
+			path.Join(path.Dir(path.Dir(entry.BasePath)), "package.json"),
+			path.Join(path.Dir(path.Dir(path.Dir(entry.BasePath))), "package.json"),
 		}
 
 		// only try administration and storefront node_modules folder when we have an entry file
@@ -363,6 +369,12 @@ func InstallNodeModulesOfConfigs(ctx context.Context, cfgs ExtensionAssetConfig,
 				additionalText := ""
 				if !entry.NpmStrict {
 					additionalText = " (consider enabling npm_strict mode, to install only production relevant dependencies)"
+				}
+
+				if !addedJobs[npmPath] {
+					addedJobs[npmPath] = true
+				} else {
+					continue
 				}
 
 				jobs = append(jobs, npmInstallJob{
