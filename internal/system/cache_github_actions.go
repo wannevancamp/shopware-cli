@@ -31,6 +31,10 @@ func NewGitHubActionsCache(prefix string) (*GitHubActionsCache, error) {
 		return nil, fmt.Errorf("failed to create GitHub Actions cache client: %w", err)
 	}
 
+	if client == nil {
+		return nil, fmt.Errorf("GitHub Actions cache client is not available")
+	}
+
 	return &GitHubActionsCache{
 		client:    client,
 		prefix:    prefix,
