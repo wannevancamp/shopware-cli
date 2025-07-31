@@ -171,6 +171,7 @@ var accountCompanyProducerExtensionUploadCmd = &cobra.Command{
 
 				if maxTries == tried {
 					logging.FromContext(cmd.Context()).Infof("Skipping waiting for code review result as it took too long")
+					break
 				}
 			}
 		}
