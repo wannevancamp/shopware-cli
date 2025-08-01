@@ -583,13 +583,13 @@ func BuildAssetConfigFromExtensions(ctx context.Context, sources []asset.Source,
 			}
 		}
 
-		list[source.Name] = &sourceConfig
+		list[source.Name] = sourceConfig
 	}
 
 	return list
 }
 
-func createConfigFromPath(entryPointName string, extensionRoot string) ExtensionAssetConfigEntry {
+func createConfigFromPath(entryPointName string, extensionRoot string) *ExtensionAssetConfigEntry {
 	var entryFilePathAdmin, entryFilePathStorefront, webpackFileAdmin, webpackFileStorefront *string
 	storefrontStyles := make([]string, 0)
 
@@ -657,7 +657,7 @@ func createConfigFromPath(entryPointName string, extensionRoot string) Extension
 			StyleFiles:    storefrontStyles,
 		},
 	}
-	return cfg
+	return &cfg
 }
 
 func setupShopwareInTemp(ctx context.Context, minVersion string) (string, error) {
