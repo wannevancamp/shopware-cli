@@ -208,7 +208,7 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 			}
 
 			entryPath := "Resources/app/storefront/src/main.js"
-			nonCompatibleExtensions["Storefront"] = ExtensionAssetConfigEntry{
+			nonCompatibleExtensions["Storefront"] = &ExtensionAssetConfigEntry{
 				BasePath:      basePath,
 				Views:         []string{"Resources/views"},
 				TechnicalName: "storefront",
@@ -334,55 +334,35 @@ func InstallNodeModulesOfConfigs(ctx context.Context, cfgs ExtensionAssetConfig,
 
 	// Install shared node_modules between admin and storefront
 	for _, entry := range cfgs {
-		possibleNodePaths := []string{
-			// shared between admin and storefront
-			path.Join(entry.BasePath, "Resources", "app", "package.json"),
-			path.Join(entry.BasePath, "package.json"),
-			path.Join(path.Dir(entry.BasePath), "package.json"),
-			path.Join(path.Dir(path.Dir(entry.BasePath)), "package.json"),
-			path.Join(path.Dir(path.Dir(path.Dir(entry.BasePath))), "package.json"),
-		}
-
-		// only try administration and storefront node_modules folder when we have an entry file
-		if entry.Administration.EntryFilePath != nil {
-			possibleNodePaths = append(possibleNodePaths, path.Join(entry.BasePath, "Resources", "app", "administration", "package.json"), path.Join(entry.BasePath, "Resources", "app", "administration", "src", "package.json"))
-		}
-
-		if entry.Storefront.EntryFilePath != nil {
-			possibleNodePaths = append(possibleNodePaths, path.Join(entry.BasePath, "Resources", "app", "storefront", "package.json"), path.Join(entry.BasePath, "Resources", "app", "storefront", "src", "package.json"))
-		}
-
 		additionalNpmParameters := []string{}
 
 		if entry.NpmStrict {
 			additionalNpmParameters = []string{"--production"}
 		}
 
-		for _, possibleNodePath := range possibleNodePaths {
-			if _, err := os.Stat(possibleNodePath); err == nil {
-				npmPath := path.Dir(possibleNodePath)
+		for _, possibleNodePath := range entry.getPossibleNodePaths() {
+			npmPath := path.Dir(possibleNodePath)
 
-				if !force && nodeModulesExists(npmPath) {
-					continue
-				}
-
-				additionalText := ""
-				if !entry.NpmStrict {
-					additionalText = " (consider enabling npm_strict mode, to install only production relevant dependencies)"
-				}
-
-				if !addedJobs[npmPath] {
-					addedJobs[npmPath] = true
-				} else {
-					continue
-				}
-
-				jobs = append(jobs, npmInstallJob{
-					npmPath:             npmPath,
-					additionalNpmParams: additionalNpmParameters,
-					additionalText:      additionalText,
-				})
+			if !force && nodeModulesExists(npmPath) {
+				continue
 			}
+
+			additionalText := ""
+			if !entry.NpmStrict {
+				additionalText = " (consider enabling npm_strict mode, to install only production relevant dependencies)"
+			}
+
+			if !addedJobs[npmPath] {
+				addedJobs[npmPath] = true
+			} else {
+				continue
+			}
+
+			jobs = append(jobs, npmInstallJob{
+				npmPath:             npmPath,
+				additionalNpmParams: additionalNpmParameters,
+				additionalText:      additionalText,
+			})
 		}
 	}
 
@@ -515,7 +495,7 @@ func getNpmPackage(root string) (NpmPackage, error) {
 	return packageJsonData, nil
 }
 
-func prepareShopwareForAsset(shopwareRoot string, cfgs map[string]ExtensionAssetConfigEntry) error {
+func prepareShopwareForAsset(shopwareRoot string, cfgs ExtensionAssetConfig) error {
 	varFolder := fmt.Sprintf("%s/var", shopwareRoot)
 	if _, err := os.Stat(varFolder); os.IsNotExist(err) {
 		err := os.Mkdir(varFolder, os.ModePerm)
@@ -603,7 +583,7 @@ func BuildAssetConfigFromExtensions(ctx context.Context, sources []asset.Source,
 			}
 		}
 
-		list[source.Name] = sourceConfig
+		list[source.Name] = &sourceConfig
 	}
 
 	return list
@@ -705,7 +685,7 @@ func setupShopwareInTemp(ctx context.Context, minVersion string) (string, error)
 	return dir, nil
 }
 
-type ExtensionAssetConfig map[string]ExtensionAssetConfigEntry
+type ExtensionAssetConfig map[string]*ExtensionAssetConfigEntry
 
 func (c ExtensionAssetConfig) Has(name string) bool {
 	_, ok := c[name]
@@ -817,6 +797,44 @@ type ExtensionAssetConfigEntry struct {
 	EnableESBuildForStorefront bool
 	DisableSass                bool
 	NpmStrict                  bool
+
+	// internal cache
+	cachedPossibleNodePaths []string
+	once                    sync.Once
+}
+
+func (e *ExtensionAssetConfigEntry) getPossibleNodePaths() []string {
+	e.once.Do(func() {
+		possibleNodePaths := []string{
+			// shared between admin and storefront
+			path.Join(e.BasePath, "Resources", "app", "package.json"),
+			path.Join(e.BasePath, "package.json"),
+			path.Join(path.Dir(e.BasePath), "package.json"),
+			path.Join(path.Dir(path.Dir(e.BasePath)), "package.json"),
+			path.Join(path.Dir(path.Dir(path.Dir(e.BasePath))), "package.json"),
+		}
+
+		// only try administration and storefront node_modules folder when we have an entry file
+		if e.Administration.EntryFilePath != nil {
+			possibleNodePaths = append(possibleNodePaths, path.Join(e.BasePath, "Resources", "app", "administration", "package.json"), path.Join(e.BasePath, "Resources", "app", "administration", "src", "package.json"))
+		}
+
+		if e.Storefront.EntryFilePath != nil {
+			possibleNodePaths = append(possibleNodePaths, path.Join(e.BasePath, "Resources", "app", "storefront", "package.json"), path.Join(e.BasePath, "Resources", "app", "storefront", "src", "package.json"))
+		}
+
+		existingPaths := make([]string, 0)
+
+		for _, possibleNodePath := range possibleNodePaths {
+			if _, err := os.Stat(possibleNodePath); err == nil {
+				existingPaths = append(existingPaths, possibleNodePath)
+			}
+		}
+
+		e.cachedPossibleNodePaths = existingPaths
+	})
+
+	return e.cachedPossibleNodePaths
 }
 
 type ExtensionAssetConfigAdmin struct {
