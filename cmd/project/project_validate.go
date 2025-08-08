@@ -23,6 +23,7 @@ var projectValidateCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		reportingFormat, _ := cmd.Flags().GetString("reporter")
 		only, _ := cmd.Flags().GetString("only")
+		exclude, _ := cmd.Flags().GetString("exclude")
 		tmpDir, err := os.MkdirTemp(os.TempDir(), "analyse-project-*")
 		noCopy, _ := cmd.Flags().GetBool("no-copy")
 		if err != nil {
@@ -79,6 +80,11 @@ var projectValidateCmd = &cobra.Command{
 			return err
 		}
 
+		tools, err = tools.Exclude(exclude)
+		if err != nil {
+			return err
+		}
+
 		for _, tool := range tools {
 			tool := tool
 			gr.Go(func() error {
@@ -100,5 +106,6 @@ func init() {
 	projectRootCmd.AddCommand(projectValidateCmd)
 	projectValidateCmd.PersistentFlags().String("reporter", "", "Reporting format (summary, json, github, junit, markdown)")
 	projectValidateCmd.PersistentFlags().String("only", "", "Run only specific tools by name (comma-separated, e.g. phpstan,eslint)")
+	projectValidateCmd.PersistentFlags().String("exclude", "", "Exclude specific tools by name (comma-separated, e.g. phpstan,eslint)")
 	projectValidateCmd.PersistentFlags().Bool("no-copy", false, "Do not copy project files to temporary directory")
 }
