@@ -26,6 +26,7 @@ var extensionValidateCmd = &cobra.Command{
 		checkAgainst, _ := cmd.Flags().GetString("check-against")
 		tmpDir, err := os.MkdirTemp(os.TempDir(), "analyse-extension-*")
 		only, _ := cmd.Flags().GetString("only")
+		exclude, _ := cmd.Flags().GetString("exclude")
 
 		// If the user does not want to run full validation, only run shopware-cli
 		if !isFull {
@@ -107,6 +108,11 @@ var extensionValidateCmd = &cobra.Command{
 			return err
 		}
 
+		tools, err = tools.Exclude(exclude)
+		if err != nil {
+			return err
+		}
+
 		for _, tool := range tools {
 			tool := tool
 			gr.Go(func() error {
@@ -129,6 +135,7 @@ func init() {
 	extensionValidateCmd.PersistentFlags().String("reporter", "", "Reporting format (summary, json, github, junit, markdown)")
 	extensionValidateCmd.PersistentFlags().String("check-against", "highest", "Check against Shopware Version (highest, lowest)")
 	extensionValidateCmd.PersistentFlags().String("only", "", "Run only specific tools by name (comma-separated, e.g. phpstan,eslint)")
+	extensionValidateCmd.PersistentFlags().String("exclude", "", "Exclude specific tools by name (comma-separated, e.g. phpstan,eslint)")
 	extensionValidateCmd.PreRunE = func(cmd *cobra.Command, args []string) error {
 		reporter, _ := cmd.Flags().GetString("reporter")
 		if reporter != "summary" && reporter != "json" && reporter != "github" && reporter != "junit" && reporter != "markdown" && reporter != "" {

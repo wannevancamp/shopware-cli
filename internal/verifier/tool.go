@@ -82,6 +82,54 @@ func (tl ToolList) Only(only string) (ToolList, error) {
 	return filteredTools, nil
 }
 
+// Exclude filters out tools listed in the comma-separated exclude string.
+// Returns an error if any specified tool name does not exist in the current list.
+func (tl ToolList) Exclude(exclude string) (ToolList, error) {
+	if exclude == "" {
+		return tl, nil
+	}
+
+	requested := strings.Split(exclude, ",")
+
+	// Validate all requested excludes exist
+	for _, name := range requested {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+		found := false
+		for _, t := range tl {
+			if t.Name() == name {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil, fmt.Errorf("tool with name %q not found, possible tools: %s", name, tl.PossibleString())
+		}
+	}
+
+	// Build filtered list excluding requested names
+	excludeSet := map[string]struct{}{}
+	for _, name := range requested {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+		excludeSet[name] = struct{}{}
+	}
+
+	var filtered ToolList
+	for _, t := range tl {
+		if _, ok := excludeSet[t.Name()]; ok {
+			continue
+		}
+		filtered = append(filtered, t)
+	}
+
+	return filtered, nil
+}
+
 func (tl ToolList) PossibleString() string {
 	var possibleTools []string
 	for _, t := range tl {
