@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -134,31 +133,31 @@ var projectCreateCmd = &cobra.Command{
 			return err
 		}
 
-		if err := os.WriteFile(fmt.Sprintf("%s/composer.json", projectFolder), []byte(composerJson), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, "composer.json"), []byte(composerJson), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(fmt.Sprintf("%s/.env", projectFolder), []byte(""), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, ".env"), []byte(""), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(fmt.Sprintf("%s/.env.local", projectFolder), []byte(""), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, ".env.local"), []byte(""), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(fmt.Sprintf("%s/.gitignore", projectFolder), []byte("/.idea\n/vendor"), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, ".gitignore"), []byte("/.idea\n/vendor"), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.MkdirAll(fmt.Sprintf("%s/custom/plugins", projectFolder), os.ModePerm); err != nil {
+		if err := os.MkdirAll(filepath.Join(projectFolder, "custom", "plugins"), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.MkdirAll(fmt.Sprintf("%s/custom/static-plugins", projectFolder), os.ModePerm); err != nil {
+		if err := os.MkdirAll(filepath.Join(projectFolder, "custom", "static-plugins"), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(path.Join(projectFolder, "php.ini"), []byte("memory_limit=512M"), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, "php.ini"), []byte("memory_limit=512M"), os.ModePerm); err != nil {
 			return err
 		}
 
