@@ -2,13 +2,17 @@ package extension
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"os"
 	"path"
 	"path/filepath"
 	"slices"
+	"sort"
 	"strings"
 	"sync"
 
+	"github.com/cespare/xxhash/v2"
 	"github.com/shyim/go-version"
 
 	"github.com/shopware/shopware-cli/internal/asset"
@@ -158,6 +162,12 @@ type ExtensionAssetConfigEntry struct {
 	// internal cache
 	cachedPossibleNodePaths []string
 	once                    sync.Once
+
+	sumOfFiles string
+}
+
+func (e *ExtensionAssetConfigEntry) RequiresBuild() bool {
+	return e.Administration.EntryFilePath != nil || e.Storefront.EntryFilePath != nil
 }
 
 func (e *ExtensionAssetConfigEntry) getPossibleNodePaths() []string {
@@ -192,6 +202,194 @@ func (e *ExtensionAssetConfigEntry) getPossibleNodePaths() []string {
 	})
 
 	return e.cachedPossibleNodePaths
+}
+
+// GetContentHash returns a cached xxhash of all relevant files in the extension
+func (e *ExtensionAssetConfigEntry) GetContentHash() (string, error) {
+	if e.sumOfFiles != "" {
+		return e.sumOfFiles, nil
+	}
+
+	files, err := e.collectFilesForHashing()
+	if err != nil {
+		return "", fmt.Errorf("failed to collect files: %w", err)
+	}
+
+	// Sort files to ensure consistent hashing
+	sort.Strings(files)
+
+	// Parallelize file hashing
+	type fileHash struct {
+		path string
+		hash uint64
+		err  error
+	}
+
+	// Use worker pool pattern for parallel hashing
+	numWorkers := 8
+	if len(files) < numWorkers {
+		numWorkers = len(files)
+	}
+
+	fileChan := make(chan string, len(files))
+	resultChan := make(chan fileHash, len(files))
+
+	// Start workers
+	var wg sync.WaitGroup
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for filePath := range fileChan {
+				hash, err := e.hashSingleFile(filePath)
+				resultChan <- fileHash{path: filePath, hash: hash, err: err}
+			}
+		}()
+	}
+
+	// Send files to workers
+	for _, file := range files {
+		fileChan <- file
+	}
+	close(fileChan)
+
+	// Wait for workers to finish
+	go func() {
+		wg.Wait()
+		close(resultChan)
+	}()
+
+	// Collect results and combine hashes
+	fileHashes := make(map[string]uint64)
+	for result := range resultChan {
+		if result.err != nil {
+			return "", fmt.Errorf("failed to hash file %s: %w", result.path, result.err)
+		}
+		fileHashes[result.path] = result.hash
+	}
+
+	// Combine hashes in sorted order for consistency
+	hasher := xxhash.New()
+	for _, file := range files {
+		// Write file path and its hash
+		if _, err := hasher.Write([]byte(file)); err != nil {
+			return "", err
+		}
+		if _, err := fmt.Fprintf(hasher, "%x", fileHashes[file]); err != nil {
+			return "", err
+		}
+	}
+
+	e.sumOfFiles = fmt.Sprintf("%x", hasher.Sum64())
+	return e.sumOfFiles, nil
+}
+
+// collectFilesForHashing collects all relevant files that should be included in the hash
+func (e *ExtensionAssetConfigEntry) collectFilesForHashing() ([]string, error) {
+	var files []string
+
+	// Collect administration files
+	if e.Administration.EntryFilePath != nil {
+		adminPath := path.Join(e.BasePath, e.Administration.Path)
+		if err := e.collectFilesFromDir(adminPath, &files); err != nil {
+			return nil, fmt.Errorf("failed to collect admin files: %w", err)
+		}
+
+		// Add webpack config if exists
+		if e.Administration.Webpack != nil {
+			files = append(files, path.Join(e.BasePath, *e.Administration.Webpack))
+		}
+	}
+
+	// Collect storefront files
+	if e.Storefront.EntryFilePath != nil {
+		storefrontPath := path.Join(e.BasePath, e.Storefront.Path)
+		if err := e.collectFilesFromDir(storefrontPath, &files); err != nil {
+			return nil, fmt.Errorf("failed to collect storefront files: %w", err)
+		}
+
+		// Add webpack config if exists
+		if e.Storefront.Webpack != nil {
+			files = append(files, path.Join(e.BasePath, *e.Storefront.Webpack))
+		}
+
+		// Add style files
+		for _, styleFile := range e.Storefront.StyleFiles {
+			files = append(files, path.Join(e.BasePath, styleFile))
+		}
+	}
+
+	// Add package.json files
+	files = append(files, e.getPossibleNodePaths()...)
+
+	return files, nil
+}
+
+// collectFilesFromDir recursively collects all JS, TS, CSS, SCSS files from a directory
+func (e *ExtensionAssetConfigEntry) collectFilesFromDir(dir string, files *[]string) error {
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		return nil
+	}
+
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Skip directories and node_modules
+		if info.IsDir() || strings.Contains(path, "node_modules") {
+			return nil
+		}
+
+		// Only include relevant file types
+		ext := strings.ToLower(filepath.Ext(path))
+		if ext == ".js" || ext == ".ts" || ext == ".jsx" || ext == ".tsx" ||
+			ext == ".css" || ext == ".scss" || ext == ".sass" || ext == ".less" ||
+			ext == ".vue" || ext == ".json" {
+			*files = append(*files, path)
+		}
+
+		return nil
+	})
+
+	return err
+}
+
+// hashSingleFile hashes a single file and returns its hash
+func (e *ExtensionAssetConfigEntry) hashSingleFile(filePath string) (uint64, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		// File might not exist, return zero hash
+		if os.IsNotExist(err) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	defer func() {
+		_ = file.Close()
+	}()
+
+	hasher := xxhash.New()
+
+	// Write the file path to the hasher for uniqueness
+	if _, err := hasher.Write([]byte(filePath)); err != nil {
+		return 0, err
+	}
+
+	// Copy file content to hasher
+	if _, err := io.Copy(hasher, file); err != nil {
+		return 0, err
+	}
+
+	return hasher.Sum64(), nil
+}
+
+func (e *ExtensionAssetConfigEntry) GetOutputAdminPath() string {
+	return path.Join(e.BasePath, "Resources", "public", "administration")
+}
+
+func (e *ExtensionAssetConfigEntry) GetOutputStorefrontPath() string {
+	return path.Join(e.BasePath, "Resources", "app", "storefront", "dist", "storefront")
 }
 
 type ExtensionAssetConfigAdmin struct {

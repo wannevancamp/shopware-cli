@@ -26,6 +26,10 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 		return nil
 	}
 
+	if err := restoreAssetCaches(ctx, cfgs, assetConfig); err != nil {
+		return err
+	}
+
 	if !cfgs.RequiresAdminBuild() && !cfgs.RequiresStorefrontBuild() {
 		logging.FromContext(ctx).Infof("Building assets has been skipped as not required")
 		return nil
@@ -274,6 +278,10 @@ func BuildAssetsForExtensions(ctx context.Context, sources []asset.Source, asset
 		}
 
 		storefrontSection.End(ctx)
+	}
+
+	if err := storeAssetCaches(ctx, cfgs, assetConfig); err != nil {
+		return err
 	}
 
 	return nil
