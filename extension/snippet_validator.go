@@ -14,6 +14,8 @@ import (
 	"github.com/shopware/shopware-cli/internal/validation"
 )
 
+const jsonFileExtension = ".json"
+
 func validateStorefrontSnippets(ext Extension, check validation.Check) {
 	rootDir := ext.GetRootDir()
 
@@ -54,7 +56,7 @@ func validateStorefrontSnippetsByPath(snippetFolder, rootDir string, check valid
 			return nil
 		}
 
-		if filepath.Ext(path) != ".json" {
+		if filepath.Ext(path) != jsonFileExtension {
 			return nil
 		}
 
@@ -165,7 +167,7 @@ func validateAdministrationByPath(adminFolder, rootDir string, check validation.
 			return nil
 		}
 
-		if filepath.Ext(path) != ".json" {
+		if filepath.Ext(path) != jsonFileExtension {
 			return nil
 		}
 
