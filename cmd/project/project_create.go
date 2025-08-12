@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -47,6 +47,9 @@ var projectCreateCmd = &cobra.Command{
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		projectFolder := args[0]
+
+		useDocker, _ := cmd.PersistentFlags().GetBool("docker")
+		withoutElasticsearch, _ := cmd.PersistentFlags().GetBool("without-elasticsearch")
 
 		if _, err := os.Stat(projectFolder); err == nil {
 			return fmt.Errorf("the folder %s exists already", projectFolder)
@@ -125,61 +128,83 @@ var projectCreateCmd = &cobra.Command{
 
 		logging.FromContext(cmd.Context()).Infof("Setting up Shopware %s", chooseVersion)
 
-		composerJson, err := generateComposerJson(cmd.Context(), chooseVersion, strings.Contains(chooseVersion, "rc"))
+		composerJson, err := generateComposerJson(cmd.Context(), chooseVersion, strings.Contains(chooseVersion, "rc"), useDocker, withoutElasticsearch)
 		if err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(fmt.Sprintf("%s/composer.json", projectFolder), []byte(composerJson), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, "composer.json"), []byte(composerJson), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(fmt.Sprintf("%s/.env", projectFolder), []byte(""), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, ".env"), []byte(""), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(fmt.Sprintf("%s/.env.local", projectFolder), []byte(""), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, ".env.local"), []byte(""), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(fmt.Sprintf("%s/.gitignore", projectFolder), []byte("/.idea\n/vendor"), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, ".gitignore"), []byte("/.idea\n/vendor"), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.MkdirAll(fmt.Sprintf("%s/custom/plugins", projectFolder), os.ModePerm); err != nil {
+		if err := os.MkdirAll(filepath.Join(projectFolder, "custom", "plugins"), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.MkdirAll(fmt.Sprintf("%s/custom/static-plugins", projectFolder), os.ModePerm); err != nil {
+		if err := os.MkdirAll(filepath.Join(projectFolder, "custom", "static-plugins"), os.ModePerm); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(path.Join(projectFolder, "php.ini"), []byte("memory_limit=512M"), os.ModePerm); err != nil {
+		if err := os.WriteFile(filepath.Join(projectFolder, "php.ini"), []byte("memory_limit=512M"), os.ModePerm); err != nil {
 			return err
 		}
 
 		logging.FromContext(cmd.Context()).Infof("Installing dependencies")
 
-		composerBinary, err := exec.LookPath("composer")
-		if err != nil {
-			return err
-		}
-
 		var cmdInstall *exec.Cmd
-		phpBinary := os.Getenv("PHP_BINARY")
 
-		if phpBinary != "" {
-			cmdInstall = exec.Command(phpBinary, composerBinary, "install")
+		if useDocker {
+			// Use Docker to run composer
+			absProjectFolder, err := filepath.Abs(projectFolder)
+			if err != nil {
+				return err
+			}
+
+			dockerArgs := []string{"run", "--rm",
+				"-v", fmt.Sprintf("%s:/app", absProjectFolder),
+				"-w", "/app",
+				"ghcr.io/shopwarelabs/devcontainer/base-slim:8.3",
+				"composer", "install", "--no-interaction"}
+
+			cmdInstall = exec.CommandContext(cmd.Context(), "docker", dockerArgs...)
+			cmdInstall.Stdout = os.Stdout
+			cmdInstall.Stderr = os.Stderr
+
+			return cmdInstall.Run()
 		} else {
-			cmdInstall = exec.Command("composer", "install")
+			// Use local composer
+			composerBinary, err := exec.LookPath("composer")
+			if err != nil {
+				return err
+			}
+
+			phpBinary := os.Getenv("PHP_BINARY")
+
+			if phpBinary != "" {
+				cmdInstall = exec.CommandContext(cmd.Context(), phpBinary, composerBinary, "install")
+			} else {
+				cmdInstall = exec.CommandContext(cmd.Context(), "composer", "install")
+			}
+
+			cmdInstall.Dir = projectFolder
+			cmdInstall.Stdin = os.Stdin
+			cmdInstall.Stdout = os.Stdout
+			cmdInstall.Stderr = os.Stderr
+
+			return cmdInstall.Run()
 		}
-
-		cmdInstall.Dir = projectFolder
-		cmdInstall.Stdin = os.Stdin
-		cmdInstall.Stdout = os.Stdout
-		cmdInstall.Stderr = os.Stderr
-
-		return cmdInstall.Run()
 	},
 }
 
@@ -207,6 +232,8 @@ func getFilteredInstallVersions(ctx context.Context) ([]*version.Version, error)
 
 func init() {
 	projectRootCmd.AddCommand(projectCreateCmd)
+	projectCreateCmd.PersistentFlags().Bool("docker", false, "Use Docker to run Composer instead of local installation")
+	projectCreateCmd.PersistentFlags().Bool("without-elasticsearch", false, "Remove Elasticsearch from the installation")
 }
 
 func fetchAvailableShopwareVersions(ctx context.Context) ([]string, error) {
@@ -240,7 +267,7 @@ func fetchAvailableShopwareVersions(ctx context.Context) ([]string, error) {
 	return releases, nil
 }
 
-func generateComposerJson(ctx context.Context, version string, rc bool) (string, error) {
+func generateComposerJson(ctx context.Context, version string, rc bool, useDocker bool, withoutElasticsearch bool) (string, error) {
 	tplContent, err := template.New("composer.json").Parse(`{
     "name": "shopware/production",
     "license": "MIT",
@@ -249,8 +276,13 @@ func generateComposerJson(ctx context.Context, version string, rc bool) (string,
         "composer-runtime-api": "^2.0",
         "shopware/administration": "{{ .DependingVersions }}",
         "shopware/core": "{{ .Version }}",
+		{{if .UseElasticsearch}}
         "shopware/elasticsearch": "{{ .DependingVersions }}",
+		{{end}}
         "shopware/storefront": "{{ .DependingVersions }}",
+		{{if .UseDocker}}
+		"shopware/docker-dev": "*",
+		{{end}}
         "symfony/flex": "~2"
     },
     "repositories": [
@@ -339,6 +371,8 @@ func generateComposerJson(ctx context.Context, version string, rc bool) (string,
 		"Version":           version,
 		"DependingVersions": dependingVersions,
 		"RC":                rc,
+		"UseDocker":         useDocker,
+		"UseElasticsearch":  !withoutElasticsearch,
 	})
 	if err != nil {
 		return "", err
