@@ -243,7 +243,7 @@ func updateStoreInfo(ext *accountApi.Extension, zipExt extension.Extension, cfg 
 		if storeFaqs != nil {
 			var newFaq []accountApi.StoreFaq
 			for _, faq := range *storeFaqs {
-				newFaq = append(newFaq, accountApi.StoreFaq{Question: faq.Question, Answer: faq.Answer})
+				newFaq = append(newFaq, accountApi.StoreFaq{Question: faq.Question, Answer: faq.Answer, Position: faq.Position})
 			}
 
 			info.Faqs = newFaq

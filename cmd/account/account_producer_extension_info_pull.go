@@ -157,7 +157,7 @@ var accountCompanyProducerExtensionInfoPullCmd = &cobra.Command{
 				}
 
 				for _, element := range info.Faqs {
-					faqDE = append(faqDE, extension.ConfigStoreFaq{Question: element.Question, Answer: element.Answer})
+					faqDE = append(faqDE, extension.ConfigStoreFaq{Question: element.Question, Answer: element.Answer, Position: element.Position})
 				}
 			} else {
 				englishDescription = "file:src/Resources/store/description.en.html"
@@ -190,7 +190,7 @@ var accountCompanyProducerExtensionInfoPullCmd = &cobra.Command{
 				}
 
 				for _, element := range info.Faqs {
-					faqEN = append(faqEN, extension.ConfigStoreFaq{Question: element.Question, Answer: element.Answer})
+					faqEN = append(faqEN, extension.ConfigStoreFaq{Question: element.Question, Answer: element.Answer, Position: element.Position})
 				}
 			}
 		}

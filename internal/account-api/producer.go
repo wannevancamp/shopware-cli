@@ -466,6 +466,7 @@ type StoreProductType struct {
 type StoreFaq struct {
 	Question string `json:"question"`
 	Answer   string `json:"answer"`
+	Position int    `json:"position"`
 }
 
 type ExtensionGeneralInformation struct {

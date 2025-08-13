@@ -417,6 +417,9 @@
         },
         "answer": {
           "type": "string"
+        },
+        "position": {
+          "type": "integer"
         }
       },
       "additionalProperties": false,
@@ -530,7 +533,13 @@
       "type": "object",
       "description": "ConfigValidation is used to configure the extension validation."
     },
-    "ConfigValidationIgnoreItem": {
+    "ConfigValidationList": {
+      "items": {
+        "$ref": "#/$defs/ToolConfigIgnore"
+      },
+      "type": "array"
+    },
+    "ToolConfigIgnore": {
       "oneOf": [
         {
           "properties": {
@@ -549,12 +558,6 @@
           "type": "string"
         }
       ]
-    },
-    "ConfigValidationList": {
-      "items": {
-        "$ref": "#/$defs/ConfigValidationIgnoreItem"
-      },
-      "type": "array"
     }
   }
 }

@@ -137,6 +137,7 @@ type ConfigTranslated[T Translatable] struct {
 type ConfigStoreFaq struct {
 	Question string `yaml:"question"`
 	Answer   string `yaml:"answer"`
+	Position int    `yaml:"position"`
 }
 
 type ConfigStoreImage struct {
