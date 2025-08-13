@@ -31,6 +31,10 @@ func DoCheckReport(result Check, reportingFormat string) error {
 		return doJUnitReport(result)
 	}
 
+	if result.HasErrors() {
+		return fmt.Errorf("found errors")
+	}
+
 	return nil
 }
 
