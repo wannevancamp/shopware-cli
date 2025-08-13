@@ -12,6 +12,7 @@ import (
 	"github.com/shopware/shopware-cli/cmd/project"
 	accountApi "github.com/shopware/shopware-cli/internal/account-api"
 	"github.com/shopware/shopware-cli/internal/config"
+	"github.com/shopware/shopware-cli/internal/system"
 	"github.com/shopware/shopware-cli/logging"
 )
 
@@ -41,6 +42,10 @@ func init() {
 
 	cobra.OnInitialize(func() {
 		_ = config.InitConfig(cfgFile)
+	})
+
+	cobra.OnFinalize(func() {
+		_ = system.CloseCaches()
 	})
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.shopware-cli.yaml)")

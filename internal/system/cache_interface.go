@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"sync"
 )
 
 // ErrCacheNotFound is returned when a cache item cannot be found
@@ -45,4 +46,44 @@ type Cache interface {
 // CacheFactory creates cache instances based on the environment
 type CacheFactory interface {
 	CreateCache() Cache
+}
+
+// --- Global tracking of issued caches ---
+// We track all caches created through the factory helpers so that we can perform
+// a global cleanup (Close) at application shutdown. This is especially
+// important for remote caches (e.g. GitHub Actions cache) which might create
+// temporary files / directories which need to be removed.
+
+var (
+	trackedCachesMu sync.Mutex
+	trackedCaches   []Cache
+)
+
+// trackCache stores the cache instance for later global shutdown.
+func trackCache(c Cache) Cache {
+	if c == nil {
+		return c
+	}
+	trackedCachesMu.Lock()
+	trackedCaches = append(trackedCaches, c)
+	trackedCachesMu.Unlock()
+	return c
+}
+
+// CloseCaches closes all tracked caches collecting the first error if multiple occur.
+// It is safe to call multiple times; subsequent calls will no-op as the slice is cleared.
+func CloseCaches() error {
+	trackedCachesMu.Lock()
+	caches := trackedCaches
+	// reset slice so double call will not close twice
+	trackedCaches = nil
+	trackedCachesMu.Unlock()
+
+	var firstErr error
+	for _, c := range caches {
+		if err := c.Close(); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
 }

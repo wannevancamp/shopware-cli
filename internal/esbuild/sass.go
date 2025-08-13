@@ -28,9 +28,6 @@ func locateDartSass(ctx context.Context) (string, error) {
 
 	// Create cache instance for dart-sass
 	cache := system.GetCacheWithPrefix("dart-sass")
-	defer func() {
-		_ = cache.Close()
-	}()
 
 	cacheKey := "dart-sass-" + dartSassVersion + "-" + runtime.GOOS + "-" + runtime.GOARCH
 
