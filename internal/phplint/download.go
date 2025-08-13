@@ -17,9 +17,6 @@ func findPHPWasmFile(ctx context.Context, phpVersion string) ([]byte, error) {
 
 	// Create cache instance for PHP WASM files
 	cache := system.GetCacheWithPrefix("php-wasm")
-	defer func() {
-		_ = cache.Close()
-	}()
 
 	// Try to get from cache first
 	reader, err := cache.Get(ctx, cacheKey)

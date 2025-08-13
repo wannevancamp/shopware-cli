@@ -19,14 +19,14 @@ func (f *DefaultCacheFactory) CreateCache() Cache {
 	if isGitHubActions() {
 		// Try to create GitHub Actions cache
 		if cache, err := NewGitHubActionsCache("shopware-cli"); err == nil {
-			return cache
+			return trackCache(cache)
 		}
 		// Fall back to disk cache if GitHub Actions cache fails
 	}
 
 	// Default to disk cache
 	cacheDir := GetShopwareCliCacheDir()
-	return NewDiskCache(cacheDir)
+	return trackCache(NewDiskCache(cacheDir))
 }
 
 // CreateCacheWithPrefix creates a cache instance with a custom prefix/directory
@@ -35,14 +35,14 @@ func (f *DefaultCacheFactory) CreateCacheWithPrefix(prefix string) Cache {
 	if isGitHubActions() {
 		// Try to create GitHub Actions cache with custom prefix
 		if cache, err := NewGitHubActionsCache(prefix); err == nil {
-			return cache
+			return trackCache(cache)
 		}
 		// Fall back to disk cache if GitHub Actions cache fails
 	}
 
 	// Default to disk cache with custom subdirectory
 	cacheDir := filepath.Join(GetShopwareCliCacheDir(), prefix)
-	return NewDiskCache(cacheDir)
+	return trackCache(NewDiskCache(cacheDir))
 }
 
 // isGitHubActions detects if we're running in GitHub Actions environment
