@@ -115,7 +115,7 @@ var projectCI = &cobra.Command{
 			SkipExtensionsWithBuildFiles: true,
 			DisableStorefrontBuild:       shopCfg.Build.DisableStorefrontBuild,
 			ForceExtensionBuild:          convertForceExtensionBuild(shopCfg.Build.ForceExtensionBuild),
-			ContributeProject:            shopCfg.Build.ForceAdminBuild,
+			ForceAdminBuild:              shopCfg.Build.ForceAdminBuild,
 			KeepNodeModules:              shopCfg.Build.KeepNodeModules,
 		}
 
