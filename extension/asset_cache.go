@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 
 	"golang.org/x/sync/errgroup"
 
@@ -25,8 +26,8 @@ func restoreAssetCaches(ctx context.Context, sources ExtensionAssetConfig, asset
 
 	var errgrp errgroup.Group
 
-	for _, source := range sources {
-		if source.RequiresBuild() {
+	for name, source := range sources {
+		if source.RequiresBuild() && !slices.Contains(assetCfg.ForceExtensionBuild, name) {
 			errgrp.Go(func() error {
 				return restoreAssetCache(ctx, source, assetCfg)
 			})
@@ -43,8 +44,8 @@ func storeAssetCaches(ctx context.Context, sources ExtensionAssetConfig, assetCf
 
 	var errgrp errgroup.Group
 
-	for _, source := range sources {
-		if source.RequiresBuild() {
+	for name, source := range sources {
+		if source.RequiresBuild() && !slices.Contains(assetCfg.ForceExtensionBuild, name) {
 			errgrp.Go(func() error {
 				return storeAssetCache(ctx, source, assetCfg)
 			})
