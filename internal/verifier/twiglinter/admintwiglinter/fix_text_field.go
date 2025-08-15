@@ -22,7 +22,7 @@ func (t TextFieldFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-text-field" {
 			errs = append(errs, validation.CheckResult{
 				Message:    "sw-text-field is removed, use mt-text-field instead. Review conversion for props, events and label slot.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-text-field",
 				Line:       node.Line,
 			})

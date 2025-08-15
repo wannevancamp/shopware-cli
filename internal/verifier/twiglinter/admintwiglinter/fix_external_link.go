@@ -20,7 +20,7 @@ func (e ExternalLinkFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-external-link" {
 			checkErrors = append(checkErrors, validation.CheckResult{
 				Message:    "sw-external-link is removed, use mt-external-link instead and remove the icon property.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-external-link",
 				Line:       node.Line,
 			})

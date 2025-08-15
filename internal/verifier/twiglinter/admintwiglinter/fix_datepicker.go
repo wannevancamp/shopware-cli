@@ -22,7 +22,7 @@ func (d DatepickerFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-datepicker" {
 			checkErrors = append(checkErrors, validation.CheckResult{
 				Message:    "sw-datepicker is removed, use mt-datepicker instead. Please review the conversion for the label property.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-datepicker",
 				Line:       node.Line,
 			})

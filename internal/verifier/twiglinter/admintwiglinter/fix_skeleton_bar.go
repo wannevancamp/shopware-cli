@@ -20,7 +20,7 @@ func (s SkeletonBarFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-skeleton-bar" {
 			errors = append(errors, validation.CheckResult{
 				Message:    "sw-skeleton-bar is removed, use mt-skeleton-bar instead.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-skeleton-bar",
 				Line:       node.Line,
 			})

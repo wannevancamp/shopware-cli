@@ -22,7 +22,7 @@ func (e EmailFieldFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-email-field" {
 			errors = append(errors, validation.CheckResult{
 				Message:    "sw-email-field is removed, use mt-email-field instead. Review conversion for props, events and label slot.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-email-field",
 				Line:       node.Line,
 			})
