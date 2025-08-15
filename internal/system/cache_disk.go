@@ -106,6 +106,12 @@ func (c *DiskCache) StoreFolderCache(ctx context.Context, key string, folderPath
 	// Remove any existing cached folder
 	_ = os.RemoveAll(cacheFolderPath)
 
+	// Ensure parent directory exists for the final location
+	if err := os.MkdirAll(filepath.Dir(cacheFolderPath), 0755); err != nil {
+		_ = os.RemoveAll(tmpPath)
+		return fmt.Errorf("failed to create cache directory structure: %w", err)
+	}
+
 	// Atomically rename temporary folder to final location
 	if err := os.Rename(tmpPath, cacheFolderPath); err != nil {
 		_ = os.RemoveAll(tmpPath)
