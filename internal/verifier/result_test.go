@@ -43,7 +43,7 @@ func TestHasErrors(t *testing.T) {
 		{
 			name: "no errors",
 			results: []validation.CheckResult{
-				{Severity: "warning"},
+				{Severity: validation.SeverityWarning},
 				{Severity: "info"},
 			},
 			expected: false,
@@ -51,8 +51,8 @@ func TestHasErrors(t *testing.T) {
 		{
 			name: "has errors",
 			results: []validation.CheckResult{
-				{Severity: "warning"},
-				{Severity: "error"},
+				{Severity: validation.SeverityWarning},
+				{Severity: validation.SeverityError},
 				{Severity: "info"},
 			},
 			expected: true,
