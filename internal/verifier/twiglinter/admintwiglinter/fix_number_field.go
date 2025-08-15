@@ -22,7 +22,7 @@ func (n NumberFieldFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-number-field" {
 			errs = append(errs, validation.CheckResult{
 				Message:    "sw-number-field is removed, use mt-number-field instead. Please review conversion for props, events and label slot.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-number-field",
 				Line:       node.Line,
 			})

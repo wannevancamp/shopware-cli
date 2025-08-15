@@ -22,7 +22,7 @@ func (p PasswordFieldFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-password-field" {
 			checkErrors = append(checkErrors, validation.CheckResult{
 				Message:    "sw-password-field is removed, use mt-password-field instead. Please review conversion for label/hint properties.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-password-field",
 				Line:       node.Line,
 			})

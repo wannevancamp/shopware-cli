@@ -20,7 +20,7 @@ func (p ProgressBarFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-progress-bar" {
 			errors = append(errors, validation.CheckResult{
 				Message:    "sw-progress-bar is removed, use mt-progress-bar instead.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-progress-bar",
 				Line:       node.Line,
 			})

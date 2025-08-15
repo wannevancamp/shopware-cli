@@ -22,7 +22,7 @@ func (s SwitchFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-switch-field" {
 			errs = append(errs, validation.CheckResult{
 				Message:    "sw-switch-field is removed, use mt-switch instead. Review conversion for props, events and slots.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-switch-field",
 				Line:       node.Line,
 			})

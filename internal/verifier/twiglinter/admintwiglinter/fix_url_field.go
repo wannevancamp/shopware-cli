@@ -22,7 +22,7 @@ func (u UrlFieldFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-url-field" {
 			errors = append(errors, validation.CheckResult{
 				Message:    "sw-url-field is removed, use mt-url-field instead. Review conversion for props, events, label and hint slot.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-url-field",
 				Line:       node.Line,
 			})

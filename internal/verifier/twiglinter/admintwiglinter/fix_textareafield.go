@@ -22,7 +22,7 @@ func (t TextareaFieldFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-textarea-field" {
 			checkErrors = append(checkErrors, validation.CheckResult{
 				Message:    "sw-textarea-field is removed, use mt-textarea instead. Please manually review the new API differences.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-textarea-field",
 				Line:       node.Line,
 			})

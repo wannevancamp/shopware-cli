@@ -78,10 +78,6 @@ func (s StyleLint) Check(ctx context.Context, check *Check, config ToolConfig) e
 				fixedPath := strings.TrimPrefix(strings.TrimPrefix(diagnostic.Source, "/private"), config.RootDir+"/")
 
 				for _, msg := range diagnostic.Warnings {
-					if msg.Severity == "warning" {
-						msg.Severity = "warn"
-					}
-
 					check.AddResult(validation.CheckResult{
 						Path:       fixedPath,
 						Line:       msg.Line,
@@ -92,10 +88,6 @@ func (s StyleLint) Check(ctx context.Context, check *Check, config ToolConfig) e
 				}
 
 				for _, msg := range diagnostic.Deprecations {
-					if msg.Severity == "warning" {
-						msg.Severity = "warn"
-					}
-
 					check.AddResult(validation.CheckResult{
 						Path:       fixedPath,
 						Line:       msg.Line,

@@ -23,7 +23,7 @@ func (s SelectFieldFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-select-field" {
 			errs = append(errs, validation.CheckResult{
 				Message:    "sw-select-field is removed, use mt-select instead. Review conversion for props, slots and events.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-select-field",
 				Line:       node.Line,
 			})

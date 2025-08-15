@@ -20,7 +20,7 @@ func (a AlertFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-alert" {
 			errors = append(errors, validation.CheckResult{
 				Message:    "sw-alert is removed, use mt-banner instead. Please review conversion for variant changes.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-alert",
 				Line:       node.Line,
 			})

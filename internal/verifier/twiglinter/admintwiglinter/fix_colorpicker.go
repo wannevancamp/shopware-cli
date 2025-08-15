@@ -22,7 +22,7 @@ func (c ColorpickerFixer) Check(nodes []html.Node) []validation.CheckResult {
 		if node.Tag == "sw-colorpicker" {
 			checkErrors = append(checkErrors, validation.CheckResult{
 				Message:    "sw-colorpicker is removed, use mt-colorpicker instead. Please review conversion for label property.",
-				Severity:   "warn",
+				Severity:   validation.SeverityWarning,
 				Identifier: "sw-colorpicker",
 				Line:       node.Line,
 			})
