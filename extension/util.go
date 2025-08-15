@@ -19,9 +19,15 @@ func PlatformPath(projectRoot, component, path string) string {
 	return filepath.Join(projectRoot, "vendor", "shopware", strings.ToLower(component), path)
 }
 
-// IsContributeProject checks if the project is a contribution project aka shopware/shopware.
-func IsContributeProject(projectRoot string) bool {
+// projectRequiresBuild checks if the project is a contribution project aka shopware/shopware.
+func projectRequiresBuild(projectRoot string) bool {
+	// We work inside Shopware itself
 	if _, err := os.Stat(filepath.Join(projectRoot, "src", "Core", "composer.json")); err == nil {
+		return true
+	}
+
+	// vendor/shopware/platform does never have assets pre-build
+	if _, err := os.Stat(filepath.Join(projectRoot, "vendor", "shopware", "platform", "composer.json")); err == nil {
 		return true
 	}
 

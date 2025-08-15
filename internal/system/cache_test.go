@@ -243,6 +243,41 @@ func TestDiskCacheFolderOperations(t *testing.T) {
 	assert.ErrorIs(t, err, ErrCacheNotFound)
 }
 
+func TestDiskCacheStoreFolderCreatesParentDirectory(t *testing.T) {
+	// Create temporary directory for testing
+	tmpDir := t.TempDir()
+
+	// Create a source directory with some content
+	sourceDir := t.TempDir()
+	err := os.WriteFile(filepath.Join(sourceDir, "test.txt"), []byte("test content"), 0644)
+	require.NoError(t, err)
+
+	// Create a cache instance with a nested path to ensure parent directories need to be created
+	cache := NewDiskCache(tmpDir)
+	ctx := context.Background()
+	cacheKey := "test-folder-with-long-key-that-creates-nested-structure"
+
+	// Store the folder cache - this should create the necessary parent directory structure
+	err = cache.StoreFolderCache(ctx, cacheKey, sourceDir)
+	require.NoError(t, err)
+
+	// Verify the cached folder exists and has correct content
+	cachedFolderPath, err := cache.GetFolderCachePath(ctx, cacheKey)
+	require.NoError(t, err)
+	require.NotEmpty(t, cachedFolderPath)
+
+	// Check that the file exists in the cached folder
+	cachedFile := filepath.Join(cachedFolderPath, "test.txt")
+	cachedContent, err := os.ReadFile(cachedFile)
+	require.NoError(t, err)
+	assert.Equal(t, "test content", string(cachedContent))
+
+	// Verify the parent directory structure was created
+	parentDir := filepath.Dir(cachedFolderPath)
+	_, err = os.Stat(parentDir)
+	require.NoError(t, err, "Parent directory should exist")
+}
+
 func TestGitHubActionsCacheSymlinksAndPermissions(t *testing.T) {
 	// This test would only work in GitHub Actions, but we can test the tar creation logic
 	sourceDir := t.TempDir()

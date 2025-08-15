@@ -41,8 +41,8 @@ type AssetBuildConfig struct {
 	Browserslist                 string
 	SkipExtensionsWithBuildFiles bool
 	NPMForceInstall              bool
-	ContributeProject            bool
 	ForceExtensionBuild          []string
+	ForceAdminBuild              bool
 	KeepNodeModules              []string
 }
 
