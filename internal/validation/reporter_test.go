@@ -130,6 +130,29 @@ func TestMarkdownReportIsDeterministic(t *testing.T) {
 	}
 }
 
+func TestErrorExistsSummary(t *testing.T) {
+	testResults := []CheckResult{
+		{
+			Path:       "z_file.go",
+			Line:       5,
+			Identifier: "test.rule2",
+			Message:    "Second message",
+			Severity:   SeverityError,
+		},
+		{
+			Path:       "a_file.go",
+			Line:       10,
+			Identifier: "test.rule1",
+			Message:    "First message",
+			Severity:   SeverityWarning,
+		},
+	}
+
+	check := &testCheck{Results: testResults}
+
+	assert.Error(t, DoCheckReport(check, "summary"))
+}
+
 // testCheck is a simple implementation of Check interface for testing
 type testCheck struct {
 	Results []CheckResult
