@@ -15,7 +15,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout Repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # ratchet:actions/checkout@v4
 
       - name: Set up Go
         uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # ratchet:actions/setup-go@v5
@@ -25,7 +25,7 @@ jobs:
           check-latest: true
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@ccf2c627fe61b1b4d924adfcbd19d661a18133a0 # ratchet:shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@20529878ed81ef8e78ddf08b480401e6101a850f # ratchet:shivammathur/setup-php@v2
         with:
           php-version: '8.2'
 
@@ -36,7 +36,7 @@ jobs:
         run: mv shopware-cli /usr/local/bin/
 
       - name: Checkout Plugin
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # ratchet:actions/checkout@v4
         with:
           repository: 'FriendsOfShopware/FroshTools'
           ref: '75e2013752fd4db7535e4b72b3e3e8d57e531002'
