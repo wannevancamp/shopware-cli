@@ -43,6 +43,7 @@ dockers:
     goarch: amd64
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.4-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.4-amd64"
     build_flag_templates:
       - "--build-arg=PHP_VERSION=8.4"
       - "--platform=linux/amd64"
@@ -51,6 +52,7 @@ dockers:
     goarch: amd64
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
     build_flag_templates:
       - "--build-arg=PHP_VERSION=8.3"
       - "--platform=linux/amd64"
@@ -59,6 +61,7 @@ dockers:
     goarch: amd64
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.2-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.2-amd64"
     build_flag_templates:
       - "--build-arg=PHP_VERSION=8.2"
       - "--platform=linux/amd64"
@@ -67,6 +70,7 @@ dockers:
     goarch: amd64
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.1-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.1-amd64"
     build_flag_templates:
       - "--build-arg=PHP_VERSION=8.1"
       - "--platform=linux/amd64"
@@ -77,6 +81,7 @@ dockers:
     goarch: arm64
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.4-arm64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.4-arm64"
     build_flag_templates:
       - "--build-arg=PHP_VERSION=8.4"
       - "--platform=linux/arm64"
@@ -85,6 +90,7 @@ dockers:
     goarch: arm64
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
     build_flag_templates:
       - "--build-arg=PHP_VERSION=8.3"
       - "--platform=linux/arm64"
@@ -93,6 +99,7 @@ dockers:
     goarch: arm64
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.2-arm64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.2-arm64"
     build_flag_templates:
       - "--build-arg=PHP_VERSION=8.2"
       - "--platform=linux/arm64"
@@ -101,6 +108,7 @@ dockers:
     goarch: arm64
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.1-arm64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.1-arm64"
     build_flag_templates:
       - "--build-arg=PHP_VERSION=8.1"
       - "--platform=linux/arm64"
@@ -111,6 +119,7 @@ dockers:
     dockerfile: Dockerfile.bin
     image_templates:
       - "shopware/shopware-cli:bin-{{ .Tag }}-amd64"
+      - "ghcr.io/shopware/shopware-cli:bin-{{ .Tag }}-amd64"
     build_flag_templates:
       - "--platform=linux/amd64"
 
@@ -120,6 +129,7 @@ dockers:
     dockerfile: Dockerfile.bin
     image_templates:
       - "shopware/shopware-cli:bin-{{ .Tag }}-arm64"
+      - "ghcr.io/shopware/shopware-cli:bin-{{ .Tag }}-arm64"
     build_flag_templates:
       - "--platform=linux/arm64"
 
@@ -130,60 +140,120 @@ docker_manifests:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
 
+  - name_template: ghcr.io/shopware/shopware-cli:latest
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
+
   - name_template: shopware/shopware-cli:latest-php-8.4
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.4-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.4-arm64"
+
+  - name_template: ghcr.io/shopware/shopware-cli:latest-php-8.4
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.4-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.4-arm64"
 
   - name_template: shopware/shopware-cli:latest-php-8.3
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
 
+  - name_template: ghcr.io/shopware/shopware-cli:latest-php-8.3
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
+
   - name_template: shopware/shopware-cli:latest-php-8.2
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.2-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.2-arm64"
+
+  - name_template: ghcr.io/shopware/shopware-cli:latest-php-8.2
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.2-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.2-arm64"
 
   - name_template: shopware/shopware-cli:latest-php-8.1
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.1-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.1-arm64"
 
+  - name_template: ghcr.io/shopware/shopware-cli:latest-php-8.1
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.1-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.1-arm64"
+
   - name_template: shopware/shopware-cli:{{ .Tag }}
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
 
+  - name_template: ghcr.io/shopware/shopware-cli:{{ .Tag }}
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
+
   - name_template: shopware/shopware-cli:{{ .Tag }}-php-8.4
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.4-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.4-arm64"
+
+  - name_template: ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.4
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.4-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.4-arm64"
   
   - name_template: shopware/shopware-cli:{{ .Tag }}-php-8.3
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
 
+  - name_template: ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.3-arm64"
+
   - name_template: shopware/shopware-cli:{{ .Tag }}-php-8.2
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.2-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.2-arm64"
+
+  - name_template: ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.2
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.2-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.2-arm64"
 
   - name_template: shopware/shopware-cli:{{ .Tag }}-php-8.1
     image_templates:
       - "shopware/shopware-cli:{{ .Tag }}-php-8.1-amd64"
       - "shopware/shopware-cli:{{ .Tag }}-php-8.1-arm64"
 
+  - name_template: ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.1
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.1-amd64"
+      - "ghcr.io/shopware/shopware-cli:{{ .Tag }}-php-8.1-arm64"
+
   - name_template: shopware/shopware-cli:bin-{{ .Tag }}
     image_templates:
       - "shopware/shopware-cli:bin-{{ .Tag }}-amd64"
       - "shopware/shopware-cli:bin-{{ .Tag }}-arm64"
 
+  - name_template: ghcr.io/shopware/shopware-cli:bin-{{ .Tag }}
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:bin-{{ .Tag }}-amd64"
+      - "ghcr.io/shopware/shopware-cli:bin-{{ .Tag }}-arm64"
+
   - name_template: shopware/shopware-cli:bin
     image_templates:
       - "shopware/shopware-cli:bin-{{ .Tag }}-amd64"
       - "shopware/shopware-cli:bin-{{ .Tag }}-arm64"
+
+  - name_template: ghcr.io/shopware/shopware-cli:bin
+    image_templates:
+      - "ghcr.io/shopware/shopware-cli:bin-{{ .Tag }}-amd64"
+      - "ghcr.io/shopware/shopware-cli:bin-{{ .Tag }}-arm64"
 
 sboms:
   - artifacts: archive
