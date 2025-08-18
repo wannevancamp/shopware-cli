@@ -20,15 +20,25 @@ func DetectDefaultReporter() string {
 func DoCheckReport(result Check, reportingFormat string) error {
 	switch reportingFormat {
 	case "summary":
-		return doSummaryReport(result)
+		if err := doSummaryReport(result); err != nil {
+			return err
+		}
 	case "json":
-		return doJSONReport(result)
+		if err := doJSONReport(result); err != nil {
+			return err
+		}
 	case "github":
-		return doGitHubReport(result)
+		if err := doGitHubReport(result); err != nil {
+			return err
+		}
 	case "markdown":
-		return doMarkdownReport(result)
+		if err := doMarkdownReport(result); err != nil {
+			return err
+		}
 	case "junit":
-		return doJUnitReport(result)
+		if err := doJUnitReport(result); err != nil {
+			return err
+		}
 	}
 
 	if result.HasErrors() {
