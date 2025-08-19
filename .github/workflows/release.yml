@@ -23,7 +23,7 @@ jobs:
           egress-policy: audit
 
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # ratchet:actions/checkout@v4
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # ratchet:actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -50,7 +50,7 @@ jobs:
         uses: sigstore/cosign-installer@d58896d6a1865668819e1d91763c7751a165e159 # ratchet:sigstore/cosign-installer@v3
 
       - name: Install Syft
-        uses: anchore/sbom-action/download-syft@7b36ad622f042cab6f59a75c2ac24ccb256e9b45 # ratchet:anchore/sbom-action/download-syft@v0.20.4
+        uses: anchore/sbom-action/download-syft@da167eac915b4e86f08b264dbdbc867b61be6f0c # ratchet:anchore/sbom-action/download-syft@v0.20.5
 
       - name: Gather Frosh Homebrew Token
         uses: octo-sts/action@6177b4481c00308b3839969c3eca88c96a91775f # ratchet:octo-sts/action@v1.0.0
@@ -80,7 +80,7 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552 # ratchet:goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # ratchet:goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser-pro
           version: '~> v2'
